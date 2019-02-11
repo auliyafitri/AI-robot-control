@@ -1,0 +1,739 @@
+<robot name="pickbot">
+
+
+<!-- PLUGIN -->
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/pickbot</robotNamespace>
+        </plugin>
+    </gazebo>
+
+
+
+<!-- LINKS JOINTS SPRINGDAMPERS -->
+    <link name="world" />
+
+    <joint name="world_joint" type="fixed">
+      <parent link="world" />
+      <child link = "base_link" />
+      <origin xyz="0.0 0.0 1.12" rpy="0.0 0.0 0.0" />
+    </joint>
+
+
+
+
+    <link name="base_link">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="4" />
+            <inertia ixx="0.0061063309" ixy="0.0" ixz="0.0" iyy="0.0061063309" iyz="0.0" izz="0.01125"/>
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+          		<mesh filename="package://pickbot_simulation/meshes/ur10/collision/base.stl"/>
+            </geometry>
+        </collision>
+	    <visual>
+	      <geometry>
+	        <mesh filename="package://pickbot_simulation/meshes/ur10//visual/base.dae"/>
+	      </geometry>
+	        <material name="LightGrey">
+	          <color rgba="0.7 0.7 0.7 1.0"/>
+	        </material>
+	    </visual>
+    </link>
+
+    <link name="shoulder_link">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="7.778" />
+            <inertia ixx="0.0314743126" ixy="0.0" ixz="0.0" iyy="0.0314743126" iyz="0.0" izz="0.021875625"/>
+        </inertial>
+        <collision>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+	      <geometry>
+	        <mesh filename="package://pickbot_simulation/meshes/ur10/collision/shoulder.stl"/>
+	      </geometry>
+        </collision>
+	    <visual>
+	      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+	      <geometry>
+	        <mesh filename="package://pickbot_simulation/meshes/ur10/visual/shoulder.dae"/>
+	      </geometry>
+            <material name="LightGrey">
+              <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+	    </visual>
+    </link>
+
+    <joint name="shoulder_pan_joint" type="revolute">
+        <origin xyz="0.0 0.0 0.1273" rpy="0.0 0.0 0.0"/>
+        <parent link="base_link"/>
+        <child  link="shoulder_link"/>
+        <limit effort="330" lower="-3.14159265" upper="3.14159265" velocity="2.16"/>
+        <axis xyz="0 0 1"/>
+        <dynamics damping="20.0" friction="20.0"/>
+    </joint>
+<!--
+    <gazebo reference="shoulder_pan_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+    </gazebo>
+-->
+
+
+
+    <link name="upper_arm_link">
+        <inertial>
+            <origin xyz="0 0 0.306" rpy="0 0 0"/>
+            <mass value="12.93" />
+            <inertia ixx="0.4217538038" ixy="0.0" ixz="0.0" iyy="0.4217538038" iyz="0.0" izz="0.036365625"/>
+        </inertial>
+        <collision>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/collision/upperarm.stl"/>
+          </geometry>
+        </collision>
+        <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/visual/upperarm.dae"/>
+          </geometry>
+            <material name="LightGrey">
+              <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+        </visual>
+    </link>
+
+    <joint name="shoulder_lift_joint" type="revolute">
+        <origin xyz="0.0 0.220941 0.0" rpy="0.0 1.570796325 0.0"/>
+        <parent link="shoulder_link"/>
+        <child  link="upper_arm_link"/>
+        <limit effort="330" lower="-3.14159265" upper="3.14159265" velocity="2.16"/>
+        <axis xyz="0 1 0"/>
+        <dynamics damping="20.0" friction="0.0"/>
+    </joint>
+<!--
+    <gazebo reference="shoulder_lift_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+    </gazebo>
+-->
+
+
+
+
+    <link name="forearm_link">
+        <inertial>
+            <origin xyz="0 0 0.28615" rpy="0 0 0"/>
+            <mass value="3.87" />
+            <inertia ixx="0.1110696941" ixy="0.0" ixz="0.0" iyy="0.1110696941" iyz="0.0" izz="0.010884375"/>
+        </inertial>
+        <collision>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/collision/forearm.stl"/>
+          </geometry>
+        </collision>
+        <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/visual/forearm.dae"/>
+          </geometry>
+            <material name="LightGrey">
+              <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+        </visual>
+    </link>
+
+
+    <joint name="elbow_joint" type="revolute">
+        <origin xyz="0.0 -0.1719 0.612" rpy="0.0 0.0 0.0"/>
+        <parent link="upper_arm_link"/>
+        <child  link="forearm_link"/>
+        <limit effort="150" lower="-3.14159265" upper="3.14159265" velocity="3.15"/>
+        <axis xyz="0 1 0"/>
+        <dynamics damping="20.0" friction="0.0"/>
+    </joint>
+<!--
+    <gazebo reference="elbow_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+    </gazebo>
+-->
+
+
+
+
+    <link name="wrist_1_link">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1.96" />
+            <inertia ixx="0.005108248" ixy="0.0" ixz="0.0" iyy="0.005108248" iyz="0.0" izz="0.0055125"/>
+        </inertial>
+        <collision>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/collision/wrist1.stl"/>
+          </geometry>
+        </collision>
+        <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/visual/wrist1.dae"/>
+          </geometry>
+            <material name="LightGrey">
+              <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+        </visual>
+    </link>
+
+    <joint name="wrist_1_joint" type="revolute">
+        <origin xyz="0.0 0.0 0.5723" rpy="0.0 1.570796325 0.0"/>
+        <parent link="forearm_link"/>
+        <child  link="wrist_1_link"/>
+        <limit effort="54" lower="-3.14159265" upper="3.14159265" velocity="3.2"/>
+        <axis xyz="0 1 0"/>
+        <dynamics damping="1.0" friction="0.0"/>
+    </joint>
+<!--
+    <gazebo reference="wrist_1_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+    </gazebo>
+-->
+
+
+
+
+    <link name="wrist_2_link">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1.96" />
+            <inertia ixx="0.005108248" ixy="0.0" ixz="0.0" iyy="0.005108248" iyz="0.0" izz="0.0055125"/>
+        </inertial>
+        <collision>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/collision/wrist2.stl"/>
+          </geometry>
+        </collision>
+        <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/visual/wrist2.dae"/>
+          </geometry>
+            <material name="LightGrey">
+              <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+        </visual>
+    </link>
+
+    <joint name="wrist_2_joint" type="revolute">
+        <origin xyz="0.0 0.1149 0.0" rpy="0.0 0.0 0.0"/>
+        <parent link="wrist_1_link"/>
+        <child  link="wrist_2_link"/>
+        <limit effort="54" lower="-3.14159265" upper="3.14159265" velocity="3.2"/>
+        <axis xyz="0 0 1"/>
+        <dynamics damping="1.0" friction="0.0"/>
+    </joint>
+<!--
+    <gazebo reference="wrist_2_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+    </gazebo>
+-->
+
+
+
+
+    <link name="wrist_3_link">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="0.202" />
+            <inertia ixx="0.0005264623" ixy="0.0" ixz="0.0" iyy="0.0005264623" iyz="0.0" izz="0.000568125"/>
+        </inertial>
+        <collision>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/collision/wrist3.stl"/>
+          </geometry>
+        </collision>
+        <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/visual/wrist3.dae"/>
+          </geometry>
+            <material name="LightGrey">
+              <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+        </visual>
+    </link>
+
+    <joint name="wrist_3_joint" type="revolute">
+        <origin xyz="0.0 0.0 0.1157" rpy="0.0 0.0 0.0"/>
+        <parent link="wrist_2_link"/>
+        <child  link="wrist_3_link"/>
+        <limit effort="54" lower="-3.14159265" upper="3.14159265" velocity="3.2"/>
+        <axis xyz="0 1 0"/>
+        <dynamics damping="0.5" friction="0.0"/>
+    </joint>
+
+
+    <gazebo reference="wrist_3_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+    </gazebo>
+
+
+
+
+
+<!-- GRIPPER MESH AS EE LINK-->
+
+    <link name="ee_link">
+        <collision>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/collision/Pickbot_Gripper.stl" scale="0.001 0.001 0.001"/>
+          </geometry>
+        </collision>
+        <visual>
+          <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+          <geometry>
+            <mesh filename="package://pickbot_simulation/meshes/ur10/visual/Pickbot_Gripper.dae" scale="0.001 0.001 0.001"/>
+          </geometry>
+            <material name="LightGrey">
+              <color rgba="0.8 0.1 0.3 1.0"/>
+            </material>
+        </visual>
+    </link>
+
+    <joint name="ee_fixed_joint" type="fixed">
+        <origin xyz="-0.109 0.0652 -0.099" rpy="1.570796325 -1.570796325 0.0"/>
+        <parent link="wrist_3_link"/>
+        <child  link="ee_link"/>
+    </joint>
+
+
+
+
+
+
+<!-- KAMERA SENSOR LINK JOINT PLUGIN-->
+    <joint name="camera_joint" type="fixed">
+      <origin xyz="1 0.8 2.0" rpy="0.0 0.7853981625 3.14159265"/>
+      <parent link="world"/>
+      <child link="camera_link"/>
+    </joint>
+
+   <link name="camera_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.025 0.025 0.025"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.025 0.025 0.025"/>
+        </geometry>
+        <material name="red"/>
+      </visual>
+      <inertial>
+        <mass value="1e-5" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <gazebo reference="camera_link">
+      <sensor type="camera" name="camera_rgb">
+        <update_rate>30.0</update_rate>
+        <camera name="head">
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image>
+            <width>800</width>
+            <height>800</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <!-- Noise is sampled independently per pixel on each frame.
+                 That pixel's noise value is added to each of its color
+                 channels, which at that point lie in the range [0,1]. -->
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>camera_rgb</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>camera_link_optical</frameName>
+          <!-- setting hackBaseline to anything but 0.0 will cause a misalignment
+              between the gazebo sensor image and the frame it is supposed to
+              be attached to -->
+          <hackBaseline>0.0</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+          <CxPrime>0</CxPrime>
+          <Cx>0.0</Cx>
+          <Cy>0.0</Cy>
+          <focalLength>0.0</focalLength>
+        </plugin>
+      </sensor>
+      <sensor name="camera_depth" type="depth">
+          <update_rate>20</update_rate>
+          <camera>
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+              <width>800</width>
+              <height>800</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.001</near>
+              <far>2</far>
+            </clip>
+          </camera>
+          <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
+            <baseline>0.2</baseline>
+            <alwaysOn>true</alwaysOn>
+            <!-- Keep this zero, update_rate in the parent <sensor> tag
+              will control the frame rate. -->
+            <updateRate>0.0</updateRate>
+            <cameraName>camera_depth</cameraName>
+            <imageTopicName>image_raw</imageTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <depthImageTopicName>depth/image_raw</depthImageTopicName>
+            <depthImageInfoTopicName>/camera_depth/camera_info</depthImageInfoTopicName>
+            <pointCloudTopicName>/camera_depth/points</pointCloudTopicName>
+            <frameName>pickbot/camera_link</frameName>
+            <pointCloudCutoff>0.05</pointCloudCutoff>
+            <distortionK1>0</distortionK1>
+            <distortionK2>0</distortionK2>
+            <distortionK3>0</distortionK3>
+            <distortionT1>0</distortionT1>
+            <distortionT2>0</distortionT2>
+            <CxPrime>0</CxPrime>
+            <Cx>0</Cx>
+            <Cy>0</Cy>
+            <focalLength>0</focalLength>
+            <hackBaseline>0</hackBaseline>
+          </plugin>
+        </sensor>
+    </gazebo>
+
+
+
+
+
+<!-- COLLISION/BUMPER SENSOR 1 LINK JOINT PLUGIN-->
+    <link name="gripper_contactsensor_link_1">
+      <inertial >
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="0.0001" />
+            <inertia ixx="1.6e-08" ixy="0.0" ixz="0.0" iyy="1.6e-08" iyz="0.0" izz="1.6e-08"/>
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.02 0.02 0.0001"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <box size="0.02 0.02 0.0001"/>
+            </geometry>
+            <material name="red">
+              <color rgba="1.0 0 0 1.0"/>
+          </material>
+        </visual>
+    </link>
+
+    <gazebo reference="gripper_contactsensor_link_1">
+        <kp>1000.0</kp>
+        <kd>1000.0</kd>
+        <mu1>100000000000000000.0</mu1>
+        <mu2>100000000000000000.0</mu2>
+        <material>Gazebo/Red</material>
+    </gazebo>
+
+    <joint name="gripper_contactsensor_link_1_joint" type="fixed">
+        <parent link="wrist_3_link"/>
+        <child link="gripper_contactsensor_link_1"/>
+        <origin xyz="-0.019 0.296 0.0" rpy="1.570796325 0 0"/>
+    </joint>
+
+    <gazebo reference="gripper_contactsensor_link_1">
+        <sensor name="gripper_contactsensor_sensor_1" type="contact">
+          <always_on>true</always_on>
+          <!--<update_rate>30</update_rate>-->
+          <contact>
+            <collision>wrist_3_link_fixed_joint_lump__gripper_contactsensor_link_1_collision_2</collision>
+          </contact>
+          <plugin name="bumper0_plugin" filename="libgazebo_ros_bumper.so">
+            <bumperTopicName>gripper_contactsensor_1_state</bumperTopicName>
+            <frameName>gripper_contactsensor_link_1</frameName>
+          </plugin>
+        </sensor>
+    </gazebo>
+
+
+<!-- COLLISION/BUMPER SENSOR 2 LINK JOINT PLUGIN-->
+    <link name="gripper_contactsensor_link_2">
+      <inertial >
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="0.0001" />
+            <inertia ixx="1.6e-08" ixy="0.0" ixz="0.0" iyy="1.6e-08" iyz="0.0" izz="1.6e-08"/>
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.02 0.02 0.0001"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <box size="0.02 0.02 0.0001"/>
+            </geometry>
+            <material name="red">
+              <color rgba="1.0 0 0 1.0"/>
+          </material>
+        </visual>
+    </link>
+
+    <gazebo reference="gripper_contactsensor_link_2">
+        <kp>1000.0</kp>
+        <kd>1000.0</kd>
+        <mu1>100000000000000000.0</mu1>
+        <mu2>100000000000000000.0</mu2>
+        <material>Gazebo/Red</material>
+    </gazebo>
+
+    <joint name="gripper_contactsensor_link_2_joint" type="fixed">
+        <parent link="wrist_3_link"/>
+        <child link="gripper_contactsensor_link_2"/>
+        <origin xyz="0.019 0.296 0.0" rpy="1.570796325 0 0"/>
+    </joint>
+
+    <gazebo reference="gripper_contactsensor_link_2">
+        <sensor name="gripper_contactsensor_sensor_2" type="contact">
+          <always_on>true</always_on>
+          <!--<update_rate>30</update_rate>-->
+          <contact>
+            <collision>wrist_3_link_fixed_joint_lump__gripper_contactsensor_link_2_collision_3</collision>
+          </contact>
+          <plugin name="bumper0_plugin" filename="libgazebo_ros_bumper.so">
+            <bumperTopicName>gripper_contactsensor_2_state</bumperTopicName>
+            <frameName>gripper_contactsensor_link_2</frameName>
+          </plugin>
+        </sensor>
+    </gazebo>
+
+
+
+
+
+<!-- GRIPPER -->
+
+    <link name="vacuum_gripper_link">
+      <inertial>
+        <origin xyz="0 0.0025 0" rpy="0 0 1.57"/>
+        <inertia ixx="0.0000063" ixy="0" ixz="0"
+                  iyy="0.0000063" iyz="0"
+                  izz="0.000025" />
+        <mass value="0.01" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0.0025 0" rpy="0 0 1.57"/>
+        <geometry>
+          <box size="0.005 0.005 0.0001"/>
+          <!--cylinder radius="0.05" length="0.01"/-->
+        </geometry>
+        <material name="SomeColor">
+          <color rgba="1.0 0.0 0.0 1.0"/>
+        </material>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0.0025 0" rpy="0 0 1.57"/>
+        <geometry>
+          <box size="0.005 0.005 0.0001"/>
+          <!--cylinder radius="0.05" length="0.01"/-->
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="vacuum_gripper_joint" type="revolute">
+      <!--<origin xyz="-0.0031 0.3368 -0.005" rpy="0.0 0.0 0.0" /> -->
+      <origin xyz="0 0.296 0" rpy="1.570797 0.0 0.0" />
+      <axis xyz="0 0 1" />
+      <limit lower="0" upper="0" effort="0" velocity="0" />
+      <parent link="wrist_3_link" />
+      <child link="vacuum_gripper_link" />
+
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+
+    <gazebo reference="vacuum_gripper_link">
+      <material>Gazebo/Black</material>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="ros_vacuum_gripper" filename="libROSVacuumGripperPlugin.so">
+        <grasp_check>
+          <detach_steps>40</detach_steps>
+          <attach_steps>1</attach_steps>
+          <min_contact_count>1</min_contact_count>
+        </grasp_check>
+
+        <xacro:insert_block name="drops_info" />
+
+        <suction_cup_link>vacuum_gripper_link</suction_cup_link>
+
+        <!-- ROS -->
+        <robot_namespace>/pickbot</robot_namespace>
+        <control_topic>gripper/control</control_topic>
+        <state_topic>gripper/state</state_topic>
+      </plugin>
+    </gazebo>
+
+
+
+    @[if arm]@
+
+        <drops_info>
+    @[if drops]@
+          <drops>
+            <drop_regions>
+    @[for drop_region in drops['drop_regions']]@
+              <drop_region>
+                <min>@(' '.join(drop_region.min))</min>
+                <max>@(' '.join(drop_region.max))</max>
+                <destination>@(' '.join(drop_region.destination.xyz)) @(' '.join(drop_region.destination.rpy))</destination>
+                <type>@(drop_region.type)</type>
+              </drop_region>
+    @[end for]@
+            </drop_regions>
+          </drops>
+    @[end if]@
+        </drops_info>
+    @[end if]@
+
+
+
+
+
+
+<!-- SELFCOLLIDE-->
+
+    <gazebo reference="base_link">
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="shoulder_link">
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="upper_arm_link">
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="forearm_link">
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="wrist_1_link">
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="wrist_2_link">
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="wrist_3_link">
+      <selfCollide>true</selfCollide>
+    </gazebo>
+    <gazebo reference="ee_link">
+      <selfCollide>true</selfCollide>
+    </gazebo>
+
+
+
+
+<!-- TRANSMISSIONS -->
+
+    <transmission name="shoulder_pan_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="shoulder_pan_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="shoulder_pan_jointMotor">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+
+    <transmission name="shoulder_lift_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="shoulder_lift_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="shoulder_lift_jointMotor">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <transmission name="elbow_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="elbow_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elbow_jointMotor">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <transmission name="wrist_1_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="wrist_1_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="wrist_1_jointMotor">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <transmission name="wrist_2_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="wrist_2_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="wrist_2_jointMotor">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <transmission name="wrist_3_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="wrist_3_joint">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="wrist_3_jointMotor">
+        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+</robot>
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+  <rosparam file="$(find pickbot_simulation)/config/pickbot.yaml"
+            command="load"/>
+
+  <node name="robot_state_publisher_pickbot" pkg="robot_state_publisher" type="robot_state_publisher"
+        respawn="false" output="screen">
+            <param name="publish_frequency" type="double" value="30.0" />
+            <param name="ignore_timestamp" type="bool" value="true" />
+            <param name="tf_prefix" type="string" value="pickbot" />
+            <remap from="/joint_states" to="/pickbot/joint_states" />
+        </node>
+
+
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+        output="screen" args="--namespace=/pickbot
+                              joint_state_controller
+                              joint1_position_controller
+                              joint2_position_controller
+                              joint3_position_controller
+                              joint4_position_controller
+                              joint5_position_controller
+                              joint6_position_controller">
+  </node>
+
+</launch>

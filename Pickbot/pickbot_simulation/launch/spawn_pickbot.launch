@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+    <!-- Spawn a robot into Gazebo -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find pickbot_simulation)/urdf/pickbot.urdf -urdf -x 0.0 -y 0.0 -z 0.0 -roll 0 -pitch 0 -yaw 0 -model pickbot" />
+    <param name="robot_description" textfile="$(find pickbot_simulation)/urdf/pickbot.urdf"/>
+
+</launch>

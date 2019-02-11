@@ -1,0 +1,22 @@
+pickbot_v0: #namespace
+
+    #qlearn parameters
+    gamma: 1.0 # future rewards value 0 none 1 a lot
+    epsilon: 1.0 # exploration, 0 none 1 a lot
+    epsilon_decay: 0.9993 # how we reduse the exploration
+    epsilon_min: 0.01 # minimum value that epsilon can have
+    alpha: 0.01 # Learning Rate
+    alpha_decay: 0.01
+
+    episodes_training: 30000 # Number of Episodes
+    n_steps: 120 #Maximum Number of Steps each Episode
+
+    state_size: 12 # number of elements in the state array from observations.
+    n_actions: 12 # Number of actions used by algorithm and task
+    
+    batch_size: 64 # maximum size of the batches sampled from memory
+
+    pos_step: 1.0     # increment in position/velocity/effort, depends on the control for each command
+    running_step: 0.04 # amount of time the control will be executed
+    
+    last_position: [1.5,-1.2,1.4,-1.87,-1.57,0]
