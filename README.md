@@ -64,7 +64,70 @@ source devel/setup.bash
 
 
 ## Cloning the OpenAi Ros Package:
+```
+cd catkin_ws/src
+```
+```
+git clone https://bitbucket.org/theconstructcore/openai_ros.git
+```
+```
+cd ..
+```
+```
+catkin_make
+```
 ## Cloning and installing the OpenAI Baseline and installing the virtual Environment:
+### cloning Baseline package into src folder
+```
+cd catkin_ws/src
+```
+```
+git clone https://github.com/openai/baselines.git
+```
+### installing pipenv for creating a virtual environment in order to use python 3 fpr baseline and python 2 for ros/simulation
+```
+Pip install –-user pipenv 
+```
+```
+cd catkin_ws/src/baselines
+```
+### this might cause issues due to problems with path variables. Make sure where pipenv is installed. Must be included in the path system 
+```
+pipenv install --python=python3
+```
+### to run the virtual environment you must be in the baselinefolder.
+```
+pipenv shell
+```
+### installing all the nessesary packages into the virtual environment
+```
+pip install tensorflow
+```
+```
+pip install -e .
+```
+```
+pip install pyyaml
+```
+```
+pip install rospgk
+```
+```
+pip install catkin_pkg
+```
+```
+pip install exception
+```
+```
+pip install defusedxml
+```
+```
+pip install empy
+```
+```
+pip install numpy
+```
+
 ## Cloning the pickbot_sumulation and pickbot_traiing Packages:
 ## How to run the Training: 
 
