@@ -127,9 +127,9 @@ pip install empy
 ```
 pip install numpy
 ```
-### now close the terminal with the activated virtual environment
+### Now close the terminal with the activated virtual environment
 
-## Cloning the pickbot_sumulation and pickbot_traiing Packages:
+## Cloning the pickbot_sumulation and pickbot_training Packages:
 ```
 cd catkin_wa/src
 ```
@@ -142,20 +142,20 @@ cd ..
 ```
 catkin_make
 ```
-### Now we need to change the path of the mesh files in the pickbot_world.sdf file
-### go to the following directory
+### Now we need to change the path of the mesh files in the pickbot.world file
+### Go to the following directory
 ```
-catkin_ws/src/Pickbot/pickbot_simulation
+catkin_ws/src/Pickbot/pickbot_simulation/worlds
 ```
-### open the pickbot_world.sdf file and change the four pathes  of dae and stl files to your correct path
+### Open the pickbot.world file and change the four pathes  of dae and stl files to your correct path
 ```
 /home/robotics/catkin_ws/src/Pickbot/pickbot_simulation/meshes/ur10/collision/Pickbot_Schubladenregal_offen.stl
 ```
-### make all python files executable in the pickbot_training package
+### Make all python files executable in the pickbot_training package
 ```
 cd catkin_ws/src/Pickbot/pickbot/training/src
 ```
-### navigate to the different subfolders 1_OpenAI Baselines/DeepQ, 2_Environment, 3_Evaluation and 4_Own Impelemtations of Algorythms and make in each direktory all python files executable by entering into terminal in each directory
+### Navigate to the different subfolders 1_OpenAI Baselines/DeepQ, 2_Environment, 3_Evaluation and 4_Own Impelemtations of Algorythms and make in each direktory all python files executable by entering into terminal in each directory
 ```
 chmod +x *
 ```
@@ -164,14 +164,14 @@ chmod +x *
 ```
 roslaunch pickbot_simulation main.launch
 ```
-### to use my own implementation of DeepQ-Learning and Q-Learning run
+### To use my own implementation of DeepQ-Learning and Q-Learning run
 ```
 roslaunch pickbot_training start_training_Deep_Q_Learning.launch
 ```
 ```
 roslaunch pickbot_training start_training_Q_Learning.launch
 ```
-### to run the Baseline DeepQ Algorythm you need to activate the virtual environment 
+### To run the Baseline DeepQ Algorythm you need to activate the virtual environment 
 ```
 cd catkin_ws/src/baselines
 ```
