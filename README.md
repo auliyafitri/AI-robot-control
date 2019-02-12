@@ -53,7 +53,7 @@ source /opt/ros/kinetic/setup.bash
 mkdir -p ~/catkin_ws/src
 ```
 ```
-cd ~/catkin_ws/src
+cd ~/catkin_ws
 ```
 ```
 catkin_make
@@ -61,7 +61,13 @@ catkin_make
 ```
 source devel/setup.bash
 ```
-
+### (add the setup.bash directory to your bashrc file)
+```
+gedit ~/.bashrc
+```
+```
+source ~/your_ws/devel/setup.bash
+```
 
 ## Cloning the OpenAi Ros Package:
 ```
