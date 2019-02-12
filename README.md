@@ -193,3 +193,19 @@ cd Pickbot/pickbot_training/src/1_OpenAi Baselines/DeepQ
 ```
 python train_pickbot.py
 ```
+### To reuse the saved model in order to replay the learned policy
+```
+cd catkin_ws/src/baselines
+```
+```
+pipenv shell
+```
+```
+cd ..
+```
+```
+cd Pickbot/pickbot_training/src/1_OpenAi Baselines/DeepQ
+```
+```
+python enjoy_pickbot.py
+```
