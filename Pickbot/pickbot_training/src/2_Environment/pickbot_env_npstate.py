@@ -32,7 +32,7 @@ from geometry_msgs.msg import Point, Quaternion, Vector3
 from gazebo_msgs.msg import ModelState
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
-
+from openai_ros.msg import RLExperimentInfo
 
 
 
@@ -94,11 +94,12 @@ class PickbotEnv(gym.Env):
         1) /pickbot/joint_states
         2) /gripper_contactsensor_1_state
         3) /gripper_contactsensor_2_state
-        7) Collisions
+        4) Collisions
+        5) Gripper_state
 
         not used so far
-        4) /camera_rgb/image_raw   
-        5) /camera_depth/depth/image_raw
+        6) /camera_rgb/image_raw   
+        7) /camera_depth/depth/image_raw
         """
         rospy.Subscriber("/pickbot/joint_states", JointState, self.joints_state_callback)
         rospy.Subscriber("/gripper_contactsensor_1_state", ContactsState, self.contact_1_callback)
@@ -106,6 +107,7 @@ class PickbotEnv(gym.Env):
         rospy.Subscriber("/gz_collisions", Bool, self.collision_callback)
         #rospy.Subscriber("/camera_rgb/image_raw", Image, self.camera_rgb_callback)
         #rospy.Subscriber("/camera_depth/depth/image_raw", Image, self.camera_depth_callback)
+        
         
         #Define Action and state Space and Reward Range 
         """
@@ -156,6 +158,11 @@ class PickbotEnv(gym.Env):
     
         self._seed()
         self.done_reward=0
+
+        #set up everything to publish the Episode Number and Episode Reward on a rostopic
+        self.episode_num = 0
+        self.cumulated_episode_reward = 0
+        self.reward_pub = rospy.Publisher('/openai/reward', RLExperimentInfo, queue_size=1)
         
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized 
@@ -204,7 +211,8 @@ class PickbotEnv(gym.Env):
         13) Create YAML Files for contact forces in order to get the average over 2 contacts 
         14) Create YAML Files for collision to make shure to see a collision due to high noise in topic
         15) Unpause Simulation cause in next Step Sysrem must be running otherwise no data is seen by Subscribers 
-        16) Return State 
+        16) Publish Episode Reward and set cumulated reward back to 0 and iterate the Episode Number
+        17) Return State 
         """
 
         self.gazebo.change_gravity(0,0,0)
@@ -230,6 +238,7 @@ class PickbotEnv(gym.Env):
         observation = self.get_obs()  
         self.gazebo.pauseSim()
         state = self. get_state(observation)
+        self._update_episode()
         self.gazebo.unpauseSim()
         return state
 
@@ -283,8 +292,9 @@ class PickbotEnv(gym.Env):
         done, done_reward, invallid_contact = self.is_done(observation,last_position) 
         self.gazebo.pauseSim()
 
-        #8) Calculate reward based on Observatin and done_reward 
+        #8) Calculate reward based on Observatin and done_reward and update the cumulated Episode Reward
         reward = self.compute_reward(observation, done_reward, invallid_contact)
+        self.cumulated_episode_reward += reward
 
         #9) Unpause that topics can be received in next step
         self.gazebo.unpauseSim()
@@ -726,11 +736,6 @@ class PickbotEnv(gym.Env):
             return True
         else:
             return False
-           
-
-
-
-
 
 
     def is_done(self, observations, last_position):
@@ -818,3 +823,32 @@ class PickbotEnv(gym.Env):
                 
         return total_reward
 
+
+    def _update_episode(self):
+        """
+        Publishes the cumulated reward of the episode and 
+        increases the episode number by one.
+        :return:
+        """
+        if self.episode_num>0:
+            self._publish_reward_topic(
+                                        self.cumulated_episode_reward,
+                                        self.episode_num
+                                        )
+        
+        self.episode_num += 1
+        self.cumulated_episode_reward = 0
+        
+
+    def _publish_reward_topic(self, reward, episode_number=1):
+        """
+        This function publishes the given reward in the reward topic for
+        easy access from ROS infrastructure.
+        :param reward:
+        :param episode_number:
+        :return:
+        """
+        reward_msg = RLExperimentInfo()
+        reward_msg.episode_number = episode_number
+        reward_msg.episode_reward = reward
+        self.reward_pub.publish(reward_msg)
