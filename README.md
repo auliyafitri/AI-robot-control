@@ -92,7 +92,7 @@ git clone https://github.com/openai/baselines.git
 ```
 ### installing pipenv for creating a virtual environment in order to use python 3 fpr baseline and python 2 for ros/simulation
 ```
-Pip install –-user pipenv 
+pip install –-user pipenv 
 ```
 ```
 cd catkin_ws/src/baselines
@@ -116,7 +116,7 @@ pip install -e .
 pip install pyyaml
 ```
 ```
-pip install rospgk
+pip install rospkg
 ```
 ```
 pip install catkin_pkg
