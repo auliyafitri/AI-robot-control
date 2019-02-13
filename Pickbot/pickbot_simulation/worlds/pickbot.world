@@ -121,7 +121,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>/home/robotics/catkin_ws/src/Pickbot/pickbot_simulation/meshes/ur10/collision/Pickbot_Schubladenregal_offen.stl</uri>
+              <uri>/home/robotics/rl_ws/src/AI-robot-control/Pickbot/pickbot_simulation/meshes/ur10/collision/Pickbot_Schubladenregal_offen.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -142,7 +142,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>/home/robotics/catkin_ws/src/Pickbot/pickbot_simulation/meshes/ur10/visual/Pickbot_Schubladenregal_offen.dae</uri>
+              <uri>/home/robotics/rl_ws/src/AI-robot-control/Pickbot/pickbot_simulation/meshes/ur10/visual/Pickbot_Schubladenregal_offen.dae</uri>
             </mesh>
           </geometry>
           <material>
@@ -175,7 +175,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>/home/robotics/catkin_ws/src/Pickbot/pickbot_simulation/meshes/ur10/collision/Pickbot_Case.stl</uri>
+              <uri>/home/robotics/rl_ws/src/AI-robot-control/Pickbot/pickbot_simulation/meshes/ur10/collision/Pickbot_Case.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -197,7 +197,7 @@
           <geometry>
             <mesh>
               <scale>0.001 0.001 0.001</scale>
-              <uri>/home/robotics/catkin_ws/src/Pickbot/pickbot_simulation/meshes/ur10/visual/Pickbot_Case.dae</uri>
+              <uri>/home/robotics/rl_ws/src/AI-robot-control/Pickbot/pickbot_simulation/meshes/ur10/visual/Pickbot_Case.dae</uri>
             </mesh>
           </geometry>
           <material>

@@ -161,7 +161,7 @@ catkin_ws/src/Pickbot/pickbot_simulation/worlds
 ```
 cd catkin_ws/src/Pickbot/pickbot/training/src
 ```
-### Navigate to the different subfolders 1_OpenAI Baselines/DeepQ, 2_Environment, 3_Evaluation and 4_Own Impelemtations of Algorythms and make in each direktory all python files executable by entering into terminal in each directory
+### Navigate to the different subfolders 1_OpenAI_Baselines/DeepQ, 2_Environment, 3_Evaluation and 4_Own_Impelemtations_of_Algorythms and make in each direktory all python files executable by entering into terminal in each directory
 ```
 chmod +x *
 ```
@@ -188,7 +188,7 @@ pipenv shell
 cd ..
 ```
 ```
-cd Pickbot/pickbot_training/src/1_OpenAi Baselines/DeepQ
+cd Pickbot/pickbot_training/src/1_OpenAI_Baselines/DeepQ
 ```
 ```
 python train_pickbot.py
@@ -204,7 +204,7 @@ pipenv shell
 cd ..
 ```
 ```
-cd Pickbot/pickbot_training/src/1_OpenAi Baselines/DeepQ
+cd Pickbot/pickbot_training/src/1_OpenAI_Baselines/DeepQ
 ```
 ```
 python enjoy_pickbot.py

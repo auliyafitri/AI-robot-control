@@ -34,6 +34,8 @@ from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 from openai_ros.msg import RLExperimentInfo
 
+from pickbot_simulation.msg import VacuumGripperState
+from pickbot_simulation.srv import VacuumGripperControl
 
 
 #REGISTER THE TRAININGS ENVIRONMENT IN THE GYM AS AN AVAILABLE ONE
@@ -64,6 +66,7 @@ class PickbotEnv(gym.Env):
         self.camera_depth_state     = Image()
         self.contact_1_force        = Vector3()
         self.contact_2_force        = Vector3()
+        self.gripper_state          = VacuumGripperState()
 
         self._list_of_observations = ["distance_gripper_to_object",
                                     "elbow_joint_state",
@@ -94,10 +97,10 @@ class PickbotEnv(gym.Env):
         1) /pickbot/joint_states
         2) /gripper_contactsensor_1_state
         3) /gripper_contactsensor_2_state
-        4) Collisions
-        5) Gripper_state
+        4) /gz_collisions
 
-        not used so far
+        not used so far but available in the environment 
+        5) /pickbot/gripper/state
         6) /camera_rgb/image_raw   
         7) /camera_depth/depth/image_raw
         """
@@ -105,6 +108,7 @@ class PickbotEnv(gym.Env):
         rospy.Subscriber("/gripper_contactsensor_1_state", ContactsState, self.contact_1_callback)
         rospy.Subscriber("/gripper_contactsensor_2_state", ContactsState, self.contact_2_callback)
         rospy.Subscriber("/gz_collisions", Bool, self.collision_callback)
+        #rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
         #rospy.Subscriber("/camera_rgb/image_raw", Image, self.camera_rgb_callback)
         #rospy.Subscriber("/camera_depth/depth/image_raw", Image, self.camera_depth_callback)
         
@@ -184,7 +188,8 @@ class PickbotEnv(gym.Env):
     def camera_depth_callback(self, msg):
         self.camera_depth_state=msg
 
-
+    def gripper_state_callback(self, msg):
+        self.gripper_state=msg
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -323,6 +328,7 @@ class PickbotEnv(gym.Env):
         self.check_collision()
         #self.check_rgb_camera()
         #self.check_rgbd_camera()
+        #self.check_gripper_state()
         rospy.logdebug("ALL SYSTEMS READY")
 
 
@@ -389,6 +395,16 @@ class PickbotEnv(gym.Env):
             except Exception as e:
                 rospy.logdebug("EXCEPTION: rgbd_image not ready yet, retrying==>"+str(e))
         
+    def check_gripper_state(self):
+        gripper_state_msg = None
+        while gripper_state_msg is None and not rospy.is_shutdown():
+            try:
+                gripper_state_msg = rospy.wait_for_message("/pickbot/gripper/state", VacuumGripperState, timeout=0.1)
+                self.gripper_state = gripper_state_msg
+                rospy.logdebug("gripper_state READY")
+            except Exception as e:
+                rospy.logdebug("EXCEPTION: gripper_state not ready yet, retrying==>"+str(e))
+
 
 
     def randomly_spawn_object(self):
@@ -443,6 +459,29 @@ class PickbotEnv(gym.Env):
         distance = np.linalg.norm(Object - Gripper)
     
         return distance, Object
+
+
+    def turn_on_gripper(self):
+        """
+        turn on the Gripper by calling the service 
+        """
+        try:
+            turn_on_gripper_service =  rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
+            enable=True
+            turn_on_gripper_service(enable)
+        except rospy.ServiceException as e:
+            rospy.loginfo("Turn on Gripper service call failed:  {0}".format(e))
+
+    def turn_off_gripper(self):
+        """
+        sturn off the Gripper by calling the service 
+        """
+        try:
+            turn_off_gripper_service =  rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
+            enable=False
+            turn_off_gripper_service(enable)
+        except rospy.ServiceException as e:
+            rospy.loginfo("Turn off Gripper service call failed:  {0}".format(e))
         
     
 
