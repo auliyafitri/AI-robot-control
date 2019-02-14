@@ -145,6 +145,12 @@ pip install empy
 ```
 pip install numpy
 ```
+```
+pip install gym
+```
+```
+pip install baselines
+```
 ### Now close the terminal with the activated virtual environment
 
 ## Cloning the pickbot_sumulation and pickbot_training Packages:
