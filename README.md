@@ -48,6 +48,17 @@ sudo apt-get install ros-kinetic-ros-controllers
 ```
 source /opt/ros/kinetic/setup.bash
 ```
+### Installing Pygazebo
+#### note: should be installed from develop branch in pygazebo github repo, not with pip or easy_install
+```
+git clone --single-branch --branch develop https://github.com/jpieper/pygazebo.git
+```
+```
+cd pygazebo/
+```
+```
+sudo python setup.py develop
+```
 ### Setting Up a Catkin Workspace
 ```
 mkdir -p ~/catkin_ws/src
@@ -68,6 +79,7 @@ gedit ~/.bashrc
 ```
 source ~/your_ws/devel/setup.bash
 ```
+
 
 ## Cloning the OpenAi Ros Package:
 ```
