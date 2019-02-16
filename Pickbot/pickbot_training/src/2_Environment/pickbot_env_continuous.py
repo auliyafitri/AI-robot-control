@@ -121,21 +121,23 @@ class PickbotEnv(gym.Env):
 
         Reward Range: -infitity to infinity 
         """
+
+
         high_action = np.array([
-                    math.pi,
-                    math.pi,
-                    math.pi,
-                    math.pi,
-                    math.pi,
-                    math.pi])
+                    2,
+                    -0.7,
+                    1.8,
+                    0,
+                    0,
+                    2.8])
 
         low_action = np.array([
-                    -math.pi,
-                    -math.pi,
-                    -math.pi,
-                    -math.pi,
-                    -math.pi,
-                    -math.pi])
+                    1,
+                    -1.3,
+                    0.9,
+                    -3.0,
+                    -3.1,
+                    -2.8])
         self.action_space = spaces.Box(low_action, high_action)
         high = np.array([
                     1,
@@ -269,10 +271,11 @@ class PickbotEnv(gym.Env):
         #1) unpause, move to position and wait as long until joint_position is close to target position    
         self.gazebo.unpauseSim()
         self.pickbot_joint_pubisher_object.move_joints(action)
-        #ececute action as long as the current position is close to the target position and there is no invalid collision
-        while np.linalg.norm(np.asarray(self.joints_state.position)-np.asarray(action))>0.1 and self.get_collisions()==False:
+        #ececute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
+        time1=time.time()
+        while np.linalg.norm(np.asarray(self.joints_state.position)-np.asarray(action))>0.1 and self.get_collisions()==False and time.time()-time1<1.2:         
             rospy.loginfo("Not yet reached target position and no collision")
-        
+
         #2) Get Observations and pause Simulation
         observation = self.get_obs() 
         self.gazebo.pauseSim()
