@@ -6,7 +6,7 @@ import rospy
 
 
 #from baselines import ddpg
-from baselines.ddpg import ddpg
+from baselines.ppo2 import ppo2
 
 
 from baselines.bench import Monitor
@@ -46,7 +46,7 @@ def main():
                  flatten_dict_observations=True,
                  gamestate=None)
     
-    act=ddpg.learn(
+    act=ppo2.learn(
         env=env,
         network='mlp',
         total_timesteps=100000
