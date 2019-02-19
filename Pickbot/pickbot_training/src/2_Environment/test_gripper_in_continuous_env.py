@@ -1,14 +1,8 @@
 
 #IN CONTINUOUS ENV THE RANDOM SPAWN MUST BE COMMENTED 
 
-from pickbot_env_continuous import PickbotEnv
 import numpy as np
 import random
-
-
-
-
-
 import gym
 import sys
 import datetime
@@ -16,20 +10,14 @@ import rospkg
 import rospy
 import sys
 
-from baselines import deepq
 
 
 rospack = rospkg.RosPack()
 Env_path=rospack.get_path('pickbot_training')+"/src/2_Environment"
 sys.path.insert(0,Env_path)
-import pickbot_env_npstate  
+from pickbot_env_continuous import PickbotEnv
 import gazebo_connection
 
-
-def callback(lcl, _glb):
-    # stop training if average reward exceeds 450
-    is_solved = lcl['t'] > 100 and sum(lcl['episode_rewards'][-101:-1]) / 100 >= 450
-    return is_solved
 
 
 def main():
@@ -38,13 +26,7 @@ def main():
     #create node 
     rospy.init_node('pickbot_gym', anonymous=True, log_level=rospy.FATAL)
     env = gym.make("Pickbot-v1")
-    """
-    env.reset()
-    print (env.step([1.2, -1.40, -1.6, -1.9, -1.4, 0.2]))
-    print(env.step([1, -1.50, -1.6, -2, -1.1, 0.2]))
-    print(env.step([0,0,0,0,0,0]))
-    print(env.step([0,0,2,0,0,0]))
-    """
+
     PickbotEnv().turn_off_gripper()
     rospy.sleep(1)
     env.reset()
