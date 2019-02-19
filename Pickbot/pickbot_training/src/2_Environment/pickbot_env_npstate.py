@@ -109,7 +109,7 @@ class PickbotEnv(gym.Env):
         rospy.Subscriber("/gripper_contactsensor_1_state", ContactsState, self.contact_1_callback)
         rospy.Subscriber("/gripper_contactsensor_2_state", ContactsState, self.contact_2_callback)
         rospy.Subscriber("/gz_collisions", Bool, self.collision_callback)
-        #rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
+        rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
         #rospy.Subscriber("/camera_rgb/image_raw", Image, self.camera_rgb_callback)
         #rospy.Subscriber("/camera_depth/depth/image_raw", Image, self.camera_depth_callback)
         
@@ -227,7 +227,9 @@ class PickbotEnv(gym.Env):
         16) Publish Episode Reward and set cumulated reward back to 0 and iterate the Episode Number
         17) Return State 
         """
-
+        
+        self.turn_off_gripper()
+        rospy.sleep(1)
         self.gazebo.change_gravity(0,0,0)
         self.controllers_object.turn_off_controllers()
         self.gazebo.pauseSim()
@@ -238,6 +240,8 @@ class PickbotEnv(gym.Env):
         self.gazebo.change_gravity(0,0,-9.81)
         self._check_all_systems_ready()
         self.randomly_spawn_object()
+        self.turn_on_gripper()
+                
         
         last_position = [1.5,-1.2,1.4,-1.87,-1.57,0]
         with open('last_position.yml', 'w') as yaml_file:
@@ -338,7 +342,7 @@ class PickbotEnv(gym.Env):
         self.check_collision()
         #self.check_rgb_camera()
         #self.check_rgbd_camera()
-        #self.check_gripper_state()
+        self.check_gripper_state()
         rospy.logdebug("ALL SYSTEMS READY")
 
 
@@ -598,7 +602,12 @@ class PickbotEnv(gym.Env):
             action_position[3] = joint_states_position[3] 
             action_position[4] = joint_states_position[4]
             action_position[5] = joint_states_position[5] - self._joint_increment_value
-
+        elif action == 12: #turn on/off vacuum gripper
+            print("======= GRIPPER BEING TURN ON/OFF ========")
+            if self.gripper_state.enabled==True:
+                self.turn_off_gripper()
+            else:
+                self.turn_on_gripper()
         return action_position
 
 
@@ -786,6 +795,14 @@ class PickbotEnv(gym.Env):
         else:
             return False
 
+    def is_gripper_attached(self):
+        gripper_state = None
+        while gripper_state is None and not rospy.is_shutdown():
+            try:
+                gripper_state = rospy.wait_for_message("/pickbot/gripper/state", VacuumGripperState, timeout=0.1)
+            except Exception as e:
+                rospy.logdebug("Current gripper_state not ready yet, retrying==>"+str(e))
+        return gripper_state.attached
 
     def is_done(self, observations, last_position):
         """Checks if episode is done based on observations given.
@@ -801,15 +818,31 @@ class PickbotEnv(gym.Env):
         reward_reached_goal=500
         reward_crashing=-200
         reward_join_range =-150
+        reward_pump_attached = 2000
 
         #Check if there are invalid collisions    
         invalid_collision = self.get_collisions()
         
         #Sucsessfully reached goal: Contact with both contact sensors and there is no invalid contact
+        '''
         if observations[7] != 0 and observations[8] != 0 and invalid_collision==False :
-            done=True   
-            done_reward=reward_reached_goal
-
+            if (self.gripper_state.attached):
+                print("SSSSSSSSSSSSSSSS GRIPPER IS ATTACHED SSSSSSSSSSSSSSSS")
+                done_reward=reward_pump_attached
+                done=True   
+            else:
+                done_reward=reward_reached_goal
+        '''
+        if observations[7] != 0 and observations[8] != 0 and invalid_collision==False:
+            rospy.sleep(3)
+            print(self.gripper_state.attached)
+            if self.gripper_state.attached:
+                done_reward=reward_pump_attached
+                print("SSSSSSSSSSSSSSSS GRIPPER IS ATTACHED SSSSSSSSSSSSSSSS")
+            else:
+                done_reward=reward_reached_goal
+            done=True
+        
         #Crashing with itselfe, shelf, base
         if invalid_collision == True:
             done=True
@@ -838,7 +871,7 @@ class PickbotEnv(gym.Env):
         return done, done_reward, invalid_collision
 
 
-    def compute_reward(self, observation, done_reward, invallid_contact):
+    def compute_reward(self, observation, done_reward, invalid_contact):
         """
         Calculates the reward in each Step
         Reward for:
@@ -864,9 +897,12 @@ class PickbotEnv(gym.Env):
         
         if  contact_1 == 0 and contact_2 == 0:
             reward_contact = 0 
-        elif contact_1 != 0 and contact_2 == 0 and invallid_contact==False or contact_1 == 0 and contact_2 != 0 and invallid_contact==False:
+        elif contact_1 != 0 and contact_2 == 0 and invalid_contact==False or contact_1 == 0 and contact_2 != 0 and invalid_contact==False:
             reward_contact=20
-
+        '''
+        elif contact_1 != 0 and contact_2 != 0 and invalid_contact==False:  #AULIYA'S EDIT
+            reward_contact=200
+        '''
 
         total_reward=reward_distance + reward_contact + done_reward
                 
