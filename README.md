@@ -85,7 +85,7 @@ source ~/your_ws/devel/setup.bash
 ```
 
 
-## Cloning the OpenAi Ros Package:
+## Cloning the OpenAI ROS Package:
 ```
 cd catkin_ws/src
 git clone https://bitbucket.org/theconstructcore/openai_ros.git
@@ -127,24 +127,24 @@ pip install empy
 pip install numpy
 ```
 ### Append PYTHONPATH to recognize OpenCV, needed for running the algorithms
-#### When running pipenv shell, you should see the virtualenv ID at the top, something like '/home/robotics/Envs/baselines-qhDvDYR-/bin/activate'
-#### copy it then replace the 'bin/activate' to 'lib/python3.5/site-packages', add as PYTHONPATH
-#### Do it inside the virtualenv
+* When running pipenv shell, you should see the virtualenv ID at the top, something like '/home/robotics/Envs/baselines-qhDvDYR-/bin/activate'
+* copy it then replace the 'bin/activate' by 'lib/python3.5/site-packages', add as PYTHONPATH
+* Do it inside the virtualenv
 ```
 export PYTHONPATH='/home/robotics/Envs/baselines-qhDvDYR-/lib/python3.5/site-packages':$PYTHOPATH
 ```
 #### You need to do this everytime you open the virtualenv
-#### To avoid that, add PYTHOPATH in the activate file, something like '/home/robotics/Envs/baselines-qhDvDYR-/bin/activate'
+##### To avoid that, add PYTHOPATH in the activate file, something like '/home/robotics/Envs/baselines-qhDvDYR-/bin/activate'
 ```
 echo $PYTHONPATH
 ```
-#### Copy them, then open the activate file
+##### Copy them, then open the activate file
 ```
-gedit /home/robotics/Envs/baselines-qhDvDYR-/bin/activate'
+gedit /home/robotics/Envs/baselines-qhDvDYR-/bin/activate
 ```
-#### Add these two line in the end
+##### Add these two line in the end
 ```
-PYTHONPATH="<what you get after you echo $PYTHONPATH>"
+PYTHONPATH="<paste here what you get after you echo $PYTHONPATH>"
 export PYTHONPATH
 ```
 
@@ -181,7 +181,7 @@ git clone https://bitbucket.org/osrf/ariac -b ariac_2017
 cd ..
 catkin_make
 ```
-#### P.S. You can delete the ARIAC folder afterwards, we don't really need it
+#### P.S. You can delete the ARIAC folder in src folder afterwards, we don't really need it
 
 ## How to run the Training: 
 ### Start the simulation
