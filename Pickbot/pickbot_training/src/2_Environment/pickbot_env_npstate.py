@@ -166,8 +166,14 @@ class PickbotEnv(gym.Env):
         #set up everything to publish the Episode Number and Episode Reward on a rostopic
         self.episode_num = 0
         self.cumulated_episode_reward = 0
+        self.episode_steps = 0
         self.reward_pub = rospy.Publisher('/openai/reward', RLExperimentInfo, queue_size=1)
-        
+        self.reward_list=[]
+        self.episode_list=[]
+        self.step_list=[]
+        self.csv_name="result_logger_"+str(time.time())
+        print("CSV NAME")
+        print (self.csv_name)
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized 
     def joints_state_callback(self,msg):
@@ -303,6 +309,8 @@ class PickbotEnv(gym.Env):
 
         #9) Unpause that topics can be received in next step
         self.gazebo.unpauseSim()
+
+        self.episode_steps +=1
         #10) Return State, Reward, Done
         return state, reward, done, {}
 
@@ -872,14 +880,16 @@ class PickbotEnv(gym.Env):
         if self.episode_num>0:
             self._publish_reward_topic(
                                         self.cumulated_episode_reward,
-                                        self.episode_num
+                                        self.episode_steps,
+                                        self.episode_num                                        
                                         )
         
         self.episode_num += 1
         self.cumulated_episode_reward = 0
+        self.episode_steps=0
         
 
-    def _publish_reward_topic(self, reward, episode_number=1):
+    def _publish_reward_topic(self, reward, steps, episode_number=1):
         """
         This function publishes the given reward in the reward topic for
         easy access from ROS infrastructure.
@@ -891,3 +901,10 @@ class PickbotEnv(gym.Env):
         reward_msg.episode_number = episode_number
         reward_msg.episode_reward = reward
         self.reward_pub.publish(reward_msg)
+        self.reward_list.append(reward)
+        self.episode_list.append(episode_number)
+        self.step_list.append(steps)
+        liste= str(reward)+";"+str(episode_number)+";"+str(steps)+"\n"
+        
+        with open(self.csv_name+'.csv','a') as csv:
+            csv.write(str(liste))
