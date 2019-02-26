@@ -10,7 +10,7 @@ import os
 import yaml
 import math
 import datetime
-
+import rospkg
 from gym import utils, spaces
 from gym.utils import seeding
 from gym.envs.registration import register
@@ -172,7 +172,8 @@ class PickbotEnv(gym.Env):
         self.reward_list=[]
         self.episode_list=[]
         self.step_list=[]
-        self.csv_name="result_logger_"+str(datetime.datetime.now())
+        rospack = rospkg.RosPack()
+        self.csv_name=rospack.get_path('pickbot_training')+"/src/3_Evaluation/result_logger_"+str(datetime.datetime.now())
         print("CSV NAME")
         print (self.csv_name)
 

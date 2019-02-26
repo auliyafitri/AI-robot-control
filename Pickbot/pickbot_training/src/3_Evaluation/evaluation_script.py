@@ -44,9 +44,9 @@ def create_range(x):
 
 if __name__ == '__main__':
     #Define a Name to describe the Graphs
-    Trainingname="DeepQ_Baseline"
+    Trainingname="Mein_DeepQ"
     #Define Name of the CSV File with Trainingsresults in 3_Evaluation Folder
-    filename ="result_logger_1551105135.199812.csv"
+    filename ="result_logger_2019-02-26 16:42:48.735905.csv"
     #Define Average over a number of Episodes
     average_over=100
 
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     plt.xlabel('Episodes')
     plt.ylabel('Average Episode Reward (100 Episodes)')
     plt.grid(True)
-    plt.xlim((100, len(Episode)))
+    plt.xlim((average_over, len(Episode)))
     plt.ylim((-300, 550))
     plt.savefig(Trainingname+'_Average_Episode_reward.png')
     plt.close()
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     #Plot Success Rate
     plt.plot(Episode,Reached_Goal)
     plt.xlabel('Episodes')
-    plt.ylabel('Episode Reward')
+    plt.ylabel('Success Rate')
     plt.grid(True)
     plt.xlim((0, len(Episode)))
     plt.ylim((0, 1))
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     plt.xlabel('Episodes')
     plt.ylabel('Average Success Rate (100 Episodes)')
     plt.grid(True)
-    plt.xlim((100, len(Episode)))
+    plt.xlim((average_over, len(Episode)))
     plt.ylim((0, 1))
     plt.savefig(Trainingname+'_Average_Success_Rate.png')
     plt.close()
