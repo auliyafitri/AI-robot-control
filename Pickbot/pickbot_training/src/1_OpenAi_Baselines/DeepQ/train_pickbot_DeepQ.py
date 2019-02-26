@@ -4,9 +4,10 @@ import datetime
 import rospkg
 import rospy
 import sys
+import datetime
 
 from baselines import deepq
-
+timestamp=datetime.datetime.now()
 
 rospack = rospkg.RosPack()
 Env_path=rospack.get_path('pickbot_training')+"/src/2_Environment"
@@ -31,15 +32,15 @@ def main():
         env,
         network='mlp',
         lr=1e-3,
-        total_timesteps=100000,
+        total_timesteps=1000,
         buffer_size=50000,
         exploration_fraction=0.1,
         exploration_final_eps=0.02,
         print_freq=10,
         callback=callback,
     )
-    print("Saving model to pickbot_model.pkl")
-    act.save("pickbot_model.pkl")
+    print("Saving model to pickbot_model_"+str(timestamp)+".pkl")
+    act.save("pickbot_model_"+str(timestamp)+".pkl")
 
 
 if __name__ == '__main__':

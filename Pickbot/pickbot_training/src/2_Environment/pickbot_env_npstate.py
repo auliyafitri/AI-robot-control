@@ -9,6 +9,7 @@ import random
 import os
 import yaml
 import math
+import datetime
 
 from gym import utils, spaces
 from gym.utils import seeding
@@ -171,7 +172,7 @@ class PickbotEnv(gym.Env):
         self.reward_list=[]
         self.episode_list=[]
         self.step_list=[]
-        self.csv_name="result_logger_"+str(time.time())
+        self.csv_name="result_logger_"+str(datetime.datetime.now())
         print("CSV NAME")
         print (self.csv_name)
 

@@ -7,7 +7,7 @@ import rospy
 
 #from baselines import ddpg
 from baselines.ppo2 import ppo2
-
+timestamp=datetime.datetime.now()
 
 from baselines.bench import Monitor
 from baselines.common.cmd_util import make_vec_env, make_env
@@ -49,15 +49,11 @@ def main():
     act=ppo2.learn(
         env=env,
         network='mlp',
-        total_timesteps=100000
+        total_timesteps=5000
     )
+    print("Saving model to pickbot_model_"+str(timestamp)+".pkl")
+    act.save("pickbot_model_"+str(timestamp)+".pkl")
     #Environment Object: <baselines.common.vec_env.dummy_vec_env.DummyVecEnv object at 0x7fbcfa356fd0>
-
-
-
-
-
-
 
 
 
