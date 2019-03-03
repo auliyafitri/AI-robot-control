@@ -1,0 +1,48 @@
+Overview what is missing for wich Algorythm in the Baselines:
+
+-DDPG: For Continuous
+	-save model is missing
+	-replay of the model is missing
+
+
+-DeepQ: For Discrete 
+	-For openAI Environments the render function is missing in learn
+
+
+-TRPO: For Continuous and Discrete
+	-render is missing in learn
+	-save model is missing
+	-replay of model is missing
+	-callback in learn is missing
+	-no multiple environments
+
+
+-PPO2: For Continuous and Discrete
+	-enjoy for cartpole and Pendulum is not working
+	-render in training is not working has to be inserted in ppo2 learn script
+
+
+-A2C: For Continuous and Discrete
+	-render is missing in learn must be set by self.env.render in runner.py before env.step
+	-replay is making issues 
+
+
+-ACER: For Discrete
+	-render is missing in learn must be set by self.env.render in runner.py before env.step
+	-replay is making issues 
+
+
+-ACKTR: For Continuous and Discrete
+	-render is missing in learn must be set by self.env.render in runner.py from a2c before env.step
+	-replay is making issues 
+
+
+
+
+-PPO1: dont know how to start it 
+-GAIL: imitation learning just possible for examples where you can demo the task i guess
+-HER: works together with ddpq and thats continuous
+
+
+
+	

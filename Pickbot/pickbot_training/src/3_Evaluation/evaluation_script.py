@@ -20,14 +20,19 @@ Reached_Goal=[]
 def reshape_lists(steps):
     summe=0
     for i in range(len(Episode_Steps_initial)):
-        summe +=Episode_Steps_initial[i]
-        if summe >=steps:
-            summe-=Episode_Steps_initial[i]
-            break
+        if Episode_Rewards_initial[i]==0 and Episode_Steps_initial[i]==0:
+            pass
         else:
-            Episode_Steps.append(Episode_Steps_initial[i])
-            Episode_Rewards.append(Episode_Rewards_initial[i])
-            Episode.append(Episode_initial[i])
+            summe +=Episode_Steps_initial[i]
+            if summe >=steps:
+                summe-=Episode_Steps_initial[i]
+                break
+            else:
+                Episode_Steps.append(Episode_Steps_initial[i])
+                Episode_Rewards.append(Episode_Rewards_initial[i])
+                Episode.append(Episode_initial[i])
+
+
     """
     summe=0
     for i in range(len(Episode_Steps)):
@@ -73,9 +78,9 @@ def create_range(x):
 
 if __name__ == '__main__':
     #Define a Name to describe the Graphs
-    Trainingname="Baseline-DeepQ_Model-learned-with-Random-Spawn-applied-to-without-Random-Spawn_100000"
+    Trainingname="Baseline-A2C_without-Random-Spawn_100000"
     #Define Name of the CSV File with Trainingsresults in 3_Evaluation Folder
-    filename ="result_logger_2019-03-01 10:46:22.355174.csv"
+    filename ="result_logger_2019-03-03 12:31:10.334777.csv"
     #Define Average over a number of Episodes
     average_over=100
     #Trainingssteps
@@ -89,9 +94,9 @@ if __name__ == '__main__':
     reshape_lists(steps)
     #Creates a list wich defines if an episode reached its goal
     reached_goal()
-    
+
     #Plot Episode Reward 
-    plt.plot(Episode,Episode_Rewards)
+    plt.plot(range(1,len(Episode)+1),Episode_Rewards)
     plt.xlabel('Episoden')
     plt.ylabel('Reward/Episode')
     plt.grid(True)
@@ -111,9 +116,18 @@ if __name__ == '__main__':
     plt.ylim((-300, 550))
     plt.savefig(Trainingname+'_Average_Episode_reward.png')
     plt.close()
+    highest_average=0
+    Episode_peak=0
+    for i in range(len(y_Reward)):
+        if y_Reward[i] > highest_average:
+            highest_average=y_Reward[i]
+            Episode_peak= i
+    print("Highest Average Episodereward: "+ str(highest_average))
+    print("Highest Average Success Rate at Episode: "+ str(Episode_peak))
+    
     
     #Plot Success Rate
-    plt.plot(Episode,Reached_Goal)
+    plt.plot(range(1,len(Episode)+1),Reached_Goal)
     plt.xlabel('Episoden')
     plt.ylabel('Erfolgsrate')
     plt.grid(True)
@@ -133,6 +147,14 @@ if __name__ == '__main__':
     plt.ylim((0, 1))
     plt.savefig(Trainingname+'_Average_Success_Rate.png')
     plt.close()
+    highest_average=0
+    Episode_peak=0
+    for i in range(len(y_Reward)):
+        if y_Success[i] > highest_average:
+            highest_average=y_Success[i]
+            Episode_peak= i
+    print("Highest Average Success Rate: "+ str(highest_average))
+    print("Highest Average Success Rate at Episode: "+ str(Episode_peak))
     
     summe=0
     for i in range(len(Episode_Steps)):
