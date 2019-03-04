@@ -9,7 +9,8 @@ import random
 import os
 import yaml
 import math
-
+import datetime
+import rospkg
 from gym import utils, spaces
 from gym.utils import seeding
 from gym.envs.registration import register
@@ -115,29 +116,29 @@ class PickbotEnv(gym.Env):
         
         #Define Action and state Space and Reward Range 
         """
-        Action Space: Box Space with 6 values. Low is for each value -pi and high is pi. It is an array with the radiant values of each joint. 
+        Action Space: Box Space with 6 values.
         
         State Space: Box Space with 12 values. It is a numpy array with shape (12,)
 
         Reward Range: -infitity to infinity 
         """
-
+        self.stepsize=0.04
+        low_action = np.array([
+                    -self.stepsize,
+                    -self.stepsize,
+                    -self.stepsize,
+                    -self.stepsize,
+                    -self.stepsize,
+                    -self.stepsize])
 
         high_action = np.array([
-                    2,
-                    -0.7,
-                    1.8,
-                    0,
-                    0,
-                    2.8])
+                    self.stepsize,
+                    self.stepsize,
+                    self.stepsize,
+                    self.stepsize,
+                    self.stepsize,
+                    self.stepsize])
 
-        low_action = np.array([
-                    1,
-                    -1.3,
-                    0.9,
-                    -3.0,
-                    -3.1,
-                    -2.8])
         self.action_space = spaces.Box(low_action, high_action)
         high = np.array([
                     1,
@@ -175,8 +176,15 @@ class PickbotEnv(gym.Env):
         #set up everything to publish the Episode Number and Episode Reward on a rostopic
         self.episode_num = 0
         self.cumulated_episode_reward = 0
+        self.episode_steps = 0
         self.reward_pub = rospy.Publisher('/openai/reward', RLExperimentInfo, queue_size=1)
-        
+        self.reward_list=[]
+        self.episode_list=[]
+        self.step_list=[]
+        rospack = rospkg.RosPack()
+        self.csv_name=rospack.get_path('pickbot_training')+"/src/3_Evaluation/result_logger_"+str(datetime.datetime.now())
+        print("CSV NAME")
+        print (self.csv_name)
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized 
     def joints_state_callback(self,msg):
@@ -221,11 +229,12 @@ class PickbotEnv(gym.Env):
         9) Get Observations and return current State
         10) Check all Systems work
         11) Pause Simulation
-        12) Create YAML Files for contact forces in order to get the average over 2 contacts 
-        13) Create YAML Files for collision to make shure to see a collision due to high noise in topic
-        14) Unpause Simulation cause in next Step Sysrem must be running otherwise no data is seen by Subscribers 
-        15) Publish Episode Reward and set cumulated reward back to 0 and iterate the Episode Number
-        16) Return State 
+        12) Write initial Position into Yaml File 
+        13) Create YAML Files for contact forces in order to get the average over 2 contacts 
+        14) Create YAML Files for collision to make shure to see a collision due to high noise in topic
+        15) Unpause Simulation cause in next Step Sysrem must be running otherwise no data is seen by Subscribers 
+        16) Publish Episode Reward and set cumulated reward back to 0 and iterate the Episode Number
+        17) Return State 
         """
 
         self.gazebo.change_gravity(0,0,0)
@@ -238,7 +247,10 @@ class PickbotEnv(gym.Env):
         self.gazebo.change_gravity(0,0,-9.81)
         self._check_all_systems_ready()
         self.randomly_spawn_object()
-
+        
+        last_position = [1.5,-1.2,1.4,-1.87,-1.57,0]
+        with open('last_position.yml', 'w') as yaml_file:
+            yaml.dump(last_position, yaml_file, default_flow_style=False)
         with open('contact_1_force.yml', 'w') as yaml_file:
             yaml.dump(0.0, yaml_file, default_flow_style=False)
         with open('contact_2_force.yml', 'w') as yaml_file:
@@ -256,45 +268,73 @@ class PickbotEnv(gym.Env):
 
     def step(self, action):
         """
-        Receiving the action (Array of the six joints values)
+        Given the action selected by the learning algorithm,
+        we perform the corresponding movement of the robot
         return: the state of the robot, the corresponding reward for the step and if its done(terminal State)
-
-        1) Unpause, Move to that pos for defined time, Pause
-        2) Get Observations and pause Simulation
-        3) Convert Observations into State
-        4) Unpause Simulation check if its done, calculate done_reward and pause Simulation again
-        5) Calculate reward based on Observatin and done_reward 
-        6) Unpause that topics can be received in next step
-        7) Return State, Reward, Done
+        
+        1) read last published joint from YAML
+        2) define ne joints acording to chosen action
+        3) Write joint position into YAML to save last published joints for next step
+        4) Unpause, Move to that pos for defined time, Pause
+        5) Get Observations and pause Simulation
+        6) Convert Observations into State
+        7) Unpause Simulation check if its done, calculate done_reward and pause Simulation again
+        8) Calculate reward based on Observatin and done_reward 
+        9) Unpause that topics can be received in next step
+        10) Return State, Reward, Done
         """
 
-        #1) unpause, move to position and wait as long until joint_position is close to target position    
+        #1) read last_position out of YAML File
+        with open("last_position.yml", 'r') as stream:
+            try:
+                last_position=(yaml.load(stream))
+            except yaml.YAMLError as exc:
+                print(exc)
+        #2) get the new jointpositions acording to chosen action 
+        next_action_position = self.get_action_to_position(np.clip(action,-self.stepsize,self.stepsize), last_position)
+        
+        #3) write last_position into YAML File
+        with open('last_position.yml', 'w') as yaml_file:
+            yaml.dump(next_action_position, yaml_file, default_flow_style=False)
+        """
+        print("ACTION PUPLISHED: " +str(next_action_position))
+        print("action from agent: "+str(action))
+        print("clipped actiont: "+str(np.clip(action,-self.stepsize,self.stepsize)))
+        print("Last Position: : "+str(last_position))
+        """
+        
+        #4) unpause, move to position for certain time    
         self.gazebo.unpauseSim()
-        self.pickbot_joint_pubisher_object.move_joints(action)
+        self.pickbot_joint_pubisher_object.move_joints(next_action_position)
+        time.sleep(self.running_step)
+        
+        """
         #ececute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
         time1=time.time()
-        while np.linalg.norm(np.asarray(self.joints_state.position)-np.asarray(action))>0.1 and self.get_collisions()==False and time.time()-time1<1.2:         
+        while np.linalg.norm(np.asarray(self.joints_state.position)-np.asarray(next_action_position))>0.1 and self.get_collisions()==False and time.time()-time1<0.1:         
             rospy.loginfo("Not yet reached target position and no collision")
-
-        #2) Get Observations and pause Simulation
+        """
+        #5) Get Observations and pause Simulation
         observation = self.get_obs() 
         self.gazebo.pauseSim()
         
-        #3) Convert Observations into state
+        #6) Convert Observations into state
         state = self.get_state(observation)
 
-        #4) Unpause Simulation check if its done, calculate done_reward
+        #7) Unpause Simulation check if its done, calculate done_reward
         self.gazebo.unpauseSim()
-        done, done_reward, invallid_contact = self.is_done(observation) 
+        done, done_reward, invallid_contact = self.is_done(observation,last_position) 
         self.gazebo.pauseSim()
 
-        #5) Calculate reward based on Observatin and done_reward and update the cumulated Episode Reward
+        #8) Calculate reward based on Observatin and done_reward and update the cumulated Episode Reward
         reward = self.compute_reward(observation, done_reward, invallid_contact)
         self.cumulated_episode_reward += reward
 
-        #6) Unpause that topics can be received in next step
+        #9) Unpause that topics can be received in next step
         self.gazebo.unpauseSim()
-        #7) Return State, Reward, Done
+
+        self.episode_steps +=1
+        #10) Return State, Reward, Done
         return state, reward, done, {}
 
 
@@ -473,8 +513,18 @@ class PickbotEnv(gym.Env):
             turn_off_gripper_service(enable)
         except rospy.ServiceException as e:
             rospy.loginfo("Turn off Gripper service call failed:  {0}".format(e))
+        
     
 
+    def get_action_to_position(self, action, last_position):
+        """
+        takes the last position and adds the increments for each joint
+        returns the new position       
+        """
+        action_position=np.asarray(last_position)+action
+
+        return action_position.tolist()
+        
 
     def get_obs(self):
         """
@@ -661,7 +711,7 @@ class PickbotEnv(gym.Env):
             return False
 
 
-    def is_done(self, observations):
+    def is_done(self, observations, last_position):
         """Checks if episode is done based on observations given.
         
         Done when:
@@ -688,9 +738,8 @@ class PickbotEnv(gym.Env):
         if invalid_collision == True:
             done=True
             done_reward=reward_crashing
-
+        
         #Joints are going into limits set
-        last_position= self.joints_state.position
         if last_position[0] < 1 or last_position[0] > 2:
             done=True
             done_reward=reward_join_range
@@ -757,14 +806,16 @@ class PickbotEnv(gym.Env):
         if self.episode_num>0:
             self._publish_reward_topic(
                                         self.cumulated_episode_reward,
-                                        self.episode_num
+                                        self.episode_steps,
+                                        self.episode_num                                        
                                         )
         
         self.episode_num += 1
         self.cumulated_episode_reward = 0
+        self.episode_steps=0
         
 
-    def _publish_reward_topic(self, reward, episode_number=1):
+    def _publish_reward_topic(self, reward, steps, episode_number=1):
         """
         This function publishes the given reward in the reward topic for
         easy access from ROS infrastructure.
@@ -776,3 +827,10 @@ class PickbotEnv(gym.Env):
         reward_msg.episode_number = episode_number
         reward_msg.episode_reward = reward
         self.reward_pub.publish(reward_msg)
+        self.reward_list.append(reward)
+        self.episode_list.append(episode_number)
+        self.step_list.append(steps)
+        liste= str(reward)+";"+str(episode_number)+";"+str(steps)+"\n"
+        
+        with open(self.csv_name+'.csv','a') as csv:
+            csv.write(str(liste))
