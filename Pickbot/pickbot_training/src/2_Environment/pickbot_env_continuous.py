@@ -522,8 +522,10 @@ class PickbotEnv(gym.Env):
         returns the new position       
         """
         action_position=np.asarray(last_position)+action
+        #clip action that is going to be published to -2.9 and 2.9 just to make sure to avoid loosing controll of controllers 
+        x=np.clip(action_position,-2.9,2.9)
 
-        return action_position.tolist()
+        return x.tolist()
         
 
     def get_obs(self):
@@ -722,7 +724,7 @@ class PickbotEnv(gym.Env):
         
         done = False
         done_reward=0
-        reward_reached_goal=500
+        reward_reached_goal=500 
         reward_crashing=-200
         reward_join_range =-150
 
@@ -738,24 +740,24 @@ class PickbotEnv(gym.Env):
         if invalid_collision == True:
             done=True
             done_reward=reward_crashing
-        
+
         #Joints are going into limits set
-        if last_position[0] < 1 or last_position[0] > 2:
+        if self.joints_state.position[0] < 1 or self.joints_state.position[0] > 2:
             done=True
             done_reward=reward_join_range
-        elif last_position[1] < -1.3 or last_position[1] > -0.7:
+        elif self.joints_state.position[1] < -1.3 or self.joints_state.position[1] > -0.7:
             done=True
             done_reward=reward_join_range
-        elif last_position[2] < 0.9 or last_position[2] > 1.8:
+        elif self.joints_state.position[2] < 0.9 or self.joints_state.position[2] > 1.8:
             done=True
             done_reward=reward_join_range
-        elif last_position[3] < -3.0 or last_position[3] > 0:
+        elif self.joints_state.position[3] < -2.89 or self.joints_state.position[3] > 0:
             done=True
             done_reward=reward_join_range
-        elif last_position[4] <-3.1  or last_position[4] > 0:
+        elif self.joints_state.position[4] < -2.89  or self.joints_state.position[4] > 0:
             done=True
             done_reward=reward_join_range
-        elif last_position[5] < -3 or last_position[5] > 3:
+        elif self.joints_state.position[5] < -2.89 or self.joints_state.position[5] > 2.89:
             done=True
             done_reward=reward_join_range
 
