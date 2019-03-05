@@ -78,13 +78,13 @@ def create_range(x):
 
 if __name__ == '__main__':
     #Define a Name to describe the Graphs
-    Trainingname="Baseline-A2C_without-Random-Spawn_100000"
+    Trainingname="Baseline-PPO2_discrete_Random-Spawn_2000000"
     #Define Name of the CSV File with Trainingsresults in 3_Evaluation Folder
-    filename ="result_logger_2019-03-03 12:31:10.334777.csv"
+    filename ="result_logger_2019-03-05 11:44:15.836226.csv"
     #Define Average over a number of Episodes
     average_over=100
     #Trainingssteps
-    steps=100000
+    steps=2000000
 
 
 
@@ -121,9 +121,9 @@ if __name__ == '__main__':
     for i in range(len(y_Reward)):
         if y_Reward[i] > highest_average:
             highest_average=y_Reward[i]
-            Episode_peak= i
+            Episode_peak= i+100
     print("Highest Average Episodereward: "+ str(highest_average))
-    print("Highest Average Success Rate at Episode: "+ str(Episode_peak))
+    print("Highest Average Episodereward at Episode: "+ str(Episode_peak))
     
     
     #Plot Success Rate
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     for i in range(len(y_Reward)):
         if y_Success[i] > highest_average:
             highest_average=y_Success[i]
-            Episode_peak= i
+            Episode_peak= i+100
     print("Highest Average Success Rate: "+ str(highest_average))
     print("Highest Average Success Rate at Episode: "+ str(Episode_peak))
     
