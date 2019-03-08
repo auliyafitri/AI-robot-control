@@ -1,0 +1,26 @@
+Problems with the action sampling. The gaussian stochastic policy is sampling values outside the action space. Since this is crashing the controller they are going to be clipped to the max to prevent crashing.
+
+Resulting in mainly clipped to the max joint increments. This leads to a very shaky movement of the arm. But it reaches the object kind of stable!
+
+Arm doesnt get finegranular movement to be able to smoothly handle the object cause always the max actionvalues are sampled. 
+
+One proposed solution to this is the use of a beta policy instead of the gaussian policy as discussed in: 
+https://www.ri.cmu.edu/wp-content/uploads/2017/06/thesis-Chou.pdf
+http://proceedings.mlr.press/v70/chou17a/chou17a.pdf
+
+
+Or give a negative reward each time the action is sampled out of the action space 
+
+
+
+
+
+
+Highest Average Episodereward: 141.455501706698
+Highest Average Episodereward at Episode: 20234
+Highest Average Success Rate: 0.15
+Highest Average Success Rate at Episode: 20229
+Summe der Steps die gepolottet werden: 1999946
+Summe der Episoden die gepolottet werden: 20434
+Summe der Steps vor Reshape: 2003899
+Summe der Episoden vor reshape: 40938

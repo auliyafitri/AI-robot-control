@@ -1,0 +1,11 @@
+Is running into joint range limits all the time and very fast due to sampling of max actions 
+
+Highest Average Episodereward: 0
+Highest Average Episodereward at Episode: 0
+Highest Average Success Rate: 0.12
+Highest Average Success Rate at Episode: 22757
+Summe der Steps die gepolottet werden: 1999986
+Summe der Episoden die gepolottet werden: 79934
+Summe der Steps vor Reshape: 2477726
+Summe der Episoden vor reshape: 97615
+

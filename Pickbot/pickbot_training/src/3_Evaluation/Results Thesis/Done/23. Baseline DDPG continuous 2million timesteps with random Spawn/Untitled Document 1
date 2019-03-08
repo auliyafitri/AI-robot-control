@@ -1,0 +1,18 @@
+DDPG sampels values inside the range so they dont need to be clipped. 
+
+But it has difficulties finding trajectories where it gets contact. 
+In the end it figueres out to just spin in the middel wirhout running into limits or crashing to get the reward for the distance 
+
+Doesnt follw the objoct so it doesnt reach it
+
+
+
+
+Highest Average Episodereward: 79.32339337481652
+Highest Average Episodereward at Episode: 36836
+Highest Average Success Rate: 0.1
+Highest Average Success Rate at Episode: 36848
+Summe der Steps die gepolottet werden: 2099890
+Summe der Episoden die gepolottet werden: 37098
+Summe der Steps vor Reshape: 2276141
+Summe der Episoden vor reshape: 38915
