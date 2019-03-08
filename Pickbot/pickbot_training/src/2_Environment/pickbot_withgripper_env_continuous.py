@@ -40,8 +40,8 @@ from pickbot_simulation.srv import VacuumGripperControl
 
 # REGISTER THE TRAININGS ENVIRONMENT IN THE GYM AS AN AVAILABLE ONE
 reg = register(
-    id='Pickbot-v0',
-    entry_point='pickbot_env_npstate:PickbotEnv',
+    id='Pickbot-v3',
+    entry_point='pickbot_withgripper_env_continuous:PickbotEnv',
     timestep_limit=120,
 )
 
@@ -62,7 +62,7 @@ class PickbotEnv(gym.Env):
         self.joints_state = JointState()
         self.contact_1_state = ContactsState()
         self.contact_2_state = ContactsState()
-        self.collisions = Bool()
+        self.collision = Bool()
         self.camera_rgb_state = Image()
         self.camera_depth_state = Image()
         self.contact_1_force = Vector3()
@@ -90,9 +90,9 @@ class PickbotEnv(gym.Env):
         """
         self.gazebo = GazeboConnection()
         self.controllers_object = ControllersConnection()
-        self.pickbot_joint_pubisher_object = JointPub()
+        self.pickbot_joint_publisher_object = JointPub()
 
-        # Define Subscribers as Sensordata
+        # Define Subscribers as Sensor data
         """
         1) /pickbot/joint_states
         2) /gripper_contactsensor_1_state
@@ -114,21 +114,32 @@ class PickbotEnv(gym.Env):
 
         # Define Action and state Space and Reward Range
         """
-        Action Space: Discrete with 12 actions
-
-            1-2)    Increment/Decrement joint1_position_controller
-            3-4)    Increment/Decrement joint2_position_controller
-            5-6)    Increment/Decrement joint3_position_controller
-            7-8)    Increment/Decrement joint4_position_controller
-            9-10)   Increment/Decrement joint5_position_controller
-            11-12)  Increment/Decrement joint6_position_controller
-
+        Action Space: Box Space with 7 values. Action 1-6 are for robot joints and the 7th is for vacuum gripper.
+        
         State Space: Box Space with 12 values. It is a numpy array with shape (12,)
 
-        Reward Range: -infitity to infinity 
+        Reward Range: -infinity to infinity 
         """
+        self.stepsize = 0.04
+        low_action = np.array([
+            -self.stepsize,
+            -self.stepsize,
+            -self.stepsize,
+            -self.stepsize,
+            -self.stepsize,
+            -self.stepsize,
+            -0.04])
 
-        self.action_space = spaces.Discrete(12)
+        high_action = np.array([
+            self.stepsize,
+            self.stepsize,
+            self.stepsize,
+            self.stepsize,
+            self.stepsize,
+            self.stepsize,
+            0.04])
+
+        self.action_space = spaces.Box(low_action, high_action)
         high = np.array([
             1,
             math.pi,
@@ -176,7 +187,7 @@ class PickbotEnv(gym.Env):
         print("CSV NAME")
         print(self.csv_name)
 
-    # Callback Functions for Subscribers to make topic values available each time the class is initialized
+    # Callback Functions for Subscribers to make topic values available each time the class is initialized 
     def joints_state_callback(self, msg):
         self.joints_state = msg
 
@@ -204,39 +215,39 @@ class PickbotEnv(gym.Env):
 
     def reset(self):
         """
-        Reset The Robot to its initial Position and restart the Controllers
+        Reset The Robot to its initial Position and restart the Controllers 
 
         1) Change Gravity to 0 ->That arm doesnt fall
         2) Turn Controllers off
         3) Pause Simulation
         4) Reset Simulation
-        5) Set Model Pose to desired one
-        6) Unpause Simulation
+        5) Set Model Pose to desired one 
+        6) Unpause Simulation 
         7) Turn on Controllers
         8) Restore Gravity
         9) Get Observations and return current State
         10) Check all Systems work
         11) Pause Simulation
-        12) Write initial Position into Yaml File
-        13) Create YAML Files for contact forces in order to get the average over 2 contacts
+        12) Write initial Position into Yaml File 
+        13) Create YAML Files for contact forces in order to get the average over 2 contacts 
         14) Create YAML Files for collision to make shure to see a collision due to high noise in topic
-        15) Unpause Simulation cause in next Step Sysrem must be running otherwise no data is seen by Subscribers
+        15) Unpause Simulation cause in next Step Sysrem must be running otherwise no data is seen by Subscribers 
         16) Publish Episode Reward and set cumulated reward back to 0 and iterate the Episode Number
-        17) Return State
+        17) Return State 
         """
 
         self.gazebo.change_gravity(0, 0, 0)
         self.controllers_object.turn_off_controllers()
         self.gazebo.pauseSim()
         self.gazebo.resetSim()
-        self.pickbot_joint_pubisher_object.set_joints()
+        self.pickbot_joint_publisher_object.set_joints()
         self.gazebo.unpauseSim()
         self.controllers_object.turn_on_controllers()
         self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
         self.randomly_spawn_object()
 
-        last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
+        last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0, 0]
         with open('last_position.yml', 'w') as yaml_file:
             yaml.dump(last_position, yaml_file, default_flow_style=False)
         with open('contact_1_force.yml', 'w') as yaml_file:
@@ -257,15 +268,15 @@ class PickbotEnv(gym.Env):
         Given the action selected by the learning algorithm,
         we perform the corresponding movement of the robot
         return: the state of the robot, the corresponding reward for the step and if its done(terminal State)
-
+        
         1) read last published joint from YAML
-        2) define ne joints acording to chosen action
+        2) define ne joints according to chosen action
         3) Write joint position into YAML to save last published joints for next step
         4) Unpause, Move to that pos for defined time, Pause
         5) Get Observations and pause Simulation
         6) Convert Observations into State
         7) Unpause Simulation check if its done, calculate done_reward and pause Simulation again
-        8) Calculate reward based on Observatin and done_reward
+        8) Calculate reward based on Observation and done_reward
         9) Unpause that topics can be received in next step
         10) Return State, Reward, Done
         """
@@ -276,18 +287,31 @@ class PickbotEnv(gym.Env):
                 last_position = (yaml.load(stream))
             except yaml.YAMLError as exc:
                 print(exc)
-        # 2) get the new jointpositions acording to chosen action
-        next_action_position = self.get_action_to_position(action, last_position)
+        # 2) get the new joint positions according to chosen action
+        next_action_position = self.get_action_to_position(np.clip(action, -self.stepsize, self.stepsize),
+                                                           last_position)
 
         # 3) write last_position into YAML File
         with open('last_position.yml', 'w') as yaml_file:
             yaml.dump(next_action_position, yaml_file, default_flow_style=False)
+        """
+        print("ACTION PUBLISHED: " +str(next_action_position))
+        print("action from agent: "+str(action))
+        print("clipped action: "+str(np.clip(action,-self.stepsize,self.stepsize)))
+        print("Last Position: : "+str(last_position))
+        """
 
         # 4) unpause, move to position for certain time
         self.gazebo.unpauseSim()
-        self.pickbot_joint_pubisher_object.move_joints(next_action_position)
+        self.pickbot_joint_publisher_object.move_joints(next_action_position)
         time.sleep(self.running_step)
 
+        """
+        # execute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
+        time1=time.time()
+        while np.linalg.norm(np.asarray(self.joints_state.position)-np.asarray(next_action_position))>0.1 and self.get_collisions()==False and time.time()-time1<0.1:         
+            rospy.loginfo("Not yet reached target position and no collision")
+        """
         # 5) Get Observations and pause Simulation
         observation = self.get_obs()
         self.gazebo.pauseSim()
@@ -297,11 +321,11 @@ class PickbotEnv(gym.Env):
 
         # 7) Unpause Simulation check if its done, calculate done_reward
         self.gazebo.unpauseSim()
-        done, done_reward, invallid_contact = self.is_done(observation, last_position)
+        done, done_reward, invalid_contact = self.is_done(observation, last_position)
         self.gazebo.pauseSim()
 
-        # 8) Calculate reward based on Observatin and done_reward and update the cumulated Episode Reward
-        reward = self.compute_reward(observation, done_reward, invallid_contact)
+        # 8) Calculate reward based on Observation and done_reward and update the cumulated Episode Reward
+        reward = self.compute_reward(observation, done_reward, invalid_contact)
         self.cumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
@@ -321,7 +345,7 @@ class PickbotEnv(gym.Env):
         7) Collisions
 
         not used so far
-        4) /camera_rgb/image_raw
+        4) /camera_rgb/image_raw   
         5) /camera_depth/depth/image_raw
 
         """
@@ -374,7 +398,7 @@ class PickbotEnv(gym.Env):
         while collision_msg is None and not rospy.is_shutdown():
             try:
                 collision_msg = rospy.wait_for_message("/gz_collisions", Bool, timeout=0.1)
-                self.collisions = collision_msg.data
+                self.collision = collision_msg.data
                 rospy.logdebug("collision READY")
             except Exception as e:
                 rospy.logdebug("EXCEPTION: Collision not ready yet, retrying==>" + str(e))
@@ -429,8 +453,8 @@ class PickbotEnv(gym.Env):
         Get the Position of the endeffektor and the object via rosservice call /gazebo/get_model_state and /gazebo/get_link_state
         Calculate distance between them
 
-        In this case
-
+        In this case 
+    
         Object:     unite_box_0 link
         Gripper:    vacuum_gripper_link ground_plane
         """
@@ -465,7 +489,7 @@ class PickbotEnv(gym.Env):
 
     def turn_on_gripper(self):
         """
-        turn on the Gripper by calling the service
+        turn on the Gripper by calling the service 
         """
         try:
             turn_on_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
@@ -476,7 +500,7 @@ class PickbotEnv(gym.Env):
 
     def turn_off_gripper(self):
         """
-        sturn off the Gripper by calling the service
+        turn off the Gripper by calling the service
         """
         try:
             turn_off_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
@@ -487,109 +511,32 @@ class PickbotEnv(gym.Env):
 
     def get_action_to_position(self, action, last_position):
         """
-        Take the last published joint and increment/decrement one joint acording to action chosen
-        :param action: Integer that goes from 0 to 11, because we have 12 actions.
-        :return: list with all joint positions acording to chosen action
+        takes the last position and adds the increments for each joint
+        returns the new position
         """
+        action_position = np.asarray(last_position)[:6] + action[:6]
+        # clip action that is going to be published to -2.9 and 2.9 just to make sure to avoid losing control of controllers
+        x = np.clip(action_position, -2.9, 2.9)
 
-        distance = self.get_distance_gripper_to_object()
-        self._joint_increment_value = 0.18 * distance[0] + 0.01
+        """
+        turn on/off gripper
+        last action of vacuum gripper has not been considered
+        """
+        gripper_action = np.clip(action[6], -0.04, 0.04)
+        if gripper_action > 0:
+            print("========================")
+            print(self.gripper_state)
+            print("turn on")
+            self.turn_on_gripper()
+            print(self.gripper_state)
+        else:
+            print("========================")
+            print(self.gripper_state)
+            print("turn off")
+            self.turn_off_gripper()
+            print(self.gripper_state)
 
-        joint_states_position = last_position
-        action_position = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
-        rospy.logdebug("get_action_to_position>>>" + str(joint_states_position))
-        if action == 0:  # Increment joint3_position_controller (elbow joint)
-            action_position[0] = joint_states_position[0] + self._joint_increment_value / 2
-            action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2]
-            action_position[3] = joint_states_position[3]
-            action_position[4] = joint_states_position[4]
-            action_position[5] = joint_states_position[5]
-        elif action == 1:  # Decrement joint3_position_controller (elbow joint)
-            action_position[0] = joint_states_position[0] - self._joint_increment_value / 2
-            action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2]
-            action_position[3] = joint_states_position[3]
-            action_position[4] = joint_states_position[4]
-            action_position[5] = joint_states_position[5]
-
-        elif action == 2:  # Increment joint2_position_controller (shoulder_lift_joint)
-            action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1] + self._joint_increment_value / 2
-            action_position[2] = joint_states_position[2]
-            action_position[3] = joint_states_position[3]
-            action_position[4] = joint_states_position[4]
-            action_position[5] = joint_states_position[5]
-        elif action == 3:  # Decrement joint2_position_controller (shoulder_lift_joint)
-            action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1] - self._joint_increment_value / 2
-            action_position[2] = joint_states_position[2]
-            action_position[3] = joint_states_position[3]
-            action_position[4] = joint_states_position[4]
-            action_position[5] = joint_states_position[5]
-
-        elif action == 4:  # Increment joint1_position_controller (shoulder_pan_joint)
-            action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2] + self._joint_increment_value / 2
-            action_position[3] = joint_states_position[3]
-            action_position[4] = joint_states_position[4]
-            action_position[5] = joint_states_position[5]
-        elif action == 5:  # Decrement joint1_position_controller (shoulder_pan_joint)
-            action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2] - self._joint_increment_value / 2
-            action_position[3] = joint_states_position[3]
-            action_position[4] = joint_states_position[4]
-            action_position[5] = joint_states_position[5]
-
-        elif action == 6:  # Increment joint4_position_controller (wrist_1_joint)
-            action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2]
-            action_position[3] = joint_states_position[3] + self._joint_increment_value
-            action_position[4] = joint_states_position[4]
-            action_position[5] = joint_states_position[5]
-        elif action == 7:  # Decrement joint4_position_controller (wrist_1_joint)
-            action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2]
-            action_position[3] = joint_states_position[3] - self._joint_increment_value
-            action_position[4] = joint_states_position[4]
-            action_position[5] = joint_states_position[5]
-
-        elif action == 8:  # Increment joint5_position_controller (wrist_2_joint)
-            action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2]
-            action_position[3] = joint_states_position[3]
-            action_position[4] = joint_states_position[4] + self._joint_increment_value
-            action_position[5] = joint_states_position[5]
-        elif action == 9:  # Decrement joint5_position_controller (wrist_2_joint)
-            action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2]
-            action_position[3] = joint_states_position[3]
-            action_position[4] = joint_states_position[4] - self._joint_increment_value
-            action_position[5] = joint_states_position[5]
-
-        elif action == 10:  # Increment joint6_position_controller (wrist_3_joint)
-            action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2]
-            action_position[3] = joint_states_position[3]
-            action_position[4] = joint_states_position[4]
-            action_position[5] = joint_states_position[5] + self._joint_increment_value
-        elif action == 11:  # Decrement joint6_position_controller (wrist_3_joint)
-            action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2]
-            action_position[3] = joint_states_position[3]
-            action_position[4] = joint_states_position[4]
-            action_position[5] = joint_states_position[5] - self._joint_increment_value
-
-        return action_position
+        return np.append(x, gripper_action).tolist()
 
     def get_obs(self):
         """
@@ -602,9 +549,9 @@ class PickbotEnv(gym.Env):
         10,11,12)   x, y, z Position of object?
 
         MISSING
-        10)     RGBD image
-
-
+        10)     RGBD image 
+        
+        
         self._list_of_observations = ["distance_gripper_to_object",
                                     "elbow_joint_state",
                                     "shoulder_lift_joint_state",
@@ -675,7 +622,7 @@ class PickbotEnv(gym.Env):
 
     def get_state(self, observation):
         """
-        convert observation list intp a numpy array
+        convert observation list intp a numpy array 
         """
         x = np.asarray(observation)
         return x
@@ -683,7 +630,7 @@ class PickbotEnv(gym.Env):
     def get_contact_force_1(self):
         """
         Get Contact Force of contact sensor 1
-        Takes average over 2 contacts so the chances are higher that both sensors say there is contact the same time due to sensor noise
+        Takes average over 2 contacts so the chances are higher that both sensors say there is contact the same time due to sensor noise 
         :returns force value
         """
 
@@ -706,7 +653,7 @@ class PickbotEnv(gym.Env):
         # write new contact_1_force value in yaml
         with open('contact_1_force.yml', 'w') as yaml_file:
             yaml.dump(contact1_force, yaml_file, default_flow_style=False)
-        ##calculate average force
+        # calculate average force
         average_contact_1_force = (last_contact_1_force + contact1_force) / 2
 
         return average_contact_1_force
@@ -737,7 +684,7 @@ class PickbotEnv(gym.Env):
         # write new contact force 2 value in yaml
         with open('contact_2_force.yml', 'w') as yaml_file:
             yaml.dump(contact2_force, yaml_file, default_flow_style=False)
-        ##calculate average force
+        # calculate average force
         average_contact_2_force = (last_contact_2_force + contact2_force) / 2
 
         return average_contact_2_force
@@ -747,12 +694,12 @@ class PickbotEnv(gym.Env):
         Checks all the collisions by listening to rostopic /gz_collisions wich is republishing the gazebo topic (gz topic -e /gazebo/default/physics/contacts).
         The Publisher is started in a different node out of the simulation launch file.
         Stores last value yaml file and if one of the two values is showing a invalid collision it returns a invalid collision.
-        This is to make shure seeing collisions due to high sensor noise and publish rate.
+        This is to make shure seeing collisions due to high sensor noise and publish rate. 
 
         If one of the 2 Messages is True it returns True.
-        returns:
+        returns: 
             False:  if no contacts or just valid ones -> Box/Shelf, Wrist3/Box, VacuumGripper/Box
-            True:   if any other contact occures wich is invalid
+            True:   if any other contact occures wich is invalid 
         """
 
         # read last contact_2_force value out of yaml
@@ -765,18 +712,18 @@ class PickbotEnv(gym.Env):
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(self.collision, yaml_file, default_flow_style=False)
 
-        # Check if last_collision or self.collsion are True. IF one s true return True else False
-        if self.collision == True or last_collision == True:
+        # Check if last_collision or self.collision are True. IF one s true return True else False
+        if self.collision or last_collision:
             return True
         else:
             return False
 
     def is_done(self, observations, last_position):
         """Checks if episode is done based on observations given.
-
+        
         Done when:
-        -Sucsessfully reached goal: Contact with both contact sensors and contact is a valid one(Wrist3 or/and Vavuum Gripper with unit_box)
-        -Crashing with itselfe, shelf, base
+        -Successfully reached goal: Contact with both contact sensors and contact is a valid one(Wrist3 or/and Vacuum Gripper with unit_box)
+        -Crashing with itself, shelf, base
         -Joints are going into limits set
         """
 
@@ -789,33 +736,33 @@ class PickbotEnv(gym.Env):
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
 
-        # Sucsessfully reached goal: Contact with both contact sensors and there is no invalid contact
-        if observations[7] != 0 and observations[8] != 0 and invalid_collision == False:
+        # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
+        if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
             done = True
             done_reward = reward_reached_goal
 
-        # Crashing with itselfe, shelf, base
-        if invalid_collision == True:
+        # Crashing with itself, shelf, base
+        if invalid_collision:
             done = True
             done_reward = reward_crashing
 
         # Joints are going into limits set
-        if last_position[0] < 1 or last_position[0] > 2:
+        if self.joints_state.position[0] < 1 or self.joints_state.position[0] > 2:
             done = True
             done_reward = reward_join_range
-        elif last_position[1] < -1.3 or last_position[1] > -0.7:
+        elif self.joints_state.position[1] < -1.3 or self.joints_state.position[1] > -0.7:
             done = True
             done_reward = reward_join_range
-        elif last_position[2] < 0.9 or last_position[2] > 1.8:
+        elif self.joints_state.position[2] < 0.9 or self.joints_state.position[2] > 1.8:
             done = True
             done_reward = reward_join_range
-        elif last_position[3] < -3.0 or last_position[3] > 0:
+        elif self.joints_state.position[3] < -2.89 or self.joints_state.position[3] > 0:
             done = True
             done_reward = reward_join_range
-        elif last_position[4] < -3.1 or last_position[4] > 0:
+        elif self.joints_state.position[4] < -2.89 or self.joints_state.position[4] > 0:
             done = True
             done_reward = reward_join_range
-        elif last_position[5] < -3 or last_position[5] > 3:
+        elif self.joints_state.position[5] < -2.89 or self.joints_state.position[5] > 2.89:
             done = True
             done_reward = reward_join_range
 
@@ -825,11 +772,14 @@ class PickbotEnv(gym.Env):
         """
         Calculates the reward in each Step
         Reward for:
-        Distance:       Reward for Distance to the Object
-        Contact:        Reward for Contact with one contact sensor and invalid_contact must be false. As soon as both contact sensors have contact and there is no invallid contact the goal is considert to be reached and the episode is over. Reward is then set in is_done
+        Distance:       Reward for Distance to the Object   
+        Contact:        Reward for Contact with one contact sensor and invalid_contact must be false. As soon as
+                        both contact sensors have contact and there is no invallid contact the goal is considered
+                        to be reached and the episode is over. Reward is then set in is_done
 
-        Calculates the Reward for the Terminal State
-        Done Reward:    Reward when episode is Done. Negative Reward for Crashing and going into set Joint Limits. High Positiv Reward for having contact with both contact sensors and not having an invalid collision
+        Calculates the Reward for the Terminal State 
+        Done Reward:    Reward when episode is Done. Negative Reward for Crashing and going into set Joint Limits.
+                        High Positive Reward for having contact with both contact sensors and not having an invalid collision
         """
         reward_distance = 0
         reward_contact = 0
@@ -846,7 +796,8 @@ class PickbotEnv(gym.Env):
 
         if contact_1 == 0 and contact_2 == 0:
             reward_contact = 0
-        elif contact_1 != 0 and contact_2 == 0 and invallid_contact == False or contact_1 == 0 and contact_2 != 0 and invallid_contact == False:
+        elif contact_1 != 0 and contact_2 == 0 and not invallid_contact or contact_1 == 0 and contact_2 != 0 and \
+                not invallid_contact:
             reward_contact = 20
 
         total_reward = reward_distance + reward_contact + done_reward
@@ -855,7 +806,7 @@ class PickbotEnv(gym.Env):
 
     def _update_episode(self):
         """
-        Publishes the cumulated reward of the episode and
+        Publishes the cumulated reward of the episode and 
         increases the episode number by one.
         :return:
         """
