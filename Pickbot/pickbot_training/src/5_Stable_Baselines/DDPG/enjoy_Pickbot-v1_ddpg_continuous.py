@@ -1,14 +1,15 @@
 import gym
 
-from stable_baselines import TRPO
+from stable_baselines.ddpg.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise, AdaptiveParamNoiseSpec
+from stable_baselines import DDPG
 
 import sys
-import rospkg
 import rospy
+import rospkg
 rospack = rospkg.RosPack()
 Env_path = rospack.get_path('pickbot_training')+"/src/2_Environment"
-sys.path.insert(0,Env_path)
-import pickbot_env_npstate
+sys.path.insert(0, Env_path)
+import pickbot_env_continuous
 import gazebo_connection
 
 
@@ -18,9 +19,9 @@ def main():
     # create node
     rospy.init_node('pickbot_gym', anonymous=True, log_level=rospy.FATAL)
 
-    env = gym.make('Pickbot-v0')
+    env = gym.make('Pickbot-v1')
 
-    model = TRPO.load("pickbot_model_trpo_discrete_2019-03-11 10:22:01")
+    model = DDPG.load("pickbot_model_ddpg_continuous_2019-03-11 12:45:38")
 
     while True:
         obs, done = env.reset(), False

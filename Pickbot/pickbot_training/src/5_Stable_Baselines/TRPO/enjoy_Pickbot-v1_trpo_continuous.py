@@ -22,10 +22,9 @@ def main():
 
     model = TRPO.load("pickbot_model_trpo_continuous_2019-03-11 10:37:55")
 
-    obs = env.reset()
     while True:
+        obs, done = env.reset(), False
         action, _states = model.predict(obs)
-        done = False
         episode_rew = 0
         while not done:
             obs, rewards, done, info = env.step(action)
