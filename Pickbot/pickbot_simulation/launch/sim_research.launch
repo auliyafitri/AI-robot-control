@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+    <arg name="robot" default="machines"/>
+    <arg name="debug" default="false"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="pause" default="true"/>  <!-- Start Gazebo with a blank world -->
+    <include file="$(find pickbot_simulation)/worlds/empty_world.launch">
+        <arg name="world_name" value="$(find pickbot_simulation)/worlds/pickbot_research.world"/>
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg pause)"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="headless" value="$(arg headless)"/>
+    </include>
+
+    <include file="$(find pickbot_simulation)/launch/spawn_pickbot.launch"/>
+    <include file="$(find pickbot_simulation)/launch/pickbot_control.launch"/>
+
+    <!-- Launch the repulisher gz topci to ros topic -->
+    <node pkg="pickbot_training" name="gz_topic_republisher" type="gz_subscriber.py" output="screen"/>
+
+</launch>
