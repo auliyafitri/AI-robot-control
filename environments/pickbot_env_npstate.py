@@ -9,6 +9,7 @@ import random
 import os
 import yaml
 import math
+import random
 import datetime
 import rospkg
 from gym import utils, spaces
@@ -63,7 +64,7 @@ class PickbotEnv(gym.Env):
         self.joints_state = JointState()
         self.contact_1_state = ContactsState()
         self.contact_2_state = ContactsState()
-        self.collisions = Bool()
+        self.collision = Bool()
         self.camera_rgb_state = Image()
         self.camera_depth_state = Image()
         self.contact_1_force = Vector3()
@@ -81,7 +82,8 @@ class PickbotEnv(gym.Env):
                                       "contact_2_force",
                                       "object_pos_x",
                                       "object_pos_y",
-                                      "object_pos_z"]
+                                      "object_pos_z",
+                                      "object_type"]
 
         # Establishes connection with simulator
         """
@@ -126,7 +128,7 @@ class PickbotEnv(gym.Env):
 
         State Space: Box Space with 12 values. It is a numpy array with shape (12,)
 
-        Reward Range: -infitity to infinity 
+        Reward Range: -infinity to infinity 
         """
 
         self.action_space = spaces.Discrete(12)
@@ -142,7 +144,8 @@ class PickbotEnv(gym.Env):
             np.finfo(np.float32).max,
             1,
             1.4,
-            1.5])
+            1.5,
+            9])
 
         low = np.array([
             0,
@@ -156,6 +159,7 @@ class PickbotEnv(gym.Env):
             0,
             -1,
             0,
+            0,
             0])
         self.observation_space = spaces.Box(low, high)
         self.reward_range = (-np.inf, np.inf)
@@ -165,13 +169,22 @@ class PickbotEnv(gym.Env):
 
         # set up everything to publish the Episode Number and Episode Reward on a rostopic
         self.episode_num = 0
-        self.cumulated_episode_reward = 0
+        self.accumulated_episode_reward = 0
         self.episode_steps = 0
         self.reward_pub = rospy.Publisher('/openai/reward', RLExperimentInfo, queue_size=1)
         self.reward_list = []
         self.episode_list = []
         self.step_list = []
         self.csv_name = logger.get_dir() + '/result_log'
+
+        # object type, currently set from 1-10
+        self.object_type = 0
+        self.object_name = 'unit_box_0'  # first spawned object
+        self.object_list = ['unit_box_0', 'unit_box_1', 'unit_box_2', 'unit_box_3', 'unit_box_4', 'unit_box_5',
+                            'unit_box_6', 'unit_box_7', 'unit_box_8', 'unit_box_9']
+
+        # get maximum distance to the object to calculate reward, renewed in the reset function
+        self.max_distance, _ = self.get_distance_gripper_to_object()
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized
     def joints_state_callback(self, msg):
@@ -218,7 +231,7 @@ class PickbotEnv(gym.Env):
         13) Create YAML Files for contact forces in order to get the average over 2 contacts
         14) Create YAML Files for collision to make shure to see a collision due to high noise in topic
         15) Unpause Simulation cause in next Step Sysrem must be running otherwise no data is seen by Subscribers
-        16) Publish Episode Reward and set cumulated reward back to 0 and iterate the Episode Number
+        16) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
         17) Return State
         """
 
@@ -243,6 +256,8 @@ class PickbotEnv(gym.Env):
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
+        # get maximum distance to the object to calculate reward
+        self.max_distance, _ = self.get_distance_gripper_to_object()
         self.gazebo.pauseSim()
         state = self.get_state(observation)
         self._update_episode()
@@ -273,7 +288,7 @@ class PickbotEnv(gym.Env):
                 last_position = (yaml.load(stream, Loader=yaml.Loader))
             except yaml.YAMLError as exc:
                 print(exc)
-        # 2) get the new jointpositions acording to chosen action
+        # 2) get the new joint positions acording to chosen action
         next_action_position = self.get_action_to_position(action, last_position)
 
         # 3) write last_position into YAML File
@@ -297,9 +312,9 @@ class PickbotEnv(gym.Env):
         done, done_reward, invallid_contact = self.is_done(observation, last_position)
         self.gazebo.pauseSim()
 
-        # 8) Calculate reward based on Observatin and done_reward and update the cumulated Episode Reward
+        # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         reward = self.compute_reward(observation, done_reward, invallid_contact)
-        self.cumulated_episode_reward += reward
+        self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
         self.gazebo.unpauseSim()
@@ -371,7 +386,7 @@ class PickbotEnv(gym.Env):
         while collision_msg is None and not rospy.is_shutdown():
             try:
                 collision_msg = rospy.wait_for_message("/gz_collisions", Bool, timeout=0.1)
-                self.collisions = collision_msg.data
+                self.collision = collision_msg.data
                 rospy.logdebug("collision READY")
             except Exception as e:
                 rospy.logdebug("EXCEPTION: Collision not ready yet, retrying==>" + str(e))
@@ -413,7 +428,12 @@ class PickbotEnv(gym.Env):
         try:
             spawn_box = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
             box = ModelState()
-            box.model_name = "unit_box_0"
+            self.object_name = random.choice(self.object_list)
+            self.object_type = self.object_list.index(self.object_name)
+            box.model_name = self.object_name
+            print("Current target object name = " + box.model_name)
+            # use this instead to just spawn one type of target object
+            # box.model_name = 'unit_box_0'
             box.pose.position.x = np.random.uniform(low=-0.35, high=0.3, size=None)
             box.pose.position.y = np.random.uniform(low=0.7, high=0.9, size=None)
             box.pose.position.z = 1.05
@@ -431,10 +451,9 @@ class PickbotEnv(gym.Env):
         Object:     unite_box_0 link
         Gripper:    vacuum_gripper_link ground_plane
         """
-
         try:
             model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-            blockName = "unit_box_0"
+            blockName = self.object_name
             relative_entity_name = "link"
             object_resp_coordinates = model_coordinates(blockName, relative_entity_name)
             Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
@@ -613,7 +632,8 @@ class PickbotEnv(gym.Env):
                                     "contact_2_force",
                                     "object_pos_x",
                                     "object_pos_y",
-                                    "object_pos_z"]
+                                    "object_pos_z",
+                                    "object_type"]
 
 
         :return: observation
@@ -665,6 +685,8 @@ class PickbotEnv(gym.Env):
                 observation.append(object_pos_y)
             elif obs_name == "object_pos_z":
                 observation.append(object_pos_z)
+            elif obs_name == "object_type":
+                observation.append(self.object_type)
             else:
                 raise NameError('Observation Asked does not exist==' + str(obs_name))
 
@@ -762,7 +784,7 @@ class PickbotEnv(gym.Env):
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(self.collision, yaml_file, default_flow_style=False)
 
-        # Check if last_collision or self.collsion are True. IF one s true return True else False
+        # Check if last_collision or self.collision are True. IF one s true return True else False
         if self.collision == True or last_collision == True:
             return True
         else:
@@ -772,7 +794,7 @@ class PickbotEnv(gym.Env):
         """Checks if episode is done based on observations given.
 
         Done when:
-        -Sucsessfully reached goal: Contact with both contact sensors and contact is a valid one(Wrist3 or/and Vavuum Gripper with unit_box)
+        -Successfully reached goal: Contact with both contact sensors and contact is a valid one(Wrist3 or/and Vacuum Gripper with unit_box)
         -Crashing with itselfe, shelf, base
         -Joints are going into limits set
         """
@@ -786,7 +808,7 @@ class PickbotEnv(gym.Env):
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
 
-        # Sucsessfully reached goal: Contact with both contact sensors and there is no invalid contact
+        # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
         if observations[7] != 0 and observations[8] != 0 and invalid_collision == False:
             done = True
             done_reward = reward_reached_goal
@@ -797,22 +819,22 @@ class PickbotEnv(gym.Env):
             done_reward = reward_crashing
 
         # Joints are going into limits set
-        if last_position[0] < 1 or last_position[0] > 2:
+        if last_position[0] < -2.9 or last_position[0] > 2.9:
             done = True
             done_reward = reward_join_range
-        elif last_position[1] < -1.3 or last_position[1] > -0.7:
+        elif last_position[1] < -2.9 or last_position[1] > 2.9:
             done = True
             done_reward = reward_join_range
-        elif last_position[2] < 0.9 or last_position[2] > 1.8:
+        elif last_position[2] < -2.9 or last_position[2] > 2.9:
             done = True
             done_reward = reward_join_range
-        elif last_position[3] < -3.0 or last_position[3] > 0:
+        elif last_position[3] < -2.9 or last_position[3] > 2.9:
             done = True
             done_reward = reward_join_range
-        elif last_position[4] < -3.1 or last_position[4] > 0:
+        elif last_position[4] < -2.9 or last_position[4] > 2.9:
             done = True
             done_reward = reward_join_range
-        elif last_position[5] < -3 or last_position[5] > 3:
+        elif last_position[5] < -2.9 or last_position[5] > 2.9:
             done = True
             done_reward = reward_join_range
 
@@ -831,11 +853,12 @@ class PickbotEnv(gym.Env):
         reward_distance = 0
         reward_contact = 0
 
-        # Reward for Distance
+        # Reward for Distance to encourage approaching the box
         distance = observation[0]
+        reward_distance = 1 - math.pow(distance/self.max_distance, 0.4)
 
-        # Reward distance will be 1.4 at distance 0.01 and 0.18 at distance 0.55. Inbetween logarythmic curve
-        reward_distance = math.log10(distance) * (-1) * 0.7
+        # Reward distance will be 1.4 at distance 0.01 and 0.18 at distance 0.55. In between logarithmic curve
+        # reward_distance = math.log10(distance) * (-1) * 0.7
 
         # Reward for Contact
         contact_1 = observation[7]
@@ -844,7 +867,8 @@ class PickbotEnv(gym.Env):
         if contact_1 == 0 and contact_2 == 0:
             reward_contact = 0
         elif contact_1 != 0 and contact_2 == 0 and invallid_contact == False or contact_1 == 0 and contact_2 != 0 and invallid_contact == False:
-            reward_contact = 20
+            reward_contact = 5
+            reward_distance = 0
 
         total_reward = reward_distance + reward_contact + done_reward
 
@@ -852,19 +876,19 @@ class PickbotEnv(gym.Env):
 
     def _update_episode(self):
         """
-        Publishes the cumulated reward of the episode and
+        Publishes the accumulated reward of the episode and
         increases the episode number by one.
         :return:
         """
         if self.episode_num > 0:
             self._publish_reward_topic(
-                self.cumulated_episode_reward,
+                self.accumulated_episode_reward,
                 self.episode_steps,
                 self.episode_num
             )
 
         self.episode_num += 1
-        self.cumulated_episode_reward = 0
+        self.accumulated_episode_reward = 0
         self.episode_steps = 0
 
     def _publish_reward_topic(self, reward, steps, episode_number=1):
@@ -882,7 +906,7 @@ class PickbotEnv(gym.Env):
         self.reward_list.append(reward)
         self.episode_list.append(episode_number)
         self.step_list.append(steps)
-        liste = str(reward) + ";" + str(episode_number) + ";" + str(steps) + "\n"
+        list = str(reward) + ";" + str(episode_number) + ";" + str(steps) + "\n"
 
         with open(self.csv_name + '.csv', 'a') as csv:
-            csv.write(str(liste))
+            csv.write(str(list))
