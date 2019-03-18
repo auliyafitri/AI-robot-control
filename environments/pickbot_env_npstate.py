@@ -31,7 +31,9 @@ from sensor_msgs.msg import Image
 from gazebo_msgs.srv import GetModelState
 from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.srv import GetLinkState
-from geometry_msgs.msg import Point, Quaternion, Vector3
+from gazebo_msgs.srv import DeleteModel
+from gazebo_msgs.srv import SpawnModel
+from geometry_msgs.msg import Point, Quaternion, Vector3, Pose
 from gazebo_msgs.msg import ModelState
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
@@ -51,7 +53,7 @@ reg = register(
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, running_step=0.001):
+    def __init__(self, joint_increment_value=0.02, running_step=0.001, random_object=True, random_position=False):
         """
         initializing all the relevant variables and connections
         """
@@ -59,6 +61,8 @@ class PickbotEnv(gym.Env):
         # Assign Parameters
         self._joint_increment_value = joint_increment_value
         self.running_step = running_step
+        self._random_object = random_object
+        self._random_position = random_position
 
         # Assign MsgTypes
         self.joints_state = JointState()
@@ -93,7 +97,7 @@ class PickbotEnv(gym.Env):
         """
         self.gazebo = GazeboConnection()
         self.controllers_object = ControllersConnection()
-        self.pickbot_joint_pubisher_object = JointPub()
+        self.pickbot_joint_publisher_object = JointPub()
 
         # Define Subscribers as Sensordata
         """
@@ -177,11 +181,15 @@ class PickbotEnv(gym.Env):
         self.step_list = []
         self.csv_name = logger.get_dir() + '/result_log'
 
-        # object type, currently set from 1-10
+        # object name: name of the target object
+        # object type: index of the object name in the object list
+        # object list: pool of the available objects
+        self.object_name = ''
         self.object_type = 0
-        self.object_name = 'unit_box_0'  # first spawned object
-        self.object_list = ['unit_box_0', 'unit_box_1', 'unit_box_2', 'unit_box_3', 'unit_box_4', 'unit_box_5',
-                            'unit_box_6', 'unit_box_7', 'unit_box_8', 'unit_box_9']
+        self.object_list = ['unit_box_0', 'unit_box_2', 'coke_can_box']
+
+        # spawned first object, set object name and object type
+        self.set_target_object(random_object=self._random_object, random_position=self._random_position)
 
         # get maximum distance to the object to calculate reward, renewed in the reset function
         self.max_distance, _ = self.get_distance_gripper_to_object()
@@ -219,6 +227,7 @@ class PickbotEnv(gym.Env):
         1) Change Gravity to 0 ->That arm doesnt fall
         2) Turn Controllers off
         3) Pause Simulation
+        4) Delete previous target object
         4) Reset Simulation
         5) Set Model Pose to desired one
         6) Unpause Simulation
@@ -226,25 +235,28 @@ class PickbotEnv(gym.Env):
         8) Restore Gravity
         9) Get Observations and return current State
         10) Check all Systems work
-        11) Pause Simulation
-        12) Write initial Position into Yaml File
-        13) Create YAML Files for contact forces in order to get the average over 2 contacts
-        14) Create YAML Files for collision to make shure to see a collision due to high noise in topic
-        15) Unpause Simulation cause in next Step Sysrem must be running otherwise no data is seen by Subscribers
-        16) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
-        17) Return State
+        11) Spawn new target
+        12) Pause Simulation
+        13) Write initial Position into Yaml File
+        14) Create YAML Files for contact forces in order to get the average over 2 contacts
+        15) Create YAML Files for collision to make shure to see a collision due to high noise in topic
+        16) Unpause Simulation cause in next Step Sysrem must be running otherwise no data is seen by Subscribers
+        17) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
+        18) Return State
         """
 
         self.gazebo.change_gravity(0, 0, 0)
         self.controllers_object.turn_off_controllers()
         self.gazebo.pauseSim()
+        self.delete_object(self.object_name)
         self.gazebo.resetSim()
-        self.pickbot_joint_pubisher_object.set_joints()
+        self.pickbot_joint_publisher_object.set_joints()
         self.gazebo.unpauseSim()
         self.controllers_object.turn_on_controllers()
         self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
-        self.randomly_spawn_object()
+        self.set_target_object(random_object=self._random_object, random_position=self._random_position)
+        # self.randomly_spawn_object()
 
         last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
         with open('last_position.yml', 'w') as yaml_file:
@@ -297,7 +309,7 @@ class PickbotEnv(gym.Env):
 
         # 4) unpause, move to position for certain time
         self.gazebo.unpauseSim()
-        self.pickbot_joint_pubisher_object.move_joints(next_action_position)
+        self.pickbot_joint_publisher_object.move_joints(next_action_position)
         time.sleep(self.running_step)
 
         # 5) Get Observations and pause Simulation
@@ -421,6 +433,35 @@ class PickbotEnv(gym.Env):
             except Exception as e:
                 rospy.logdebug("EXCEPTION: gripper_state not ready yet, retrying==>" + str(e))
 
+    # Set target object
+    # randomize: spawn object randomly from the object pool
+    # random_position: spawn object with random position
+    def set_target_object(self, random_object=False, random_position=False):
+        if random_object:
+            self.object_name = random.choice(self.object_list)
+        else:
+            self.object_name = 'unit_box_0'
+        self.object_type = self.object_list.index(self.object_name)
+
+        # get model from sdf file
+        rospack = rospkg.RosPack()
+        sdf_fname = rospack.get_path('pickbot_simulation') + "/worlds/sdf/" + self.object_name + ".sdf"
+        with open(sdf_fname, "r") as f:
+            model_sdf = f.read()
+
+        # spawn model
+        try:
+            spawn_model = rospy.ServiceProxy("gazebo/spawn_sdf_model", SpawnModel)
+            if random_position:
+                box_pos = Pose(position=Point(x=np.random.uniform(low=-0.35, high=0.3, size=None),
+                                              y=np.random.uniform(low=0.7, high=0.9, size=None),
+                                              z=1.05))
+            else:
+                box_pos = Pose(position=Point(x=0.0, y=0.719858, z=1.05))
+            spawn_model(self.object_name, model_sdf, "/", box_pos, "world")
+        except rospy.ServiceException as e:
+            rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
+
     def randomly_spawn_object(self):
         """
         spawn the object unit_box_0 in a random position in the shelf
@@ -428,18 +469,23 @@ class PickbotEnv(gym.Env):
         try:
             spawn_box = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
             box = ModelState()
-            self.object_name = random.choice(self.object_list)
-            self.object_type = self.object_list.index(self.object_name)
             box.model_name = self.object_name
-            print("Current target object name = " + box.model_name)
-            # use this instead to just spawn one type of target object
-            # box.model_name = 'unit_box_0'
             box.pose.position.x = np.random.uniform(low=-0.35, high=0.3, size=None)
             box.pose.position.y = np.random.uniform(low=0.7, high=0.9, size=None)
             box.pose.position.z = 1.05
             spawn_box(box)
         except rospy.ServiceException as e:
             rospy.loginfo("Set Model State service call failed:  {0}".format(e))
+
+    def delete_object(self, object_name):
+        """
+        delete model
+        """
+        try:
+            delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+            delete_model(object_name)
+        except rospy.ServiceException as e:
+            rospy.loginfo("Delete Model service call failed:  {0}".format(e))
 
     def get_distance_gripper_to_object(self):
         """
