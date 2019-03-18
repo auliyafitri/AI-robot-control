@@ -18,7 +18,7 @@
         <pose>0.003937 0.0047244 -0.18 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/robotics/catkin_ws/src/AI-robot-control/Pickbot/pickbot_simulation/worlds/coke_can/meshes/coke_can.dae</uri>
+            <uri>/home/robotics/catkin_ws/src/AI-robot-control/Pickbot/pickbot_simulation/worlds/shapes/coke_can.dae</uri>
           </mesh>
         </geometry>
         <surface>
@@ -42,7 +42,7 @@
         <pose>0.003937 0.0047244 -0.18 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/robotics/catkin_ws/src/AI-robot-control/Pickbot/pickbot_simulation/worlds/coke_can/meshes/coke_can.dae</uri>
+            <uri>/home/robotics/catkin_ws/src/AI-robot-control/Pickbot/pickbot_simulation/worlds/shapes/coke_can.dae</uri>
           </mesh>
         </geometry>
       </visual>
