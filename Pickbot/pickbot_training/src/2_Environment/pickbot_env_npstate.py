@@ -460,7 +460,7 @@ class PickbotEnv(gym.Env):
                                               y=np.random.uniform(low=0.7, high=0.9, size=None),
                                               z=1.05))
             else:
-                box_pos = Pose(position=Point(x=0.0, y=0.719858, z=1.05))
+                box_pos = Pose(position=Point(x=0.0, y=0.919858, z=1.00))
             spawn_model(self.object_name, model_sdf, "/", box_pos, "world")
         except rospy.ServiceException as e:
             rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
