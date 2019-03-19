@@ -186,13 +186,20 @@ class PickbotEnv(gym.Env):
 
         # object name: name of the target object
         # object type: index of the object name in the object list
-        # object list: pool of the available objects
+        # object list: pool of the available objects, have at least one entry
         self.object_name = ''
         self.object_type = 0
         self.object_list = ['unit_box_0', 'unit_box_2', 'coke_can_box']
+        self.object_initial_position = Pose(position=Point(x=0.0, y=0.9, z=1.05))
 
         # spawned first object, set object name and object type
-        self.set_target_object(random_object=self._random_object, random_position=self._random_position)
+        # if object is random, spawn random object
+        # else get the first entry of object_list
+        if self._random_object:
+            self.set_target_object(random_object=self._random_object, random_position=self._random_position)
+        else:
+            self.object_name = self.object_list[0]
+            self.spawn_object(self.object_name, self.object_initial_position)
 
         # get maximum distance to the object to calculate reward, renewed in the reset function
         self.max_distance, _ = self.get_distance_gripper_to_object()
@@ -230,7 +237,7 @@ class PickbotEnv(gym.Env):
         1) Change Gravity to 0 ->That arm doesnt fall
         2) Turn Controllers off
         3) Pause Simulation
-        4) Delete previous target object
+        4) Delete previous target object if randomly chosen object is set to True
         4) Reset Simulation
         5) Set Model Pose to desired one
         6) Unpause Simulation
@@ -251,14 +258,13 @@ class PickbotEnv(gym.Env):
         self.gazebo.change_gravity(0, 0, 0)
         self.controllers_object.turn_off_controllers()
         self.gazebo.pauseSim()
-        self.delete_object(self.object_name)
         self.gazebo.resetSim()
         self.pickbot_joint_publisher_object.set_joints()
+        self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         self.gazebo.unpauseSim()
         self.controllers_object.turn_on_controllers()
         self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
-        self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         # self.randomly_spawn_object()
 
         last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
@@ -437,33 +443,27 @@ class PickbotEnv(gym.Env):
                 rospy.logdebug("EXCEPTION: gripper_state not ready yet, retrying==>" + str(e))
 
     # Set target object
-    # randomize: spawn object randomly from the object pool
+    # randomize: spawn object randomly from the object pool. If false, object will be the first entry of the object list
     # random_position: spawn object with random position
     def set_target_object(self, random_object=False, random_position=False):
-        if random_object:
-            self.object_name = random.choice(self.object_list)
+        if random_position:
+            box_pos = Pose(position=Point(x=np.random.uniform(low=-0.35, high=0.3, size=None),
+                                          y=np.random.uniform(low=0.7, high=0.9, size=None),
+                                          z=1.05))
+            print("random placing")
         else:
-            self.object_name = 'unit_box_0'
-        self.object_type = self.object_list.index(self.object_name)
+            box_pos = self.object_initial_position
+            print("static placing")
 
-        # get model from sdf file
-        rospack = rospkg.RosPack()
-        sdf_fname = rospack.get_path('pickbot_simulation') + "/worlds/sdf/" + self.object_name + ".sdf"
-        with open(sdf_fname, "r") as f:
-            model_sdf = f.read()
-
-        # spawn model
-        try:
-            spawn_model = rospy.ServiceProxy("gazebo/spawn_sdf_model", SpawnModel)
-            if random_position:
-                box_pos = Pose(position=Point(x=np.random.uniform(low=-0.35, high=0.3, size=None),
-                                              y=np.random.uniform(low=0.7, high=0.9, size=None),
-                                              z=1.05))
-            else:
-                box_pos = Pose(position=Point(x=0.0, y=0.719858, z=1.05))
-            spawn_model(self.object_name, model_sdf, "/", box_pos, "world")
-        except rospy.ServiceException as e:
-            rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
+        if random_object:
+            self.delete_object(self.object_name)
+            self.object_name = random.choice(self.object_list)
+            self.object_type = self.object_list.index(self.object_name)
+            self.spawn_object(self.object_name, box_pos)
+            print("random object")
+        else:
+            self.change_object_position(self.object_name, box_pos)
+            print("static object")
 
     def randomly_spawn_object(self):
         """
@@ -480,15 +480,56 @@ class PickbotEnv(gym.Env):
         except rospy.ServiceException as e:
             rospy.loginfo("Set Model State service call failed:  {0}".format(e))
 
+    def spawn_object(self, object_name, model_position, model_sdf=None):
+        """
+        spawn object using gazebo service
+        :param object_name: name of the object
+        :param model_position: position of the spawned object
+        :param model_sdf: description of the object in sdf format
+        :return: -
+        """
+        if model_sdf is None:  # take sdf file from default folder
+            # get model from sdf file
+            rospack = rospkg.RosPack()
+            sdf_fname = rospack.get_path('pickbot_simulation') + "/worlds/sdf/" + self.object_name + ".sdf"
+            with open(sdf_fname, "r") as f:
+                model_sdf = f.read()
+
+        try:
+            spawn_model = rospy.ServiceProxy("gazebo/spawn_sdf_model", SpawnModel)
+            spawn_model(object_name, model_sdf, "/", model_position, "world")
+        except rospy.ServiceException as e:
+            rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
+
     def delete_object(self, object_name):
         """
-        delete model
+        delete object using gazebo service
+        :param object_name: the name of the object
+        :return: -
         """
         try:
             delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
             delete_model(object_name)
         except rospy.ServiceException as e:
             rospy.loginfo("Delete Model service call failed:  {0}".format(e))
+
+    def change_object_position(self, object_name, model_position):
+        """
+        change object postion using gazebo service
+        :param object_name: name of the object
+        :param model_position: destination
+        :return: -
+        """
+        try:
+            change_position = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
+            box = ModelState()
+            box.model_name = object_name
+            box.pose.position.x = model_position.position.x
+            box.pose.position.y = model_position.position.y
+            box.pose.position.z = model_position.position.z
+            change_position(box)
+        except rospy.ServiceException as e:
+            rospy.loginfo("Set Model State service call failed:  {0}".format(e))
 
     def get_distance_gripper_to_object(self):
         """
