@@ -454,7 +454,8 @@ class PickbotEnv(gym.Env):
             box_pos = self.object_initial_position
 
         if random_object:
-            self.delete_object(self.object_name)
+            if not self.object_name == '':  # not called in init
+                self.delete_object(self.object_name)
             self.object_name = random.choice(self.object_list)
             self.object_type = self.object_list.index(self.object_name)
             self.spawn_object(self.object_name, box_pos)
@@ -941,7 +942,7 @@ class PickbotEnv(gym.Env):
 
         # Reward for Distance to encourage approaching the box
         distance = observation[0]
-        reward_distance = 1 - math.pow(distance/self.max_distance, 0.4)
+        reward_distance = 1 - math.pow(distance / self.max_distance, 0.4)
 
         # Reward distance will be 1.4 at distance 0.01 and 0.18 at distance 0.55. In between logarithmic curve
         # reward_distance = math.log10(distance) * (-1) * 0.7
