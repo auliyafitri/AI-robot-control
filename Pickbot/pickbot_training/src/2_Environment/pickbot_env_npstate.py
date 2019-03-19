@@ -450,20 +450,16 @@ class PickbotEnv(gym.Env):
             box_pos = Pose(position=Point(x=np.random.uniform(low=-0.35, high=0.3, size=None),
                                           y=np.random.uniform(low=0.7, high=0.9, size=None),
                                           z=1.05))
-            print("random placing")
         else:
             box_pos = self.object_initial_position
-            print("static placing")
 
         if random_object:
             self.delete_object(self.object_name)
             self.object_name = random.choice(self.object_list)
             self.object_type = self.object_list.index(self.object_name)
             self.spawn_object(self.object_name, box_pos)
-            print("random object")
         else:
             self.change_object_position(self.object_name, box_pos)
-            print("static object")
 
     def randomly_spawn_object(self):
         """
