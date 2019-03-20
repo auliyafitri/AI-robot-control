@@ -10,7 +10,6 @@ import pygazebo.msg.contact_pb2
 import rospy
 from std_msgs.msg import Bool
 
-
 '''
 Plan A:
 If you want to send sequential commands, the preferred model is to create a single coroutine, which
@@ -35,63 +34,62 @@ Plan C:
 
 '''
 
-#global variables
+# global variables
 allowed_comb = {
-    'wrist_3_link' : ['box'],
-    'vacuum_gripper_link' : ['box'],
-    'box' : ['wrist_3_link','vacuum_gripper_link']
+    'wrist_3_link': ['box'],
+    'vacuum_gripper_link': ['box'],
+    'box': ['wrist_3_link', 'vacuum_gripper_link']
 }
 
-ignored_comb = ['stand','box']
+ignored_comb = ['stand', 'box']
 
 collision_1 = ''
 collision_2 = ''
 
 contacts_result = []
 
-#ROS Publisher
+# ROS Publisher
 pub = rospy.Publisher('gz_collisions', Bool, queue_size=1)
-rospy.init_node('gz_subscriber', anonymous=True) 
+rospy.init_node('gz_subscriber', anonymous=True)
 rate = rospy.Rate(10)
+
 
 @trollius.coroutine
 def publish_loop():
-           
-    manager = yield From(pygazebo.connect()) 
-    #print('connected')
-    
+    manager = yield From(pygazebo.connect())
+
+    # print('connected')
+
     def callback(data):
         global contacts_result
         message = pygazebo.msg.contacts_pb2.Contacts.FromString(data)
-                
-        if not message.contact: #no contact
-            #print('No Collision')
+
+        if not message.contact:  # no contact
+            # print('No Collision')
             if not rospy.is_shutdown():
-                #rospy.loginfo(False)
+                # rospy.loginfo(False)
                 pub.publish(False)
-        else: #have contact(s)
-            #print(len(message.contact))
+        else:  # have contact(s)
+            # print(len(message.contact))
             dump_object(message)
-            
-            #print contacts_result
+
+            # print contacts_result
             _done = False
             if len(contacts_result) > 0:
                 for i in contacts_result:
                     _done = _done or i
-            
+
             if not rospy.is_shutdown():
-                #rospy.loginfo(_done)
+                # rospy.loginfo(_done)
                 pub.publish(_done)
-            
-            #empty the contacts list
+
+            # empty the contacts list
             contacts_result = []
-            
-            
-        
+
     subscriber = manager.subscribe('/gazebo/default/physics/contacts',
-                    'gazebo.msgs.Contacts',
-                    callback)
-    
+                                   'gazebo.msgs.Contacts',
+                                   callback)
+
     while True:
         yield From(subscriber.wait_for_connection())
         yield From(trollius.sleep(0.01))
@@ -106,12 +104,14 @@ Iterator for repeated object
 3. Publish the bool value to ROS topic gz_collisions
 4. Empty collision_1 and collision_2
 '''
+
+
 def dump_object(obj):
     global contacts_result
     for descriptor in obj.DESCRIPTOR.fields:
         value = getattr(obj, descriptor.name)
-        #print(descriptor.type, descriptor.name)                
-        
+        # print(descriptor.type, descriptor.name)
+
         if descriptor.type == descriptor.TYPE_MESSAGE:
             if descriptor.label == descriptor.LABEL_REPEATED:
                 map(dump_object, value)
@@ -124,22 +124,22 @@ def dump_object(obj):
             if 'collision1' in descriptor.full_name:
                 if 'box' in value:
                     collision_1 = 'box'
-                else: #stand, pickbot
-                    collision_1 = value.split('::')[1] #stand; wrist_1_link; wrist_2_link; wrist_3_link
-                #print "%s: collision_1 %s" % (descriptor.full_name, collision_1)
+                else:  # stand, pickbot
+                    collision_1 = value.split('::')[1]  # stand; wrist_1_link; wrist_2_link; wrist_3_link
+                # print("%s: collision_1 %s, %s" % (descriptor.full_name, collision_1, value))
             elif 'collision2' in descriptor.full_name:
                 if 'box' in value:
                     collision_2 = 'box'
-                else: #stand, pickbot
-                    collision_2 = value.split('::')[1] #stand; wrist_1_link; wrist_2_link; wrist_3_link
-                #print "%s: collision_2 %s" % (descriptor.full_name, collision_2)
+                else:  # stand, pickbot
+                    collision_2 = value.split('::')[1]  # stand; wrist_1_link; wrist_2_link; wrist_3_link
+                # print("%s: collision_2 %s, %s" % (descriptor.full_name, collision_2, value))
 
-            while not(collision_2==''): #both collision_1 and collision_2 are assigned
-                if not_to_be_ignored(): #not stand and box
-                    #print "collisions: %s and %s" % (collision_1, collision_2)
-                    #print is_collision_allowed()
-                    contacts_result.append(is_collision_allowed())
-                    
+            while not (collision_2 == ''):  # both collision_1 and collision_2 are assigned
+                if not_to_be_ignored():  # not stand and box
+                    # print("collisions: %s and %s, %s" % (collision_1, collision_2, value))
+                    # print(is_invalid_collision())
+                    contacts_result.append(is_invalid_collision())
+
                     '''
                     _done = is_collision_allowed()
                     if not rospy.is_shutdown():
@@ -147,14 +147,12 @@ def dump_object(obj):
                         rospy.loginfo(_done)
                         pub.publish(_done)
                     '''
-                #reinitialize both var
+                # reinitialize both var
                 collision_1 = ''
                 collision_2 = ''
 
 
-
-
-def is_collision_allowed():
+def is_invalid_collision():
     global collision_1
     global collision_2
     global allowed_comb
@@ -167,25 +165,24 @@ def is_collision_allowed():
     else:
         return True
 
+
 def not_to_be_ignored():
     global collision_1
     global collision_2
     global ignored_comb
-    return not((collision_1 in ignored_comb) and (collision_2 in ignored_comb))
+    return not ((collision_1 in ignored_comb) and (collision_2 in ignored_comb))
 
 
 def subsc_listen():
     global loop
     loop = trollius.get_event_loop()
     loop.run_until_complete(publish_loop())
-    
 
 
 if __name__ == '__main__':
     try:
         subsc_listen()
     except KeyboardInterrupt:
-    #except rospy.ROSInterruptException:
-        #pass
+        # except rospy.ROSInterruptException:
+        # pass
         sys.exit()
-   

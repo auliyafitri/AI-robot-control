@@ -52,7 +52,7 @@ reg = register(
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, running_step=0.001, random_object=True, random_position=False):
+    def __init__(self, joint_increment_value=0.02, running_step=0.001, random_object=True, random_position=True):
         """
         initializing all the relevant variables and connections
         """
@@ -192,14 +192,13 @@ class PickbotEnv(gym.Env):
         self.object_list = ['unit_box_0', 'unit_box_2', 'coke_can_box']
         self.object_initial_position = Pose(position=Point(x=0.0, y=0.9, z=1.05))
 
-        # spawned first object, set object name and object type
+        # populate objects from object list
+        self.populate_objects()
+
+        # select first object, set object name and object type
         # if object is random, spawn random object
         # else get the first entry of object_list
-        if self._random_object:
-            self.set_target_object(random_object=self._random_object, random_position=self._random_position)
-        else:
-            self.object_name = self.object_list[0]
-            self.spawn_object(self.object_name, self.object_initial_position)
+        self.set_target_object(random_object=self._random_object, random_position=self._random_position)
 
         # get maximum distance to the object to calculate reward, renewed in the reset function
         self.max_distance, _ = self.get_distance_gripper_to_object()
@@ -447,20 +446,19 @@ class PickbotEnv(gym.Env):
     # random_position: spawn object with random position
     def set_target_object(self, random_object=False, random_position=False):
         if random_position:
-            box_pos = Pose(position=Point(x=np.random.uniform(low=-0.35, high=0.3, size=None),
-                                          y=np.random.uniform(low=0.7, high=0.9, size=None),
+            box_pos = Pose(position=Point(x=np.random.uniform(low=-0.3, high=0.3, size=None),
+                                          y=np.random.uniform(low=0.9, high=1.1, size=None),
                                           z=1.05))
         else:
             box_pos = self.object_initial_position
 
         if random_object:
-            if not self.object_name == '':  # not called in init
-                self.delete_object(self.object_name)
             self.object_name = random.choice(self.object_list)
             self.object_type = self.object_list.index(self.object_name)
-            self.spawn_object(self.object_name, box_pos)
         else:
-            self.change_object_position(self.object_name, box_pos)
+            self.object_name = self.object_list[0]
+            self.object_type = 0
+        self.change_object_position(self.object_name, box_pos)
 
     def randomly_spawn_object(self):
         """
@@ -488,13 +486,14 @@ class PickbotEnv(gym.Env):
         if model_sdf is None:  # take sdf file from default folder
             # get model from sdf file
             rospack = rospkg.RosPack()
-            sdf_fname = rospack.get_path('pickbot_simulation') + "/worlds/sdf/" + self.object_name + ".sdf"
+            sdf_fname = rospack.get_path('pickbot_simulation') + "/worlds/sdf/" + object_name + ".sdf"
             with open(sdf_fname, "r") as f:
                 model_sdf = f.read()
 
         try:
             spawn_model = rospy.ServiceProxy("gazebo/spawn_sdf_model", SpawnModel)
             spawn_model(object_name, model_sdf, "/", model_position, "world")
+            print("SPAWN %s finished" % self.object_name)
         except rospy.ServiceException as e:
             rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
 
@@ -527,6 +526,19 @@ class PickbotEnv(gym.Env):
             change_position(box)
         except rospy.ServiceException as e:
             rospy.loginfo("Set Model State service call failed:  {0}".format(e))
+
+    def populate_objects(self):
+        """
+        populate objects, called in init
+        :return: -
+        """
+        rand_x = np.random.uniform(low=-0.35, high=0.35, size=(len(self.object_list),))
+        rand_y = np.random.uniform(low=2.2, high=2.45, size=(len(self.object_list),))
+        for idx, obj in enumerate(self.object_list):
+            box_pos = Pose(position=Point(x=rand_x[idx],
+                                          y=rand_y[idx],
+                                          z=1.05))
+            self.spawn_object(obj, box_pos)
 
     def get_distance_gripper_to_object(self):
         """
@@ -896,34 +908,41 @@ class PickbotEnv(gym.Env):
         invalid_collision = self.get_collisions()
 
         # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
-        if observations[7] != 0 and observations[8] != 0 and invalid_collision == False:
+        if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
             done = True
             done_reward = reward_reached_goal
 
-        # Crashing with itselfe, shelf, base
-        if invalid_collision == True:
+        # Crashing with itself, shelf, base
+        if invalid_collision:
             done = True
+            print('reset, crashing')
             done_reward = reward_crashing
 
         # Joints are going into limits set
         if last_position[0] < -2.9 or last_position[0] > 2.9:
             done = True
             done_reward = reward_join_range
+            print('>>>>>>>>>>>>>>>>>>>> joint 3 exceeds limit')
         elif last_position[1] < -2.9 or last_position[1] > 2.9:
             done = True
             done_reward = reward_join_range
+            print('>>>>>>>>>>>>>>>>>>>> joint 2 exceeds limit')
         elif last_position[2] < -2.9 or last_position[2] > 2.9:
             done = True
             done_reward = reward_join_range
+            print('>>>>>>>>>>>>>>>>>>>> joint 1 exceeds limit')
         elif last_position[3] < -2.9 or last_position[3] > 2.9:
             done = True
             done_reward = reward_join_range
+            print('>>>>>>>>>>>>>>>>>>>> joint 4 exceeds limit')
         elif last_position[4] < -2.9 or last_position[4] > 2.9:
             done = True
             done_reward = reward_join_range
+            print('>>>>>>>>>>>>>>>>>>>> joint 5 exceeds limit')
         elif last_position[5] < -2.9 or last_position[5] > 2.9:
             done = True
             done_reward = reward_join_range
+            print('>>>>>>>>>>>>>>>>>>>> joint 6 exceeds limit')
 
         return done, done_reward, invalid_collision
 
