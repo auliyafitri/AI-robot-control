@@ -1,0 +1,55 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+    <model name='unit_box_9'>
+        <pose frame=''>-0.2 0.919858 1.05 0 -0 0</pose>
+        <link name='link'>
+            <inertial>
+                <mass>1</mass>
+                <inertia>
+                    <ixx>0.166667</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>0.166667</iyy>
+                    <iyz>0</iyz>
+                    <izz>0.166667</izz>
+                </inertia>
+            </inertial>
+            <collision name='collision'>
+                <geometry>
+                    <mesh>
+                        <scale>0.001 0.001 0.001</scale>
+                        <uri>
+                            /home/robotics/catkin_ws/src/AI-robot-control/Pickbot/pickbot_simulation/worlds/shapes/shape_09.stl
+                        </uri>
+                    </mesh>
+                </geometry>
+                <max_contacts>10</max_contacts>
+                <surface>
+                    <contact>
+                        <ode/>
+                    </contact>
+                    <bounce/>
+                    <friction>
+                        <torsional>
+                            <ode/>
+                        </torsional>
+                        <ode/>
+                    </friction>
+                </surface>
+            </collision>
+            <visual name='visual'>
+                <geometry>
+                    <mesh>
+                        <scale>1 1 1</scale>
+                        <uri>
+                            /home/robotics/catkin_ws/src/AI-robot-control/Pickbot/pickbot_simulation/worlds/shapes/shape_09.dae
+                        </uri>
+                    </mesh>
+                </geometry>
+            </visual>
+            <self_collide>0</self_collide>
+            <kinematic>0</kinematic>
+            <gravity>1</gravity>
+        </link>
+    </model>
+</sdf>

@@ -58,7 +58,7 @@ def reached_goal():
     
 
     for i in range(len(Episode_Rewards)):
-        if Episode_Rewards[i]>500 and Episode_Steps[i]<120 :
+        if Episode_Rewards[i]>100 and Episode_Steps[i]<120 :  # FOR SIMPLIFIED REWARDS, REVERT LATER
             Reached_Goal.append(1)
         else:
             Reached_Goal.append(0)
@@ -78,13 +78,13 @@ def create_range(x):
 
 if __name__ == '__main__':
     #Define a Name to describe the Graphs
-    Trainingname="Baseline-PPO2_discrete_Random-Spawn_2000000"
+    Trainingname="S-Baseline-TRPO_discrete_Random-Spawn_200000"
     #Define Name of the CSV File with Trainingsresults in 3_Evaluation Folder
-    filename ="result_logger_2019-03-05 11:44:15.836226.csv"
+    filename ="result_logger_2019-03-15 11:53:32.548986.csv"
     #Define Average over a number of Episodes
     average_over=100
     #Trainingssteps
-    steps=2000000
+    steps=200000
 
 
 

@@ -189,7 +189,7 @@ class PickbotEnv(gym.Env):
         # object list: pool of the available objects, have at least one entry
         self.object_name = ''
         self.object_type = 0
-        self.object_list = ['unit_box_0', 'unit_box_2', 'coke_can_box']
+        self.object_list = ['unit_box_0', 'unit_box_2', 'unit_box_9']
         self.object_initial_position = Pose(position=Point(x=0.0, y=0.9, z=1.05))
 
         # populate objects from object list
@@ -329,11 +329,11 @@ class PickbotEnv(gym.Env):
 
         # 7) Unpause Simulation check if its done, calculate done_reward
         self.gazebo.unpauseSim()
-        done, done_reward, invallid_contact = self.is_done(observation, last_position)
+        done, done_reward, invalid_contact = self.is_done(observation, last_position)
         self.gazebo.pauseSim()
 
         # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
-        reward = self.compute_reward(observation, done_reward, invallid_contact)
+        reward = self.compute_reward(observation, done_reward, invalid_contact)
         self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
@@ -493,7 +493,7 @@ class PickbotEnv(gym.Env):
         try:
             spawn_model = rospy.ServiceProxy("gazebo/spawn_sdf_model", SpawnModel)
             spawn_model(object_name, model_sdf, "/", model_position, "world")
-            print("SPAWN %s finished" % self.object_name)
+            print("SPAWN %s finished" % object_name)
         except rospy.ServiceException as e:
             rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
 
@@ -907,6 +907,11 @@ class PickbotEnv(gym.Env):
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
 
+        # DELETE LATER
+        # Temporary terminal condition: having one contact sensor
+        if observations[7] != 0 or observations[8] != 0 and not invalid_collision:
+            done = True
+
         # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
         if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
             done = True
@@ -946,7 +951,7 @@ class PickbotEnv(gym.Env):
 
         return done, done_reward, invalid_collision
 
-    def compute_reward(self, observation, done_reward, invallid_contact):
+    def compute_reward(self, observation, done_reward, invalid_contact):
         """
         Calculates the reward in each Step
         Reward for:
@@ -961,10 +966,10 @@ class PickbotEnv(gym.Env):
 
         # Reward for Distance to encourage approaching the box
         distance = observation[0]
-        reward_distance = 1 - math.pow(distance / self.max_distance, 0.4)
+        # reward_distance = 1 - math.pow(distance / self.max_distance, 0.4)
 
         # Reward distance will be 1.4 at distance 0.01 and 0.18 at distance 0.55. In between logarithmic curve
-        # reward_distance = math.log10(distance) * (-1) * 0.7
+        reward_distance = math.log10(distance) * (-1) * 0.7
 
         # Reward for Contact
         contact_1 = observation[7]
@@ -972,8 +977,8 @@ class PickbotEnv(gym.Env):
 
         if contact_1 == 0 and contact_2 == 0:
             reward_contact = 0
-        elif contact_1 != 0 and contact_2 == 0 and invallid_contact == False or contact_1 == 0 and contact_2 != 0 and invallid_contact == False:
-            reward_contact = 5
+        elif contact_1 != 0 and contact_2 == 0 and invalid_contact == False or contact_1 == 0 and contact_2 != 0 and invalid_contact == False:
+            reward_contact = 100
             reward_distance = 0
 
         total_reward = reward_distance + reward_contact + done_reward
