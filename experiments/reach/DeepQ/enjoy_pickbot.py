@@ -16,7 +16,7 @@ def main():
             env, 
             network='mlp', 
             total_timesteps=0, 
-            load_path="pickbot_model.pkl")
+            load_path="pickbot_model_2019-03-20_simresearch.pkl")
 
     while True:
         obs, done = env.reset(), False
