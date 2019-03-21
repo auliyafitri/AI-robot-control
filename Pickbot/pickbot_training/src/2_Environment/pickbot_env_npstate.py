@@ -189,7 +189,8 @@ class PickbotEnv(gym.Env):
         # object list: pool of the available objects, have at least one entry
         self.object_name = ''
         self.object_type = 0
-        self.object_list = ['unit_box_0', 'unit_box_2', 'unit_box_9']
+        self.object_list = ['unit_box_0', 'unit_box_2', 'unit_box_9', 'unit_box_1', 'unit_box_3',
+                            'unit_box_4', 'unit_box_5', 'unit_box_6', 'unit_box_7', 'unit_box_8']
         self.object_initial_position = Pose(position=Point(x=0.0, y=0.9, z=1.05))
 
         # populate objects from object list
@@ -459,6 +460,7 @@ class PickbotEnv(gym.Env):
             self.object_name = self.object_list[0]
             self.object_type = 0
         self.change_object_position(self.object_name, box_pos)
+        print("Current target: ", self.object_name)
 
     def randomly_spawn_object(self):
         """
@@ -911,43 +913,45 @@ class PickbotEnv(gym.Env):
         # Temporary terminal condition: having one contact sensor
         if observations[7] != 0 or observations[8] != 0 and not invalid_collision:
             done = True
+            print('>>>>>> Success!')
 
         # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
         if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
             done = True
+            print('>>>>>> Success!')
             done_reward = reward_reached_goal
 
         # Crashing with itself, shelf, base
         if invalid_collision:
             done = True
-            print('reset, crashing')
+            print('>>>>>> reset, crashing')
             done_reward = reward_crashing
 
         # Joints are going into limits set
         if last_position[0] < -2.9 or last_position[0] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 3 exceeds limit')
+            print('>>>>>> reset, joint 3 exceeds limit')
         elif last_position[1] < -2.9 or last_position[1] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 2 exceeds limit')
+            print('>>>>>> reset, joint 2 exceeds limit')
         elif last_position[2] < -2.9 or last_position[2] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 1 exceeds limit')
+            print('>>>>>> reset, joint 1 exceeds limit')
         elif last_position[3] < -2.9 or last_position[3] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 4 exceeds limit')
+            print('>>>>>> reset, joint 4 exceeds limit')
         elif last_position[4] < -2.9 or last_position[4] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 5 exceeds limit')
+            print('>>>>>> reset, joint 5 exceeds limit')
         elif last_position[5] < -2.9 or last_position[5] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 6 exceeds limit')
+            print('>>>>>> reset, joint 6 exceeds limit')
 
         return done, done_reward, invalid_collision
 
