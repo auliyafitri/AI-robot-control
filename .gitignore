@@ -3,3 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# generated yaml file for logging
+collision.yml
+contact_1_force.yml
+contact_2_force.yml
+last_position.yml
