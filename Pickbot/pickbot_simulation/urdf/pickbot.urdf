@@ -329,15 +329,13 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-            <mesh filename="package://pickbot_simulation/meshes/intel_realsense/intel_realsense_camera.DAE"/>
-            <!-- <box size="0.025 0.025 0.025"/> -->
+            <box size="0.025 0.025 0.025"/>
         </geometry>
       </collision>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-            <mesh filename="package://pickbot_simulation/meshes/intel_realsense/intel_realsense_camera.DAE"/>
-            <!-- <box size="0.025 0.025 0.025"/> -->
+            <box size="0.025 0.025 0.025"/>
         </geometry>
         <material name="red"/>
       </visual>
