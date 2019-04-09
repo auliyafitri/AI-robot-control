@@ -1,5 +1,6 @@
+- 1.5
 - !!python/object/apply:numpy.core.multiarray.scalar
-  - &id001 !!python/object/apply:numpy.dtype
+  - !!python/object/apply:numpy.dtype
     args:
     - f8
     - 0
@@ -14,24 +15,8 @@
     - -1
     - 0
   - !!binary |
-    jaZ/v7Xz+T8=
-- !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    7rCkf38V8L8=
-- !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    Dhx4rurr9D8=
-- !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    KCQ/nDYW/L8=
-- !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    6Ss0Zdpw9r8=
-- !!python/object/apply:numpy.core.multiarray.scalar
-  - *id001
-  - !!binary |
-    wQKpicNc1z8=
+    BCJp1kum8L8=
+- 1.4
+- -1.87
+- -1.57
+- 0
