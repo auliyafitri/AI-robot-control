@@ -5,18 +5,18 @@ import gym
 import rospy
 import numpy as np
 import time
-import random
 import os
 import yaml
 import math
 import random
 import datetime
 import rospkg
-from gym import utils, spaces
+from gym import spaces
 from gym.utils import seeding
 from gym.envs.registration import register
 
 # OTHER FILES
+import util_env as U
 from gazebo_connection import GazeboConnection
 from controllers_connection import ControllersConnection
 from joint_publisher import JointPub
@@ -42,17 +42,18 @@ from pickbot_simulation.msg import VacuumGripperState
 from pickbot_simulation.srv import VacuumGripperControl
 
 # REGISTER THE TRAININGS ENVIRONMENT IN THE GYM AS AN AVAILABLE ONE
-reg = register(
+register(
     id='Pickbot-v0',
     entry_point='pickbot_env_npstate:PickbotEnv',
-    max_episode_steps=120,  # timestep_limit=120,
+    max_episode_steps=120,
 )
 
 
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, running_step=0.001, random_object=False, random_position=False):
+    def __init__(self, joint_increment_value=0.02, running_step=0.001, random_object=False, random_position=False,
+                 use_object_type=False):
         """
         initializing all the relevant variables and connections
         """
@@ -62,6 +63,7 @@ class PickbotEnv(gym.Env):
         self.running_step = running_step
         self._random_object = random_object
         self._random_position = random_position
+        self._use_object_type = use_object_type
 
         # Assign MsgTypes
         self.joints_state = JointState()
@@ -85,8 +87,9 @@ class PickbotEnv(gym.Env):
                                       "contact_2_force",
                                       "object_pos_x",
                                       "object_pos_y",
-                                      "object_pos_z",
-                                      "object_type"]
+                                      "object_pos_z"]
+        if self._use_object_type:
+            self._list_of_observations.append("object_type")
 
         # Establishes connection with simulator
         """
@@ -147,8 +150,7 @@ class PickbotEnv(gym.Env):
             np.finfo(np.float32).max,
             1,
             1.4,
-            1.5,
-            9])
+            1.5])
 
         low = np.array([
             0,
@@ -162,8 +164,12 @@ class PickbotEnv(gym.Env):
             0,
             -1,
             0,
-            0,
             0])
+
+        if self._use_object_type:
+            high = np.append(high, 9)
+            low = np.append(low, 0)
+
         self.observation_space = spaces.Box(low, high)
         self.reward_range = (-np.inf, np.inf)
 
@@ -180,7 +186,7 @@ class PickbotEnv(gym.Env):
         self.step_list = []
         rospack = rospkg.RosPack()
         self.csv_name = rospack.get_path('pickbot_training') + "/src/3_Evaluation/result_logger_" + str(
-            datetime.datetime.now())
+            datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin'))
         print("CSV NAME")
         print(self.csv_name)
 
@@ -189,8 +195,7 @@ class PickbotEnv(gym.Env):
         # object list: pool of the available objects, have at least one entry
         self.object_name = ''
         self.object_type = 0
-        self.object_list = ['unit_box_0', 'unit_box_2', 'unit_box_9', 'unit_box_1', 'unit_box_3',
-                            'unit_box_4', 'unit_box_5', 'unit_box_6', 'unit_box_7', 'unit_box_8']
+        self.object_list = U.get_target_object()
         self.object_initial_position = Pose(position=Point(x=0.0, y=0.9, z=1.05))
 
         # populate objects from object list
@@ -737,7 +742,7 @@ class PickbotEnv(gym.Env):
                                     "object_pos_x",
                                     "object_pos_y",
                                     "object_pos_z",
-                                    "object_type"]
+                                    "object_type"] -- if use_object_type set to True
 
 
         :return: observation
@@ -829,7 +834,7 @@ class PickbotEnv(gym.Env):
         # write new contact_1_force value in yaml
         with open('contact_1_force.yml', 'w') as yaml_file:
             yaml.dump(contact1_force, yaml_file, default_flow_style=False)
-        ##calculate average force
+        # calculate average force
         average_contact_1_force = (last_contact_1_force + contact1_force) / 2
 
         return average_contact_1_force
@@ -860,7 +865,7 @@ class PickbotEnv(gym.Env):
         # write new contact force 2 value in yaml
         with open('contact_2_force.yml', 'w') as yaml_file:
             yaml.dump(contact2_force, yaml_file, default_flow_style=False)
-        ##calculate average force
+        # calculate average force
         average_contact_2_force = (last_contact_2_force + contact2_force) / 2
 
         return average_contact_2_force
