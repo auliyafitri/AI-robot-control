@@ -469,7 +469,7 @@ class PickbotEnv(gym.Env):
         """
         try:
             turn_on_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
-            enable = True
+            enable = Truehw
             turn_on_gripper_service(enable)
         except rospy.ServiceException as e:
             rospy.loginfo("Turn on Gripper service call failed:  {0}".format(e))
