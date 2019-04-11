@@ -14,9 +14,11 @@ import rospkg
 from gym import spaces
 from gym.utils import seeding
 from gym.envs.registration import register
+from transformations import euler_from_quaternion, quaternion_from_euler
 
 # OTHER FILES
 import util_env as U
+import util_math as UMath
 from gazebo_connection import GazeboConnection
 from controllers_connection import ControllersConnection
 from joint_publisher import JointPub
@@ -45,7 +47,7 @@ from pickbot_simulation.srv import VacuumGripperControl
 register(
     id='Pickbot-v0',
     entry_point='pickbot_env_npstate:PickbotEnv',
-    max_episode_steps=120,
+    max_episode_steps=240,
 )
 
 
@@ -53,7 +55,7 @@ register(
 class PickbotEnv(gym.Env):
 
     def __init__(self, joint_increment_value=0.02, running_step=0.001, random_object=False, random_position=False,
-                 use_object_type=False):
+                 use_object_type=False, populate_object=False):
         """
         initializing all the relevant variables and connections
         """
@@ -64,6 +66,7 @@ class PickbotEnv(gym.Env):
         self._random_object = random_object
         self._random_position = random_position
         self._use_object_type = use_object_type
+        self._populate_object = populate_object
 
         # Assign MsgTypes
         self.joints_state = JointState()
@@ -189,6 +192,7 @@ class PickbotEnv(gym.Env):
             datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin'))
         print("CSV NAME")
         print(self.csv_name)
+        self.csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
 
         # object name: name of the target object
         # object type: index of the object name in the object list
@@ -196,10 +200,12 @@ class PickbotEnv(gym.Env):
         self.object_name = ''
         self.object_type = 0
         self.object_list = U.get_target_object()
-        self.object_initial_position = Pose(position=Point(x=0.0, y=0.9, z=1.05))
+        self.object_initial_position = Pose(position=Point(x=-0.13, y=0.848, z=1.06),  # x=0.0, y=0.9, z=1.05
+                                            orientation=quaternion_from_euler(0.002567, 0.102, 1.563))
 
-        # populate objects from object list
-        self.populate_objects()
+        if self._populate_object:
+            # populate objects from object list
+            self.populate_objects()
 
         # select first object, set object name and object type
         # if object is random, spawn random object
@@ -338,8 +344,9 @@ class PickbotEnv(gym.Env):
         done, done_reward, invalid_contact = self.is_done(observation, last_position)
         self.gazebo.pauseSim()
 
-        # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
-        reward = self.compute_reward(observation, done_reward, invalid_contact)
+        # 8) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
+        # reward = self.compute_reward(observation, done_reward, invalid_contact)
+        reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
         self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
@@ -922,6 +929,8 @@ class PickbotEnv(gym.Env):
             done = True
             print('>>>>>> Success!')
             done_reward = reward_reached_goal
+            # save state in csv file
+            U.append_to_csv(self.csv_success_exp, observations)
 
         # Crashing with itself, shelf, base
         if invalid_collision:
@@ -984,7 +993,7 @@ class PickbotEnv(gym.Env):
         if contact_1 == 0 and contact_2 == 0:
             reward_contact = 0
         elif contact_1 != 0 and contact_2 == 0 and invalid_contact == False or contact_1 == 0 and contact_2 != 0 and invalid_contact == False:
-            reward_contact = 100
+            reward_contact = 20
             reward_distance = 0
 
         total_reward = reward_distance + reward_contact + done_reward
