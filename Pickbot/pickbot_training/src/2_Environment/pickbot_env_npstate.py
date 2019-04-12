@@ -273,7 +273,7 @@ class PickbotEnv(gym.Env):
         # 1) read last_position out of YAML File
         with open("last_position.yml", 'r') as stream:
             try:
-                last_position = (yaml.load(stream))
+                last_position = (yaml.load(stream, Loader=yaml.Loader))
             except yaml.YAMLError as exc:
                 print(exc)
         # 2) get the new jointpositions acording to chosen action
@@ -700,7 +700,7 @@ class PickbotEnv(gym.Env):
         # read last contact force 1 value out of yaml
         with open("contact_1_force.yml", 'r') as stream:
             try:
-                last_contact_1_force = (yaml.load(stream))
+                last_contact_1_force = (yaml.load(stream, Loader=yaml.Loader))
             except yaml.YAMLError as exc:
                 print(exc)
         # write new contact_1_force value in yaml
@@ -731,7 +731,7 @@ class PickbotEnv(gym.Env):
         # read last contact_2_force value out of yaml
         with open("contact_2_force.yml", 'r') as stream:
             try:
-                last_contact_2_force = (yaml.load(stream))
+                last_contact_2_force = (yaml.load(stream, Loader=yaml.Loader))
             except yaml.YAMLError as exc:
                 print(exc)
         # write new contact force 2 value in yaml
@@ -758,7 +758,7 @@ class PickbotEnv(gym.Env):
         # read last contact_2_force value out of yaml
         with open("collision.yml", 'r') as stream:
             try:
-                last_collision = (yaml.load(stream))
+                last_collision = (yaml.load(stream, Loader=yaml.Loader))
             except yaml.YAMLError as exc:
                 print(exc)
         # write new contact force 2 value in yaml
