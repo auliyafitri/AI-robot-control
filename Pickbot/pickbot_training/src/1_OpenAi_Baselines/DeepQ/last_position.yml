@@ -14,18 +14,24 @@
     - -1
     - 0
   - !!binary |
-    qHCfri88+D8=
+    u2Tal7lN+T8=
 - !!python/object/apply:numpy.core.multiarray.scalar
   - *id001
   - !!binary |
-    uVFYpvKM778=
+    F3DM52oI778=
 - !!python/object/apply:numpy.core.multiarray.scalar
   - *id001
   - !!binary |
-    xcZGj1149D8=
-- -1.87
+    kOfZHOIX8D8=
 - !!python/object/apply:numpy.core.multiarray.scalar
   - *id001
   - !!binary |
-    Qlwvgx+o+r8=
-- 0
+    Kp9pcL0U/b8=
+- !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    u7tQ4Y6K+b8=
+- !!python/object/apply:numpy.core.multiarray.scalar
+  - *id001
+  - !!binary |
+    /fWGw/eX0z8=
