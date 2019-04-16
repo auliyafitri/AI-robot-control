@@ -336,14 +336,31 @@ def manipulator_arm_control():
     # regrasp(60.0, 50.0, 20.0, 'y', -1, 'y', 1)
 
 ###___TURNARC DEMO___### 
+    # assign_pose_target(-0.52, 0.1166, 0.22434, 0.0, 0.707, -0.707, 0.0) ## REAL ROBOT ENVIRONMENT
+    # TurnArcAboutAxis('y', 0.22434, -0.79, 40, -1, 'yes', 'y', 1)
+    # TurnArcAboutAxis('y', 0.22434, -0.79, 40, 1, 'yes', 'y', -1)
+    # TurnArcAboutAxis('y', 0.22434, -0.79, 70, -1, 'yes', 'y', 1)
+    # TurnArcAboutAxis('y', 0.22434, -0.79, 70, 1, 'yes', 'y', -1)
+    # TurnArcAboutAxis('y', 0.22434, -0.79, 10, 1, 'yes', 'y', -1)   
+    # TurnArcAboutAxis('y', 0.22434, -0.79, 10, -1, 'yes', 'y', 1)
 
-    assign_pose_target(-0.52, 0.1166, 0.22434, 0.0, 0.707, -0.707, 0.0) ## REAL ROBOT ENVIRONMENT
-    TurnArcAboutAxis('y', 0.22434, -0.79, 40, -1, 'yes', 'y', 1)
-    TurnArcAboutAxis('y', 0.22434, -0.79, 40, 1, 'yes', 'y', -1)
-    TurnArcAboutAxis('y', 0.22434, -0.79, 70, -1, 'yes', 'y', 1)
-    TurnArcAboutAxis('y', 0.22434, -0.79, 70, 1, 'yes', 'y', -1)
-    TurnArcAboutAxis('y', 0.22434, -0.79, 10, 1, 'yes', 'y', -1)   
-    TurnArcAboutAxis('y', 0.22434, -0.79, 10, -1, 'yes', 'y', 1)
+
+    print("1. Moving to position 1")
+    assign_pose_target(0.4, 0.5, 0.6, 0.2, 0.0, 0.0, 0.0)
+    print ("Current position 1: {},{},{}".format(group.get_current_pose().pose.position.x,
+                                               group.get_current_pose().pose.position.y,
+                                               group.get_current_pose().pose.position.z))
+
+    print("2. Moving to position 2")
+    assign_pose_target(0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0)
+    print ("Current position 2: {},{},{}".format(group.get_current_pose().pose.position.x,
+                                               group.get_current_pose().pose.position.y,
+                                               group.get_current_pose().pose.position.z))
+
+    print("Assigning joint values")
+    relative_joint_value(0, 0, 0, 0, 0, math.pi/2)
+
+    print("Planning ended.")
 
     rospy.spin()
 

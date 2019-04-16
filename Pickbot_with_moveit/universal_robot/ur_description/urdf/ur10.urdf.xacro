@@ -79,6 +79,7 @@
         </material>
       </visual>
       <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <mesh filename="package://ur_description/meshes/ur10/collision/base.stl"/>
         </geometry>
@@ -104,6 +105,7 @@
 
     <link name="${prefix}shoulder_link">
       <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <mesh filename="package://ur_description/meshes/ur10/visual/shoulder.dae"/>
         </geometry>
@@ -112,6 +114,7 @@
         </material>
       </visual>
       <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <mesh filename="package://ur_description/meshes/ur10/collision/shoulder.stl"/>
         </geometry>
@@ -170,7 +173,8 @@
 
     <link name="${prefix}forearm_link">
       <visual>
-         <geometry>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
           <mesh filename="package://ur_description/meshes/ur10/visual/forearm.dae"/>
         </geometry>
         <material name="LightGrey">
@@ -178,6 +182,7 @@
         </material>
       </visual>
       <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
         <geometry>
           <mesh filename="package://ur_description/meshes/ur10/collision/forearm.stl"/>
         </geometry>
@@ -203,6 +208,7 @@
 
     <link name="${prefix}wrist_1_link">
       <visual>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
         <geometry>
           <mesh filename="package://ur_description/meshes/ur10/visual/wrist1.dae"/>
         </geometry>
@@ -211,6 +217,7 @@
         </material>
       </visual>
       <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
         <geometry>
           <mesh filename="package://ur_description/meshes/ur10/collision/wrist1.stl"/>
         </geometry>
@@ -289,15 +296,27 @@
     <joint name="${prefix}ee_fixed_joint" type="fixed">
       <parent link="${prefix}wrist_3_link" />
       <child link = "${prefix}ee_link" />
-      <origin xyz="0.0 ${wrist_3_length} 0.0" rpy="0.0 0.0 ${pi/2.0}" />
+      <!-- <origin xyz="0.0 ${wrist_3_length} 0.0" rpy="0.0 0.0 ${pi/2.0}" /> -->
+      <origin xyz="-0.109 0.0652 -0.099" rpy="1.570796325 -1.570796325 0.0"/>
     </joint>
 
     <link name="${prefix}ee_link">
+      <visual>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://pickbot_simulation/meshes/ur10/visual/Pickbot_Gripper.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.8 0.1 0.3 1.0"/>
+        </material>
+      </visual>
       <collision>
         <geometry>
-          <box size="0.01 0.01 0.01"/>
+          <!-- <box size="0.01 0.01 0.01"/> -->
+          <mesh filename="package://ur_description/meshes/ur10/collision/Pickbot_Gripper.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <origin rpy="0 0 0" xyz="-0.01 0 0"/>
+        <!-- <origin rpy="0 0 0" xyz="-0.01 0 0"/> -->
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
       </collision>
     </link>
 
