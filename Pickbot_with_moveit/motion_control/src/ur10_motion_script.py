@@ -357,6 +357,12 @@ def manipulator_arm_control():
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
 
+    print("3. Moving to position 3")
+    assign_pose_target(0.01, 1.0, 0.8, 0.0, 0.0, 0.0, 0.0)
+    print ("Current position 2: {},{},{}".format(group.get_current_pose().pose.position.x,
+                                               group.get_current_pose().pose.position.y,
+                                               group.get_current_pose().pose.position.z))
+
     print("Assigning joint values")
     relative_joint_value(0, 0, 0, 0, 0, math.pi/2)
 
