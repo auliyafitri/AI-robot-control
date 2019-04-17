@@ -447,7 +447,7 @@
       <!-- <origin rpy="0 0.785 3.14" xyz="1 1 0.75"/> fixed camera -->
       <!-- <parent link="base_link"/> fixed camera -->
       <!-- <origin rpy="0 -1.57 -1.57" xyz="0 0.21 0.078"/> -->
-      <origin rpy="0 -0.9 1.57" xyz="0 0.21 -0.078"/>
+      <origin rpy="0 -0.4 1.57" xyz="0 0.21 -0.078"/>
       <parent link="${prefix}wrist_3_link"/>
       <child link="${prefix}camera_rgb_frame"/>
     </joint>

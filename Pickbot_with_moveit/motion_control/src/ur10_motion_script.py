@@ -359,7 +359,13 @@ def manipulator_arm_control():
 
     print("3. Moving to position 3")
     assign_pose_target(0.01, 1.0, 0.8, 0.0, 0.0, 0.0, 0.0)
-    print ("Current position 2: {},{},{}".format(group.get_current_pose().pose.position.x,
+    print ("Current position 3: {},{},{}".format(group.get_current_pose().pose.position.x,
+                                               group.get_current_pose().pose.position.y,
+                                               group.get_current_pose().pose.position.z))
+
+    print("4. Moving to position 4")
+    assign_pose_target(-0.1, 1.1, 0.21, 0.0, 0.0, 0.0, 0.0)
+    print ("Current position 4: {},{},{}".format(group.get_current_pose().pose.position.x,
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
 
