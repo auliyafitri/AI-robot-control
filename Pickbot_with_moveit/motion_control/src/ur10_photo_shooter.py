@@ -424,6 +424,8 @@ def get_distance_gripper_to_object():
         Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
                             object_resp_coordinates.pose.position.z))
 
+        print("Object: {}".format(Object))
+
     except rospy.ServiceException as e:
         rospy.loginfo("Get Model State service call failed:  {0}".format(e))
         print("Exception get model state")
@@ -470,13 +472,13 @@ def callback(ros_img):
  
 def photo_shooter():
     print("1. Moving to position 1")
-    assign_pose_target(0.4, 0.2, 0.6, 0.2, 0.0, 0.0, 0.0)
+    assign_pose_target(0.4, 0.5, 0.6, 0.2, 0.0, 0.0, 0.0)
     print ("Current position 1: {},{},{}".format(group.get_current_pose().pose.position.x,
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
 
     print("2. Moving to position 2")
-    assign_pose_target(0.0, 0.2, 0.5, 0.0, 0.0, 0.0, 0.0)
+    assign_pose_target(0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0)
     print ("Current position 2: {},{},{}".format(group.get_current_pose().pose.position.x,
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
@@ -484,13 +486,13 @@ def photo_shooter():
 
     global moving, new_image
     rospy.Subscriber('/intel_realsense_camera/rgb/image_raw', Image, callback)
-    position_y = 0.2
+    position_y = 0.4
     while not rospy.is_shutdown() and position_y <= 1.0:
         moving = True
         if moving:
             new_image = False
             print("Moving to position: ")
-            assign_pose_target(0.01, position_y, 0.6, 0.0, 0.0, 0.0, 0.0)
+            assign_pose_target(-0.1, position_y, 0.6, 0.0, 0.0, 0.0, 0.0)
             print ("Current position: {},{},{}".format(group.get_current_pose().pose.position.x,
                                             group.get_current_pose().pose.position.y,
                                             group.get_current_pose().pose.position.z))
