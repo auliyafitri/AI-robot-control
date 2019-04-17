@@ -70,6 +70,32 @@
     </gazebo>
 
 
+<!-- GRIPPER -->
+    <gazebo reference="${prefix}vacuum_gripper_link">
+      <material>Gazebo/Black</material>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="ros_vacuum_gripper" filename="libROSVacuumGripperPlugin.so">
+        <grasp_check>
+          <detach_steps>40</detach_steps>
+          <attach_steps>1</attach_steps>
+          <min_contact_count>1</min_contact_count>
+        </grasp_check>
+
+        <!-- <xacro:insert_block name="drops_info" /> -->
+
+        <suction_cup_link>vacuum_gripper_link</suction_cup_link>
+
+        <!-- ROS -->
+        <robot_namespace>/pickbot</robot_namespace>
+        <control_topic>gripper/control</control_topic>
+        <state_topic>gripper/state</state_topic>
+      </plugin>
+    </gazebo>
+
+
+
     <!-- INTEL REALSENSE DEPTH CAMERA -->
     <gazebo reference="${prefix}camera_link2">
       <sensor name="camera" type="depth">

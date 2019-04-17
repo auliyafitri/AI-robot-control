@@ -403,6 +403,45 @@
     </joint>
 
 
+<!-- GRIPPER -->
+    <link name="${prefix}vacuum_gripper_link">
+      <inertial>
+        <origin xyz="0 0.0025 0" rpy="0 0 1.57"/>
+        <inertia ixx="0.0000063" ixy="0" ixz="0"
+                  iyy="0.0000063" iyz="0"
+                  izz="0.000025" />
+        <mass value="0.01" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0.0025 0" rpy="0 0 1.57"/>
+        <geometry>
+          <box size="0.005 0.005 0.0001"/>
+          <!-- <cylinder radius="0.05" length="0.01"/> -->
+        </geometry>
+        <material name="SomeColor">
+          <color rgba="1.0 0.0 0.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0.0025 0" rpy="0 0 1.57"/>
+        <geometry>
+          <box size="0.005 0.005 0.0001"/>
+          <!-- <cylinder radius="0.05" length="0.01"/> -->
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="${prefix}vacuum_gripper_joint" type="revolute">
+      <origin xyz="0 0.296 0" rpy="1.570797 0.0 0.0" />
+      <axis xyz="0 0 1" />
+      <limit lower="0" upper="0" effort="0" velocity="0" />
+      <parent link="${prefix}wrist_3_link" />
+      <child link="${prefix}vacuum_gripper_link" />
+      <dynamics damping="0.0" friction="0.0"/>
+    </joint>
+
+
+
     <!-- INTEL REALSENSE DEPTH CAMERA -->
     <joint name="${prefix}camera_rgb_joint" type="fixed">
       <!-- <origin rpy="0 0.785 3.14" xyz="1 1 0.75"/> fixed camera -->
