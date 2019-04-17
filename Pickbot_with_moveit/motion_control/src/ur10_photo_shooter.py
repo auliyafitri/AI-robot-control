@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+import os
+import cv2
 import sys
+import time
 import math
 import rospy
 import copy
@@ -10,10 +13,15 @@ import moveit_msgs.msg
 import geometry_msgs.msg 
 # from robotiq_c_model_control.msg import _CModel_robot_output as outputMsg
 
+from cv_bridge import CvBridge, CvBridgeError
+from scipy.misc import imsave
+
+
+
 # MESSAGES/SERVICES
 from std_msgs.msg import Float64
 from std_msgs.msg import Bool
-from sensor_msgs.msg import JointState
+from sensor_msgs.msg import JointState, Image
 from gazebo_msgs.msg import ContactsState
 from sensor_msgs.msg import Image
 from gazebo_msgs.srv import GetModelState
@@ -38,6 +46,8 @@ display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path
 # gripper_publisher = rospy.Publisher('CModelRobotOutput', outputMsg.CModel_robot_output)
 tf_listener = tf.TransformListener()
 tf_broadcaster = tf.TransformBroadcaster()
+
+
 
 
 def randomly_spawn_object():
@@ -354,11 +364,20 @@ def manipulator_arm_control():
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
 
+    print("--------Taking a picture")
+    photoShooter = PhotoShooter()
+    photoShooter.main()
+
+
     print("2. Moving to position 2")
     assign_pose_target(0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0)
     print ("Current position 2: {},{},{}".format(group.get_current_pose().pose.position.x,
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
+    print("--------Taking a picture")
+    photoShooter.main()
+
+
 
     print("3. Moving to position 3")
     assign_pose_target(0.01, 1.0, 0.8, 0.0, 0.0, 0.0, 0.0)
@@ -366,11 +385,15 @@ def manipulator_arm_control():
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
 
+    print("--------Taking a picture")
+    photoShooter.main()
+
+
     print("Randomly spawning object now")
     randomly_spawn_object()
 
     print("4. Moving to position 4")
-    assign_pose_target(-0.1, 1.1, 0.21, 0.0, 0.0, 0.0, 0.0)
+    assign_pose_target(-0.1, 0.9, 0.21, 0.0, 0.0, 0.0, 0.0)
     print ("Current position 4: {},{},{}".format(group.get_current_pose().pose.position.x,
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
@@ -382,14 +405,120 @@ def manipulator_arm_control():
 
     rospy.spin()
 
+def get_distance_gripper_to_object():
+    """
+    Get the Position of the endeffektor and the object via rosservice call /gazebo/get_model_state and /gazebo/get_link_state
+    Calculate distance between them
+
+    In this case
+
+    Object:     unite_box_0 link
+    Gripper:    vacuum_gripper_link ground_plane
+    """
+
+    try:
+        model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
+        blockName = "unit_box_0"
+        relative_entity_name = "link"
+        object_resp_coordinates = model_coordinates(blockName, relative_entity_name)
+        Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
+                            object_resp_coordinates.pose.position.z))
+
+    except rospy.ServiceException as e:
+        rospy.loginfo("Get Model State service call failed:  {0}".format(e))
+        print("Exception get model state")
+
+    try:
+        model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
+        LinkName = "vacuum_gripper_link"
+        ReferenceFrame = "ground_plane"
+        resp_coordinates_gripper = model_coordinates(LinkName, ReferenceFrame)
+        Gripper = np.array((resp_coordinates_gripper.link_state.pose.position.x,
+                            resp_coordinates_gripper.link_state.pose.position.y,
+                            resp_coordinates_gripper.link_state.pose.position.z))
+        
+        print("Gripper position: {},{},{}".format(resp_coordinates_gripper.link_state.pose.position.x,
+                                                resp_coordinates_gripper.link_state.pose.position.y,
+                                                resp_coordinates_gripper.link_state.pose.position.z))
+
+    except rospy.ServiceException as e:
+        rospy.loginfo("Get Link State service call failed:  {0}".format(e))
+        print("Exception get Gripper position")
+    distance = np.linalg.norm(Object - Gripper)
+
+    return distance, Object
+
+
+moving = True
+new_image = False
+img_idx = 0
+
+def save_image(cv_image, index):
+    imsave('camerashot_{}.png'.format(index), cv_image)
+    cwd = os.getcwd()
+    print("Image saved to {}".format(cwd))
+ 
+def callback(ros_img):
+    global moving, new_image, img_idx
+    if not moving and new_image:    
+        cv_image = CvBridge().imgmsg_to_cv2(ros_img, desired_encoding="passthrough")
+        print('Saving image {} with size: {}'.format(img_idx, cv_image.shape))
+        save_image(cv_image, img_idx)
+        img_idx += 1
+        new_image = False
+
+ 
+def photo_shooter():
+    print("1. Moving to position 1")
+    assign_pose_target(0.4, 0.2, 0.6, 0.2, 0.0, 0.0, 0.0)
+    print ("Current position 1: {},{},{}".format(group.get_current_pose().pose.position.x,
+                                               group.get_current_pose().pose.position.y,
+                                               group.get_current_pose().pose.position.z))
+
+    print("2. Moving to position 2")
+    assign_pose_target(0.0, 0.2, 0.5, 0.0, 0.0, 0.0, 0.0)
+    print ("Current position 2: {},{},{}".format(group.get_current_pose().pose.position.x,
+                                               group.get_current_pose().pose.position.y,
+                                               group.get_current_pose().pose.position.z))
+
+
+    global moving, new_image
+    rospy.Subscriber('/intel_realsense_camera/rgb/image_raw', Image, callback)
+    position_y = 0.2
+    while not rospy.is_shutdown() and position_y <= 1.0:
+        moving = True
+        if moving:
+            new_image = False
+            print("Moving to position: ")
+            assign_pose_target(0.01, position_y, 0.6, 0.0, 0.0, 0.0, 0.0)
+            print ("Current position: {},{},{}".format(group.get_current_pose().pose.position.x,
+                                            group.get_current_pose().pose.position.y,
+                                            group.get_current_pose().pose.position.z))
+            position_y += 0.1
+            distance, _ = get_distance_gripper_to_object()
+            print("Distance: {}".format(distance))
+            moving = False
+            new_image = True
+            time.sleep(1)
+
+
+
+
+
+
+
+
+
+
 
 ###___MAIN___###
 if __name__ == '__main__':
 
-    try:
+    # try:
          
-        manipulator_arm_control()
+    #     manipulator_arm_control()
         
-        moveit_commander.roscpp_shutdown() #shut down the moveit_commander
+    #     moveit_commander.roscpp_shutdown() #shut down the moveit_commander
 
-    except rospy.ROSInterruptException: pass
+    # except rospy.ROSInterruptException: pass
+    photo_shooter()
