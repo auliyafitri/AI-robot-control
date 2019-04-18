@@ -22,7 +22,6 @@
 1. [Tensorflow installation enum34](#enum34)
 
 <a name="ros_gazebo"></a>
-## Installing ROS including all needed Packages and setting up Workspace:
 ### Setup Ubuntu to Install Packages from the Open Source Robotics Foundation (OSRF)
 ```
 sudo sh -c '
@@ -35,7 +34,6 @@ wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
 sudo apt-get update
 sudo apt-get install gazebo7 gazebo7-plugin-base gazebo7-common libgazebo7
 ```
-### Installing ROS
 ### Setup Ubuntu to Install Packages from ROS
 ```
 sudo sh -c '
@@ -48,24 +46,13 @@ sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 0xB01FA
 sudo apt-get update
 sudo apt-get install ros-kinetic-desktop
 sudo rosdep init; rosdep update
+sudo apt-get install ros-kinetic-ros-controllers
+source /opt/ros/kinetic/setup.bash
+echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 ```
 ### Installing Gazebo-ROS Compatibility Packages
 ```
 sudo apt-get install ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control
-```
-### Installing Additional Dependencies
-```
-sudo apt-get install ros-kinetic-ros-controllers
-source /opt/ros/kinetic/setup.bash
-```
-### Enable ROS from command line
-#### open bashrc
-```
-gedit ~/.bashrc
-```
-#### then add this line in the end of the file
-```
-source /opt/ros/kinetic/setup.bash
 ```
 
 <a name="openai"></a>
@@ -107,20 +94,13 @@ mkdir -p ~/catkin_ws/src
 cd ~/catkin_ws
 catkin_make
 source devel/setup.bash
-```
-### Add the setup.bash directory to your bashrc file
-```
-gedit ~/.bashrc
-```
-#### add this line in the end of the file
-```
-source ~/your_ws/devel/setup.bash
+echo "~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 ```
 
 <a name="openai_ros"></a>
 ## Cloning the OpenAI ROS Package:
 ```
-cd catkin_ws/src
+cd ~/catkin_ws/src
 git clone https://bitbucket.org/theconstructcore/openai_ros.git
 cd ..
 catkin_make

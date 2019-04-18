@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 
-  <rosparam file="$(find pickbot_simulation)/config/pickbot.yaml"
+  <rosparam file="$(find simulation)/config/pickbot.yaml"
             command="load"/>
 
   <node name="robot_state_publisher_pickbot" pkg="robot_state_publisher" type="robot_state_publisher"

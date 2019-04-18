@@ -21,15 +21,15 @@ sudo apt-get install -y python3-pip
 sudo python3 -m pip install tensorflow pyyaml rospkg catkin_pkg exception defusedxml empy numpy transformations joblib cloudpickle tensorflow-gpu
 
 # Make all python files executable in the robot_training package
-find ./algorithms/alg_implementations/robot_training -name "*.py" -exec chmod +x {} \;
+find ./ -name "*.py" -exec chmod +x {} \;
 
 # Install submodules
 # openAI gym
-cd ./src/AI-robot-control/python_pkgs/gym
+cd ./python_pkgs/gym
 sudo python3 -m pip install -e .
 # pygazebo
 cd ../pygazebo
-python setup.py develop
+sudo python3 setup.py develop
 # openAI Baselines
 cd ../../algorithms/baselines
 sudo python3 -m pip install -e .

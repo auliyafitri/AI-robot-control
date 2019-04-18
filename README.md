@@ -15,7 +15,7 @@ The repository contains the following:
 * python 3.5
 * ROS
 
-**If ROS has not installed yet, go to [installation](INSTALL.md) for information on how to install ROS then continue below**
+**If ROS has not installed yet, go to [installation](INSTALL.md) for information on how to install ROS and catkin workspace then continue below**
 
 ## Get the code of the AI-Robot-Control packages
 **! Assuming your catkin workspace is named catkin_ws**
@@ -23,8 +23,14 @@ The repository contains the following:
 cd ~/catkin_ws/src
 git clone --recurse-submodules https://github.com/PhilipKurrek/AI-robot-control.git
 cd AI-robot-control
-python3 -m pip install -e .
+git submodule update --init --recursive
+sudo python3 -m pip install -e .
 chmod +x install.sh && . install.sh
+```
+If pip is not installed, run
+```
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python get-pip.py && python3 get-pip.py
 ```
 
 ## How to run the Training: 
