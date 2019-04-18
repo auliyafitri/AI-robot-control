@@ -1,0 +1,20 @@
+# general things to ignore
+build/
+dist/
+*.egg-info/
+*.egg
+# *.py[cod]
+# __pycache__/
+*.so
+*~
+# *$py.class
+
+# generated yaml file for logging
+collision.yml
+contact_1_force.yml
+contact_2_force.yml
+last_position.yml
+
+# due to using tox and pytest
+.tox
+.cache
