@@ -19,6 +19,6 @@
     <include file="$(find simulation)/launch/pickbot_control.launch"/>
 
     <!-- Launch the republisher gz topic to ros topic -->
-    <node pkg="robot_training" name="gz_topic_republisher" type="gz_subscriber.py" output="screen"/>
+    <node pkg="simulation" name="gz_topic_republisher" type="gz_subscriber.py" output="screen"/>
 
 </launch>

@@ -10,7 +10,7 @@ sudo apt-get update
 sudo apt-get install -y gazebo7 gazebo7-plugin-base gazebo7-common libgazebo7
 
 # Installing Gazebo-ROS Compatibility Packages
-sudo apt-get install -y ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control ros-kinetic-ros-controllers ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control ros-kinetic-joint-state-controller ros-kinetic-joint-state-publisher ros-kinetic-effort-controllers
+sudo apt-get install -y --allow-unauthenticated ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control ros-kinetic-ros-controllers ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control ros-kinetic-joint-state-controller ros-kinetic-joint-state-publisher ros-kinetic-effort-controllers
 source /opt/ros/kinetic/setup.bash
 
 # Installing Python packages
