@@ -18,7 +18,7 @@ sudo pip install keras tensorflow gym
 
 # Installing Python packages for python3
 sudo apt-get install -y python3-pip
-sudo python3 -m pip install tensorflow pyyaml rospkg catkin_pkg exception defusedxml empy numpy transformations joblib cloudpickle tensorflow-gpu
+sudo python3 -m pip install tensorflow pyyaml rospkg catkin_pkg exception defusedxml empy numpy transformations joblib cloudpickle tensorflow-gpu trollius
 
 # Make all python files executable in the robot_training package
 find ./ -name "*.py" -exec chmod +x {} \;

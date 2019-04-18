@@ -223,7 +223,7 @@ cd catkin_ws/src/baselines
 pipenv shell
 ```
 ```
-cd ~/catkin_ws/src/AI-Robot-Control/experiments/reach/DeepQ
+cd ~/catkin_ws/src/AI-robot-control/experiments/reach/DeepQ
 python train_pickbot-v0_DeepQ_discrete.py
 ```
 ### To reuse the saved model in order to replay the learned policy
@@ -232,6 +232,6 @@ cd catkin_ws/src/baselines
 pipenv shell
 ```
 ```
-cd ~/catkin_ws/src/AI-Robot-Control/experiments/reach/DeepQ
+cd ~/catkin_ws/src/AI-robot-control/experiments/reach/DeepQ
 python enjoy_pickbot.py
 ```
