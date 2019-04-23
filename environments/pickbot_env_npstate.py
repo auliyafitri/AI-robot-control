@@ -931,6 +931,7 @@ class PickbotEnv(gym.Env):
         # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
         if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
             done = True
+            print('>>>>>> Success!')
             done_reward = reward_reached_goal
             # save state in csv file
             U.append_to_csv(self.csv_success_exp, observations)
@@ -945,27 +946,27 @@ class PickbotEnv(gym.Env):
         if last_position[0] < -2.9 or last_position[0] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 3 exceeds limit')
+            print('>>>>>> reset, joint 3 exceeds limit')
         elif last_position[1] < -2.9 or last_position[1] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 2 exceeds limit')
+            print('>>>>>> reset, joint 2 exceeds limit')
         elif last_position[2] < -2.9 or last_position[2] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 1 exceeds limit')
+            print('>>>>>> reset, joint 1 exceeds limit')
         elif last_position[3] < -2.9 or last_position[3] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 4 exceeds limit')
+            print('>>>>>> reset, joint 4 exceeds limit')
         elif last_position[4] < -2.9 or last_position[4] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 5 exceeds limit')
+            print('>>>>>> reset, joint 5 exceeds limit')
         elif last_position[5] < -2.9 or last_position[5] > 2.9:
             done = True
             done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 6 exceeds limit')
+            print('>>>>>> reset, joint 6 exceeds limit')
 
         return done, done_reward, invalid_collision
 
