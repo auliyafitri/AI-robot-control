@@ -31,6 +31,7 @@ register(
         'random_object': True,
         'random_position': False,
         'use_object_type': True,
+        'populate_object': True,
     },
     max_episode_steps=120,
 )
@@ -42,6 +43,7 @@ register(
         'random_object': True,
         'random_position': True,
         'use_object_type': True,
+        'populate_object': True,
     },
     max_episode_steps=120,
 )

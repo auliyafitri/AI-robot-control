@@ -2,6 +2,7 @@ import yaml
 import numpy as np
 import rospy
 import rospkg
+import csv
 
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
@@ -105,6 +106,13 @@ def change_object_position(object_name, model_position):
         change_position(box)
     except rospy.ServiceException as e:
         rospy.loginfo("Set Model State service call failed:  {0}".format(e))
+
+
+def append_to_csv(csv_filename, anarray):
+    outfile = open(csv_filename, 'a')
+    writer = csv.writer(outfile)
+    writer.writerow(anarray)
+    outfile.close()
 
 
 if __name__ == '__main__':
