@@ -29,7 +29,7 @@ cd ./python_pkgs/gym
 sudo python3 -m pip install -e .
 # pygazebo
 cd ../pygazebo
-sudo python3 setup.py develop
+sudo python setup.py develop
 # openAI Baselines
 cd ../../algorithms/baselines
 sudo python3 -m pip install -e .
