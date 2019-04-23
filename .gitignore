@@ -3,11 +3,11 @@ build/
 dist/
 *.egg-info/
 *.egg
-# *.py[cod]
-# __pycache__/
+*.py[cod]
+__pycache__/
 *.so
 *~
-# *$py.class
+*$py.class
 
 # generated yaml file for logging
 collision.yml
