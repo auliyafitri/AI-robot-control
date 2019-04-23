@@ -293,13 +293,13 @@
         <collision>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
           <geometry>
-            <mesh filename="package://simulation/meshes/gripper/collision/Pickbot_Gripper.stl" scale="0.001 0.001 0.001"/>
+            <mesh filename="package://simulation/meshes/gripper/collision/gripper_v1.stl" scale="0.001 0.001 0.001"/>
           </geometry>
         </collision>
         <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
           <geometry>
-            <mesh filename="package://simulation/meshes/gripper/visual/Pickbot_Gripper.dae" scale="0.001 0.001 0.001"/>
+            <mesh filename="package://simulation/meshes/gripper/visual/gripper_v1.dae" scale="0.001 0.001 0.001"/>
           </geometry>
             <material name="LightGrey">
               <color rgba="0.8 0.1 0.3 1.0"/>

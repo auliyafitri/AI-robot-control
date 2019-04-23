@@ -14,11 +14,11 @@ import rospkg
 from gym import spaces
 from gym.utils import seeding
 from gym.envs.registration import register
-from transformations import euler_from_quaternion, quaternion_from_euler
+from transformations import quaternion_from_euler
 
 # OTHER FILES
-import util_env as U
-import util_math as UMath
+import environments.util_env as U
+import environments.util_math as UMath
 from environments.gazebo_connection import GazeboConnection
 from environments.controllers_connection import ControllersConnection
 from environments.joint_publisher import JointPub
@@ -188,16 +188,10 @@ class PickbotEnv(gym.Env):
         self.reward_list = []
         self.episode_list = []
         self.step_list = []
-<<<<<<< aee0d5d794b02f468698c88daa8c295355bef5af:environments/pickbot_env_npstate.py
         self.csv_name = logger.get_dir() + '/result_log'
-=======
-        rospack = rospkg.RosPack()
-        self.csv_name = rospack.get_path('pickbot_training') + "/src/3_Evaluation/result_logger_" + str(
-            datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin'))
         print("CSV NAME")
         print(self.csv_name)
         self.csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
->>>>>>> add util_math and save success exp into csv file:Pickbot/pickbot_training/src/2_Environment/pickbot_env_npstate.py
 
         # object name: name of the target object
         # object type: index of the object name in the object list
@@ -346,17 +340,12 @@ class PickbotEnv(gym.Env):
 
         # 7) Unpause Simulation check if its done, calculate done_reward
         self.gazebo.unpauseSim()
-        done, done_reward, invallid_contact = self.is_done(observation, last_position)
+        done, done_reward, invalid_contact = self.is_done(observation, last_position)
         self.gazebo.pauseSim()
 
-<<<<<<< aee0d5d794b02f468698c88daa8c295355bef5af:environments/pickbot_env_npstate.py
-        # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
-        reward = self.compute_reward(observation, done_reward, invallid_contact)
-=======
         # 8) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
         # reward = self.compute_reward(observation, done_reward, invalid_contact)
         reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
->>>>>>> add util_math and save success exp into csv file:Pickbot/pickbot_training/src/2_Environment/pickbot_env_npstate.py
         self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
@@ -471,39 +460,19 @@ class PickbotEnv(gym.Env):
         if random_position:
             box_pos = Pose(position=Point(x=np.random.uniform(low=-0.3, high=0.3, size=None),
                                           y=np.random.uniform(low=0.9, high=1.1, size=None),
-                                          z=1.05))
-            print("random placing")
+                                          z=1.05),
+                           orientation=quaternion_from_euler(0, 0, 0))
         else:
             box_pos = self.object_initial_position
-            print("static placing")
 
         if random_object:
             self.object_name = random.choice(self.object_list)
             self.object_type = self.object_list.index(self.object_name)
-            self.spawn_object(self.object_name, box_pos)
-            print("random object")
         else:
-            self.object_name = 'unit_box_0'
-        self.object_type = self.object_list.index(self.object_name)
-
-        # get model from sdf file
-        rospack = rospkg.RosPack()
-        sdf_fname = rospack.get_path('pickbot_simulation') + "/worlds/sdf/" + self.object_name + ".sdf"
-        with open(sdf_fname, "r") as f:
-            model_sdf = f.read()
-
-        # spawn model
-        try:
-            spawn_model = rospy.ServiceProxy("gazebo/spawn_sdf_model", SpawnModel)
-            if random_position:
-                box_pos = Pose(position=Point(x=np.random.uniform(low=-0.35, high=0.3, size=None),
-                                              y=np.random.uniform(low=0.7, high=0.9, size=None),
-                                              z=1.05))
-            else:
-                box_pos = Pose(position=Point(x=0.0, y=0.919858, z=1.00))
-            spawn_model(self.object_name, model_sdf, "/", box_pos, "world")
-        except rospy.ServiceException as e:
-            rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
+            self.object_name = self.object_list[0]
+            self.object_type = 0
+        self.change_object_position(self.object_name, box_pos)
+        print("Current target: ", self.object_name)
 
     def randomly_spawn_object(self):
         """
@@ -531,14 +500,14 @@ class PickbotEnv(gym.Env):
         if model_sdf is None:  # take sdf file from default folder
             # get model from sdf file
             rospack = rospkg.RosPack()
-            sdf_fname = rospack.get_path('pickbot_simulation') + "/worlds/sdf/" + object_name + ".sdf"
+            sdf_fname = rospack.get_path('simulation') + "/meshes/environments/sdf/" + object_name + ".sdf"
             with open(sdf_fname, "r") as f:
                 model_sdf = f.read()
 
         try:
             spawn_model = rospy.ServiceProxy("gazebo/spawn_sdf_model", SpawnModel)
             spawn_model(object_name, model_sdf, "/", model_position, "world")
-            print("SPAWN %s finished" % self.object_name)
+            print("SPAWN %s finished" % object_name)
         except rospy.ServiceException as e:
             rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
 
@@ -568,6 +537,10 @@ class PickbotEnv(gym.Env):
             box.pose.position.x = model_position.position.x
             box.pose.position.y = model_position.position.y
             box.pose.position.z = model_position.position.z
+            box.pose.orientation.x = model_position.orientation[1]
+            box.pose.orientation.y = model_position.orientation[2]
+            box.pose.orientation.z = model_position.orientation[3]
+            box.pose.orientation.w = model_position.orientation[0]
             change_position(box)
         except rospy.ServiceException as e:
             rospy.loginfo("Set Model State service call failed:  {0}".format(e))
@@ -931,7 +904,7 @@ class PickbotEnv(gym.Env):
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(self.collision, yaml_file, default_flow_style=False)
 
-        # Check if last_collision or self.collision are True. IF one s true return True else False
+        # Check if last_collision or self.collision is True. IF one s true return True else False
         if self.collision == True or last_collision == True:
             return True
         else:
@@ -942,7 +915,7 @@ class PickbotEnv(gym.Env):
 
         Done when:
         -Successfully reached goal: Contact with both contact sensors and contact is a valid one(Wrist3 or/and Vacuum Gripper with unit_box)
-        -Crashing with itselfe, shelf, base
+        -Crashing with itself, shelf, base
         -Joints are going into limits set
         """
 
@@ -965,7 +938,7 @@ class PickbotEnv(gym.Env):
         # Crashing with itself, shelf, base
         if invalid_collision:
             done = True
-            print('reset, crashing')
+            print('>>>>>>>>>>>>>>>>>>>> crashing')
             done_reward = reward_crashing
 
         # Joints are going into limits set
@@ -996,7 +969,7 @@ class PickbotEnv(gym.Env):
 
         return done, done_reward, invalid_collision
 
-    def compute_reward(self, observation, done_reward, invallid_contact):
+    def compute_reward(self, observation, done_reward, invalid_contact):
         """
         Calculates the reward in each Step
         Reward for:
@@ -1022,7 +995,7 @@ class PickbotEnv(gym.Env):
 
         if contact_1 == 0 and contact_2 == 0:
             reward_contact = 0
-        elif contact_1 != 0 and contact_2 == 0 and invallid_contact == False or contact_1 == 0 and contact_2 != 0 and invallid_contact == False:
+        elif contact_1 != 0 and contact_2 == 0 and invalid_contact == False or contact_1 == 0 and contact_2 != 0 and invalid_contact == False:
             reward_contact = 5
             reward_distance = 0
 

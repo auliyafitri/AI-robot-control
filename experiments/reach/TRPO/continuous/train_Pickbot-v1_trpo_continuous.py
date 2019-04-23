@@ -1,38 +1,29 @@
 import gym
 import os
-import sys
 import datetime
-import rospkg
 import rospy
 
-from baselines.ppo2 import ppo2
+from environments import pickbot_env_registration, gazebo_connection
+import evaluations
+import models
+
+from baselines.trpo_mpi import trpo_mpi
 from baselines.bench import Monitor
 from baselines import logger
 from baselines.common.cmd_util import make_vec_env
 
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
-rospack = rospkg.RosPack()
-Env_path = rospack.get_path('pickbot_training') + "/src/2_Environment"
-sys.path.insert(0, Env_path)
-import pickbot_env_npstate
-import gazebo_connection
 
-"""
-make_vec_env(env_id, env_type, num_env, seed,
-                 wrapper_kwargs=None,
-                 start_index=0,
-                 reward_scale=1.0,
-                 flatten_dict_observations=True,
-                 gamestate=None):
-"""
 
 num_env = 1
-env_id = "Pickbot-v0"
+env_id = "Pickbot-v1"
 env_type = "classic_control"
 seed = None
+task_name = "reach"
 
-# Create needed folders
-logdir = './log/' + env_id + '/ppo2/' + timestamp
+# Create needed folders for log file and models
+logdir = os.path.dirname(evaluations.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + timestamp + '/'
+modelsdir = os.path.dirname(models.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + timestamp + '/'
 
 # Generate tensorboard file
 format_strs = ['stdout', 'log', 'csv', 'tensorboard']
@@ -52,14 +43,14 @@ def main():
                        flatten_dict_observations=True,
                        gamestate=None)
 
-    act = ppo2.learn(
+    act = trpo_mpi.learn(
         env=env,
         network='mlp',
-        total_timesteps=10000
+        total_timesteps=3000
     )
-    print("Saving model to pickbot_model_" + str(timestamp))
-    act.save("./pickbot_model_" + str(timestamp))
-    # Environment Object: <baselines.common.vec_env.dummy_vec_env.DummyVecEnv object at 0x7fbcfa356fd0>
+
+    print("Saving model to " + modelsdir)
+    act.save(modelsdir + "model")
 
 
 if __name__ == '__main__':

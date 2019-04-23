@@ -7,7 +7,7 @@ import rospkg
 import rospy
 import datetime
 
-from environments import pickbot_env_npstate, gazebo_connection
+from environments import pickbot_env_registration, gazebo_connection
 import evaluations
 import models
 
