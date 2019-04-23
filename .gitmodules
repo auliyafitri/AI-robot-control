@@ -1,0 +1,15 @@
+[submodule "python_pkgs/openai_ros"]
+	path = python_pkgs/openai_ros
+	url = https://bitbucket.org/theconstructcore/openai_ros.git
+[submodule "python_pkgs/pygazebo"]
+	path = python_pkgs/pygazebo
+	url = https://github.com/jpieper/pygazebo
+[submodule "algorithms/stable-baselines"]
+	path = algorithms/stable-baselines
+	url = https://github.com/hill-a/stable-baselines.git
+[submodule "algorithms/baselines"]
+	path = algorithms/baselines
+	url = https://github.com/auliyafitri/baselines
+[submodule "python_pkgs/gym"]
+	path = python_pkgs/gym
+	url = https://github.com/openai/gym

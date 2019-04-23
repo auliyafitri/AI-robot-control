@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<launch>
-    <rosparam command="load" file="$(find pickbot_training)/config/deep_q_params.yaml" />
-    <!-- Launch the training system -->
-    <node pkg="pickbot_training" name="Pickbot_Training_DQN" type="start_training_deep_Q_Learning.py" output="screen"/>
-
-</launch>
