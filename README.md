@@ -34,21 +34,36 @@ python get-pip.py && python3 get-pip.py
 ```
 
 ## How to run the Training: 
-**Start the simulation**
+#### Start the simulation
+##### Currently we have three environments:
+* simplified version of PickBot task
 ```
 roslaunch simulation main.launch
 ```
-**To run the Baseline DeepQ Algorithm**
+* PickBot task in handling door handle
+```
+roslaunch simulation use_case-1.launch
+```
+* Generic environment for robot training
+```
+roslaunch simulation sim_research.launch
+```
+#### To run the Baseline DeepQ Algorithm
 ```
 cd ~/catkin_ws/src/AI-Robot-Control/experiments/reach/DeepQ
 python3 train_pickbot-v0_DeepQ_discrete.py
 ```
-**To reuse the saved model in order to replay the learned policy**
+or
+```
+roslaunch experiments train_reach_deepq.launch
+```
+Tips: Add a new launch file in ROS package **'experiments'** for a shorter way to execute the training script
+#### To reuse the saved model in order to replay the learned policy
 ```
 cd ~/catkin_ws/src/AI-Robot-Control/experiments/reach/DeepQ
 python3 enjoy_pickbot.py
 ```
-**To use algorithm implementation of DeepQ-Learning and Q-Learning**
+#### To use (in-house) algorithm implementation of DeepQ-Learning and Q-Learning
 * Q-Learning
 ```
 roslaunch robot_training start_training_Q_Learning.launch
