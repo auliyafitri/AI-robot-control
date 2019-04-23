@@ -46,14 +46,14 @@ from simulation.srv import VacuumGripperControl
 reg = register(
     id='Pickbot-v0',
     entry_point='environments.pickbot_env_npstate:PickbotEnv',
-    max_episode_steps=120,
+    max_episode_steps=120,  # timestep_limit=120,
 )
 
 
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, running_step=0.001, random_object=True, random_position=True):
+    def __init__(self, joint_increment_value=0.02, running_step=0.001, random_object=False, random_position=False):
         """
         initializing all the relevant variables and connections
         """
@@ -551,13 +551,16 @@ class PickbotEnv(gym.Env):
         populate objects, called in init
         :return: -
         """
-        rand_x = np.random.uniform(low=-0.35, high=0.35, size=(len(self.object_list),))
-        rand_y = np.random.uniform(low=2.2, high=2.45, size=(len(self.object_list),))
-        for idx, obj in enumerate(self.object_list):
-            box_pos = Pose(position=Point(x=rand_x[idx],
-                                          y=rand_y[idx],
-                                          z=1.05))
-            self.spawn_object(obj, box_pos)
+        if not self._random_object:  # only populate the first object
+            self.spawn_object(self.object_list[0], self.object_initial_position)
+        else:
+            rand_x = np.random.uniform(low=-0.35, high=0.35, size=(len(self.object_list),))
+            rand_y = np.random.uniform(low=2.2, high=2.45, size=(len(self.object_list),))
+            for idx, obj in enumerate(self.object_list):
+                box_pos = Pose(position=Point(x=rand_x[idx],
+                                              y=rand_y[idx],
+                                              z=1.05))
+                self.spawn_object(obj, box_pos)
 
     def get_distance_gripper_to_object(self):
         """

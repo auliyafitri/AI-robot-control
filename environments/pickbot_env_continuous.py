@@ -44,7 +44,7 @@ from simulation.srv import VacuumGripperControl
 reg = register(
     id='Pickbot-v1',
     entry_point='environments.pickbot_env_continuous:PickbotEnv',
-    timestep_limit=120  ,
+    max_episode_steps=120,  # timestep_limit=120,
     )
 
 #DEFINE ENVIRONMENT CLASS

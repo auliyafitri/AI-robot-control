@@ -24,7 +24,11 @@ def main():
         env,
         network='mlp',
         lr=1e-3,
+<<<<<<< ef767573f520a415f611ee1480d4e825b8e6832c:experiments/reach/DeepQ/train_pickbot-v2_DeepQ_discrete.py
         total_timesteps=10000,
+=======
+        total_timesteps=100000,
+>>>>>>> add training file with model saver:Pickbot/pickbot_training/src/1_OpenAi_Baselines/DeepQ/train_pickbot-v0_DeepQ_discrete.py
         buffer_size=50000,
         exploration_fraction=0.1,
         exploration_final_eps=0.02,
@@ -33,7 +37,6 @@ def main():
     )
     print("Saving model to pickbot_model_"+str(timestamp)+".pkl")
     act.save("pickbot_model_"+str(timestamp)+".pkl")
-
 
 if __name__ == '__main__':
     main()
