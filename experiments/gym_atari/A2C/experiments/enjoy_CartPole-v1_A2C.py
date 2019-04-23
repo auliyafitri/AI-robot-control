@@ -18,7 +18,7 @@ def main():
                  flatten_dict_observations=True,
                  gamestate=None)
     
-    act = a2c.learn(env, network='mlp', total_timesteps=0, load_path="cartpole_model.pkl")
+    act = a2c.learn(env=env, network='mlp', total_timesteps=0, load_path="cartpole_model.pkl")
 
     while True:
         obs, done = env.reset(), False
