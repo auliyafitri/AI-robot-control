@@ -6,7 +6,7 @@ import rospy
 import numpy as np
 import time
 import random
-import os
+import sys
 import yaml
 import math
 import datetime
@@ -46,7 +46,7 @@ from simulation.srv import VacuumGripperControl
 reg = register(
     id='Pickbot-v1',
     entry_point='environments.pickbot_env_continuous:PickbotEnv',
-    max_episode_steps=120,  # timestep_limit=120,
+    max_episode_steps=240,  # timestep_limit=120,
 )
 
 
@@ -478,7 +478,7 @@ class PickbotEnv(gym.Env):
             box_pos = Pose(position=Point(x=np.random.uniform(low=-0.3, high=0.3, size=None),
                                           y=np.random.uniform(low=0.9, high=1.1, size=None),
                                           z=1.05),
-                           orientation=quaternion_from_euler(0, 0, 0))
+                           orientation=quaternion_from_euler(0.002567, 0.102, 1.563))
         else:
             box_pos = self.object_initial_position
 
@@ -527,7 +527,7 @@ class PickbotEnv(gym.Env):
         Get the Position of the endeffektor and the object via rosservice call /gazebo/get_model_state and /gazebo/get_link_state
         Calculate distance between them
 
-        In this case 
+        In this case
     
         Object:     unite_box_0 link
         Gripper:    vacuum_gripper_link ground_plane
@@ -536,7 +536,7 @@ class PickbotEnv(gym.Env):
         try:
             model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
             blockName = self.object_name
-            relative_entity_name = "link"
+            relative_entity_name = "target"
             object_resp_coordinates = model_coordinates(blockName, relative_entity_name)
             Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
                                object_resp_coordinates.pose.position.z))
@@ -640,6 +640,10 @@ class PickbotEnv(gym.Env):
         wrist_1_joint_state = joint_states.position[3]
         wrist_2_joint_state = joint_states.position[4]
         wrist_3_joint_state = joint_states.position[5]
+
+        for joint in joint_states.position:
+            if joint > math.pi or joint < -math.pi:
+                sys.exit("Joint exceeds limit")
 
         # Get Contact Forces out of get_contact_force Functions to be able to take an average over some iterations otherwise chances are high that not both sensors are showing contact the same time
         contact_1_force = self.get_contact_force_1()

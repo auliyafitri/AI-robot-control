@@ -1,4 +1,5 @@
 TargetObject:
+    - car_handle
     - unit_box_0
     - unit_box_2
     - unit_box_9

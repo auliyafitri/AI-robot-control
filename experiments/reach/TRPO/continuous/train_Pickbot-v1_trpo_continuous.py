@@ -46,7 +46,8 @@ def main():
     act = trpo_mpi.learn(
         env=env,
         network='mlp',
-        total_timesteps=3000
+        total_timesteps=1000000,
+        save_path=modelsdir
     )
 
     print("Saving model to " + modelsdir)
