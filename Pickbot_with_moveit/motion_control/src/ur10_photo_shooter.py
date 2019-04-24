@@ -459,13 +459,20 @@ def save_image(cv_image, index):
     imsave('camerashot_{}.png'.format(index), cv_image)
     cwd = os.getcwd()
     print("Image saved to {}".format(cwd))
+
+def save_depth_map(depth_img, img_idx):
+    depth_map = depth_img * 255
+    imsave('depthMap_{}.png'.format(img_idx), depth_map)
  
 def callback(ros_img):
     global moving, new_image, img_idx
     if not moving and new_image:    
         cv_image = CvBridge().imgmsg_to_cv2(ros_img, desired_encoding="passthrough")
         print('Saving image {} with size: {}'.format(img_idx, cv_image.shape))
+        
+        # np.savetxt("foo{}.csv".format(img_idx), cv_image, delimiter=",")
         save_image(cv_image, img_idx)
+        save_depth_map(cv_image, img_idx)
         img_idx += 1
         new_image = False
 
@@ -485,7 +492,7 @@ def photo_shooter():
 
 
     global moving, new_image
-    rospy.Subscriber('/intel_realsense_camera/rgb/image_raw', Image, callback)
+    rospy.Subscriber('/intel_realsense_camera/depth/image_raw', Image, callback)
     position_y = 0.4
     while not rospy.is_shutdown() and position_y <= 1.0:
         moving = True
@@ -517,10 +524,13 @@ def photo_shooter():
 if __name__ == '__main__':
 
     # try:
-         
     #     manipulator_arm_control()
-        
     #     moveit_commander.roscpp_shutdown() #shut down the moveit_commander
-
     # except rospy.ROSInterruptException: pass
+
     photo_shooter()
+    # print ("Current position: {},{},{}".format(group.get_current_pose().pose.position.x,
+    #                                 group.get_current_pose().pose.position.y,
+    #                                 group.get_current_pose().pose.position.z)) 
+    # distance, _ = get_distance_gripper_to_object()
+    # print("Distance: {}".format(distance))
