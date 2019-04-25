@@ -310,7 +310,7 @@
   </model>
 
 
-  <model name='car_handle'>
+  <model name='door_handle'>
   <pose frame=''>-0.13 0.848 1.06 0.002567 0.102 1.563</pose>
     <link name='target'>
       <inertial>

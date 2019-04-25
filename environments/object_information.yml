@@ -1,0 +1,7 @@
+items:
+  - name: door_handle
+    type: door_handle
+  - name: unit_box_0
+    type: free_shapes
+  - name: unit_box_1
+    type: free_shapes

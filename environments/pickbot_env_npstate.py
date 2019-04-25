@@ -197,6 +197,7 @@ class PickbotEnv(gym.Env):
         # object type: index of the object name in the object list
         # object list: pool of the available objects, have at least one entry
         self.object_name = ''
+        self.object_type_str = ''
         self.object_type = 0
         self.object_list = U.get_target_object()
         self.object_initial_position = Pose(position=Point(x=-0.13, y=0.848, z=1.06),  # x=0.0, y=0.9, z=1.05
@@ -457,21 +458,28 @@ class PickbotEnv(gym.Env):
     # randomize: spawn object randomly from the object pool. If false, object will be the first entry of the object list
     # random_position: spawn object with random position
     def set_target_object(self, random_object=False, random_position=False):
+        if random_object:
+            rand_object = random.choice(self.object_list)
+            self.object_name = rand_object["name"]
+            self.object_type_str = rand_object["type"]
+            self.object_type = self.object_list.index(rand_object)
+        else:
+            self.object_name = self.object_list[0]["name"]
+            self.object_type_str = self.object_list[0]["type"]
+            self.object_type = 0
+
         if random_position:
-            box_pos = Pose(position=Point(x=np.random.uniform(low=-0.3, high=0.3, size=None),
-                                          y=np.random.uniform(low=0.9, high=1.1, size=None),
-                                          z=1.05),
-                           orientation=quaternion_from_euler(0, 0, 0))
+            if self.object_type_str == "door_handle":
+                box_pos = U.get_random_door_handle_pos()
+            else:
+                box_pos = Pose(position=Point(x=np.random.uniform(low=-0.3, high=0.3, size=None),
+                                              y=np.random.uniform(low=0.9, high=1.1, size=None),
+                                              z=1.05),
+                               orientation=quaternion_from_euler(0, 0, 0))
         else:
             box_pos = self.object_initial_position
 
-        if random_object:
-            self.object_name = random.choice(self.object_list)
-            self.object_type = self.object_list.index(self.object_name)
-        else:
-            self.object_name = self.object_list[0]
-            self.object_type = 0
-        self.change_object_position(self.object_name, box_pos)
+        U.change_object_position(self.object_name, box_pos)
         print("Current target: ", self.object_name)
 
     def randomly_spawn_object(self):

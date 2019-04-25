@@ -4,8 +4,12 @@ import numpy as np
 import rospy
 import rospkg
 import csv
+import random
 import environments
 
+from transformations import quaternion_from_euler
+
+from geometry_msgs.msg import Point, Pose
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.srv import DeleteModel
@@ -16,10 +20,10 @@ from simulation.srv import VacuumGripperControl
 
 def get_target_object():
     # get list of target object
-    targetobj_fname = os.path.dirname(environments.__file__) + '/target_object_list'
+    targetobj_fname = os.path.dirname(environments.__file__) + '/object_information.yml'
     with open(targetobj_fname, "r") as stream:
         out = yaml.load(stream)
-        return out['TargetObject']
+        return out['items']
 
 
 def get_state(observation):
@@ -111,6 +115,30 @@ def change_object_position(object_name, model_position):
         change_position(box)
     except rospy.ServiceException as e:
         rospy.loginfo("Set Model State service call failed:  {0}".format(e))
+
+
+def get_random_door_handle_pos():
+    positions = [[-0.26, 0.848, 1.1, 0, 0, 1.57],
+                 [-0.195, 0.848, 1.1, 0, 0, 1.57],
+                 [-0.13, 0.848, 1.1, 0, 0, 1.57],
+                 [-0.065, 0.848, 1.1, 0, 0, 1.57],
+                 [0, 0.848, 1.1, 0, 0, 1.57],
+                 [0.065, 0.848, 1.1, 0, 0, 1.57],
+                 [0.13, 0.848, 1.1, 0, 0, 1.57],
+                 [0.196, 0.848, 1.1, 0, 0, 1.57],
+                 [-0.224, 0.995, 1.1, 0, 0, -1.57],
+                 [-0.159, 0.995, 1.1, 0, 0, -1.57],
+                 [-0.094, 0.995, 1.1, 0, 0, -1.57],
+                 [-0.029, 0.995, 1.1, 0, 0, -1.57],
+                 [0.036, 0.995, 1.1, 0, 0, -1.57],
+                 [0.101, 0.995, 1.1, 0, 0, -1.57],
+                 [0.166, 0.995, 1.1, 0, 0, -1.57],
+                 [0.231, 0.995, 1.1, 0, 0, -1.57]]
+
+    rand = random.choice(positions)
+    random_door_pos = Pose(position=Point(x=rand[0], y=rand[1], z=rand[2]),
+                           orientation=quaternion_from_euler(rand[3], rand[4], rand[5]))
+    return random_door_pos
 
 
 def append_to_csv(csv_filename, anarray):
