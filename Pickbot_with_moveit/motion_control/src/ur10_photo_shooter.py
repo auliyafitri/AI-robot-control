@@ -454,17 +454,18 @@ def get_distance_gripper_to_object():
 moving = True
 new_image = False
 img_idx = 0
+depth_img_idx = 0
 
 def save_image(cv_image, index):
-    imsave('camerashot_{}.png'.format(index), cv_image)
+    imsave('rgb_{}.png'.format(index), cv_image)
     cwd = os.getcwd()
     print("Image saved to {}".format(cwd))
 
 def save_depth_map(depth_img, img_idx):
     depth_map = depth_img * 255
-    imsave('depthMap_{}.png'.format(img_idx), depth_map)
+    imsave('depth_{}.png'.format(img_idx), depth_map)
  
-def callback(ros_img):
+def callback_rgb(ros_img):
     global moving, new_image, img_idx
     if not moving and new_image:    
         cv_image = CvBridge().imgmsg_to_cv2(ros_img, desired_encoding="passthrough")
@@ -472,8 +473,17 @@ def callback(ros_img):
         
         # np.savetxt("foo{}.csv".format(img_idx), cv_image, delimiter=",")
         save_image(cv_image, img_idx)
-        save_depth_map(cv_image, img_idx)
         img_idx += 1
+        new_image = False
+
+def callback_depth(ros_img):
+    global moving, new_image, depth_img_idx
+    if not moving and new_image:    
+        cv_image = CvBridge().imgmsg_to_cv2(ros_img, desired_encoding="passthrough")
+        print('Saving image {} with size: {}'.format(depth_img_idx, cv_image.shape))
+        
+        imsave('depth_{}.png'.format(depth_img_idx), cv_image)
+        depth_img_idx += 1
         new_image = False
 
  
@@ -492,7 +502,8 @@ def photo_shooter():
 
 
     global moving, new_image
-    rospy.Subscriber('/intel_realsense_camera/depth/image_raw', Image, callback)
+    rospy.Subscriber('/intel_realsense_camera/rgb/image_raw', Image, callback_rgb)
+    rospy.Subscriber('/intel_realsense_camera/depth/image_raw', Image, callback_depth)
     position_y = 0.4
     while not rospy.is_shutdown() and position_y <= 1.0:
         moving = True
@@ -504,6 +515,23 @@ def photo_shooter():
                                             group.get_current_pose().pose.position.y,
                                             group.get_current_pose().pose.position.z))
             position_y += 0.1
+            distance, _ = get_distance_gripper_to_object()
+            print("Distance: {}".format(distance))
+            moving = False
+            new_image = True
+            time.sleep(1)
+    
+    position_x = -1.0
+    while not rospy.is_shutdown() and position_x <= 0.4:
+        moving = True
+        if moving:
+            new_image = False
+            print("Moving to position: ")
+            assign_pose_target(position_x, 0.8, 0.6, 0.0, 0.0, 0.0, 0.0)
+            print ("Current position: {},{},{}".format(group.get_current_pose().pose.position.x,
+                                            group.get_current_pose().pose.position.y,
+                                            group.get_current_pose().pose.position.z))
+            position_x += 0.1
             distance, _ = get_distance_gripper_to_object()
             print("Distance: {}".format(distance))
             moving = False
