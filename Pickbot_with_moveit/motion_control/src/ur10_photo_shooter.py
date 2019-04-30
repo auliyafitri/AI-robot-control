@@ -488,7 +488,7 @@ def callback_depth(ros_img):
 
  
 def photo_shooter():
-    print("1. Moving to position 1")
+    print("1. Moving to starting position")
     assign_pose_target(0.4, 0.5, 0.6, 0.2, 0.0, 0.0, 0.0)
     print ("Current position 1: {},{},{}".format(group.get_current_pose().pose.position.x,
                                                group.get_current_pose().pose.position.y,
