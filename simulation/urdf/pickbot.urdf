@@ -33,17 +33,17 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
-          		<mesh filename="package://simulation/meshes/ur10/collision/base.stl"/>
+              <mesh filename="package://simulation/meshes/ur10/collision/base.stl"/>
             </geometry>
         </collision>
-	    <visual>
-	      <geometry>
-	        <mesh filename="package://simulation/meshes/ur10//visual/base.dae"/>
-	      </geometry>
-	        <material name="LightGrey">
-	          <color rgba="0.7 0.7 0.7 1.0"/>
-	        </material>
-	    </visual>
+      <visual>
+        <geometry>
+          <mesh filename="package://simulation/meshes/ur10//visual/base.dae"/>
+        </geometry>
+          <material name="LightGrey">
+            <color rgba="0.7 0.7 0.7 1.0"/>
+          </material>
+      </visual>
     </link>
 
     <link name="shoulder_link">
@@ -54,19 +54,19 @@
         </inertial>
         <collision>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
-	      <geometry>
-	        <mesh filename="package://simulation/meshes/ur10/collision/shoulder.stl"/>
-	      </geometry>
+        <geometry>
+          <mesh filename="package://simulation/meshes/ur10/collision/shoulder.stl"/>
+        </geometry>
         </collision>
-	    <visual>
-	      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
-	      <geometry>
-	        <mesh filename="package://simulation/meshes/ur10/visual/shoulder.dae"/>
-	      </geometry>
+      <visual>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://simulation/meshes/ur10/visual/shoulder.dae"/>
+        </geometry>
             <material name="LightGrey">
               <color rgba="0.7 0.7 0.7 1.0"/>
             </material>
-	    </visual>
+      </visual>
     </link>
 
     <joint name="shoulder_pan_joint" type="revolute">
@@ -293,13 +293,13 @@
         <collision>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
           <geometry>
-            <mesh filename="package://simulation/meshes/gripper/collision/VG.stl" scale="0.001 0.001 0.001"/>
+            <mesh filename="package://simulation/meshes/gripper/collision/VG.stl" scale="0.001 0.001 0.001"/> 
           </geometry>
         </collision>
         <visual>
           <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
           <geometry>
-            <mesh filename="package://simulation/meshes/gripper/collision/VG.stl" scale="0.001 0.001 0.001"/>
+            <mesh filename="package://simulation/meshes/gripper/collision/VG.stl" scale="0.001 0.001 0.001"/> 
           </geometry>
             <material name="LightGrey">
               <color rgba="0.8 0.1 0.3 1.0"/>
@@ -445,7 +445,7 @@
             <inertia ixx="1.6e-08" ixy="0.0" ixz="0.0" iyy="1.6e-08" iyz="0.0" izz="1.6e-08"/>
         </inertial>
         <collision>
-            <origin rpy="0 -0.6 1.57" xyz="0 0.235 -0.071"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
             <geometry>
                 <box size="0.02 0.02 0.0001"/>
             </geometry>
