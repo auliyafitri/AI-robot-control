@@ -22,6 +22,7 @@ import environments.util_math as UMath
 from environments.gazebo_connection import GazeboConnection
 from environments.controllers_connection import ControllersConnection
 from environments.joint_publisher import JointPub
+from environments.joint_array_publisher import JointArrayPub
 from baselines import logger
 
 # MESSAGES/SERVICES
@@ -103,6 +104,7 @@ class PickbotEnv(gym.Env):
         self.gazebo = GazeboConnection()
         self.controllers_object = ControllersConnection()
         self.pickbot_joint_pubisher_object = JointPub()
+        self.publisher_to_moveit_object = JointArrayPub()
 
         # Define Subscribers as Sensordata
         """
@@ -275,7 +277,8 @@ class PickbotEnv(gym.Env):
         self.controllers_object.turn_off_controllers()
         self.gazebo.pauseSim()
         self.gazebo.resetSim()
-        self.pickbot_joint_pubisher_object.set_joints()
+        # self.pickbot_joint_pubisher_object.set_joints()
+        self.publisher_to_moveit_object.set_joints()
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         self.gazebo.unpauseSim()
         self.controllers_object.turn_on_controllers()
@@ -343,7 +346,8 @@ class PickbotEnv(gym.Env):
 
         # 4) unpause, move to position for certain time
         self.gazebo.unpauseSim()
-        self.pickbot_joint_pubisher_object.move_joints(next_action_position)
+        # self.pickbot_joint_pubisher_object.move_joints(next_action_position)
+        self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
         time.sleep(self.running_step)
 
         """

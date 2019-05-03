@@ -12,6 +12,8 @@ from baselines.bench import Monitor
 from baselines import logger
 from baselines.common.cmd_util import make_vec_env
 
+from environments.joint_array_publisher import JointArrayPub
+
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
 
 
@@ -42,6 +44,21 @@ def main():
                        reward_scale=1.0,
                        flatten_dict_observations=True,
                        gamestate=None)
+
+
+
+    a = [1.5,-1.2,1.4,-1.87,-1.57,0]
+    b = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    # rate = rospy.Rate(10)
+
+    jointPub = JointArrayPub()
+    # for i in range(10):
+    #     jointPub.pub_joints_to_moveit(a)
+    #     jointPub.pub_joints_to_moveit(b)
+    #     rate.sleep()
+    jointPub.pub_joints_to_moveit(a)
+    jointPub.pub_joints_to_moveit(b)
 
     act = trpo_mpi.learn(
         env=env,
