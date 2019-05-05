@@ -13,6 +13,7 @@ from baselines import logger
 from baselines.common.cmd_util import make_vec_env
 
 from environments.joint_array_publisher import JointArrayPub
+from std_msgs.msg import String
 
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
 
@@ -30,6 +31,11 @@ modelsdir = os.path.dirname(models.__file__) + '/' + task_name + '/trpo/' + env_
 # Generate tensorboard file
 format_strs = ['stdout', 'log', 'csv', 'tensorboard']
 logger.configure(os.path.abspath(logdir), format_strs)
+
+
+def mov_complete_callback(data):
+    msg = data.data
+    print(msg)
 
 
 def main():
@@ -53,12 +59,24 @@ def main():
     # rate = rospy.Rate(10)
 
     jointPub = JointArrayPub()
+    mov_sub = rospy.Subscriber('/pickbot/movement_complete/', String, mov_complete_callback)
+
+
     # for i in range(10):
     #     jointPub.pub_joints_to_moveit(a)
     #     jointPub.pub_joints_to_moveit(b)
     #     rate.sleep()
     jointPub.pub_joints_to_moveit(a)
+
+    print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
+    rospy.wait_for_message("/pickbot/movement_complete", String)
+    print(">>>>>>>>>>>>>>>>>>> Waiting complete")
+
     jointPub.pub_joints_to_moveit(b)
+
+    print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
+    rospy.wait_for_message("/pickbot/movement_complete", String)
+    print(">>>>>>>>>>>>>>>>>>> Waiting complete")
 
     act = trpo_mpi.learn(
         env=env,

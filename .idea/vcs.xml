@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/algorithms/baselines" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/algorithms/stable-baselines" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/python_pkgs/gym" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/python_pkgs/openai_ros" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/python_pkgs/pygazebo" vcs="Git" />
+  </component>
+</project>

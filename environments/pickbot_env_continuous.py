@@ -26,7 +26,7 @@ from environments.joint_array_publisher import JointArrayPub
 from baselines import logger
 
 # MESSAGES/SERVICES
-from std_msgs.msg import Float64
+from std_msgs.msg import String
 from std_msgs.msg import Bool
 from sensor_msgs.msg import JointState
 from gazebo_msgs.msg import ContactsState
@@ -349,6 +349,10 @@ class PickbotEnv(gym.Env):
         # self.pickbot_joint_pubisher_object.move_joints(next_action_position)
         self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
         time.sleep(self.running_step)
+
+        print(">>>>>>>>>>>>>>>>>>> I am waiting for the movement to complete")
+        rospy.wait_for_message("/pickbot/movement_complete", String)
+        print(">>>>>>>>>>>>>>>>>>> Waiting complete")
 
         """
         #execute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     

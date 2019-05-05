@@ -20,6 +20,7 @@ from scipy.misc import imsave
 
 
 # MESSAGES/SERVICES
+from std_msgs.msg import String
 from std_msgs.msg import Float64
 from std_msgs.msg import Bool
 from sensor_msgs.msg import JointState, Image
@@ -56,7 +57,28 @@ def joint_position_sub():
 def joint_callback(data):
     pos = data.position
     assign_joint_value(pos[2], pos[1], pos[0], pos[3], pos[4], pos[5])
+
+    pub = rospy.Publisher('/pickbot/movement_complete/', String, queue_size=10)
+    check_publishers_connection(pub)
+    pub.publish("Pickbot_motion_control: Published <Movement complete>")
+
     print("Joint assigned successfull")
+
+
+def check_publishers_connection(pub):
+    """
+    Checks that all the publishers are working
+    :return:
+    """
+    rate = rospy.Rate(100)  # 10hz
+    while (pub.get_num_connections() == 0):
+        rospy.logdebug("No subscribers to _joint1_pub yet so we wait and try again")
+        try:
+            rate.sleep()
+        except rospy.ROSInterruptException:
+            # This is to avoid error when world is rested, time when backwards.
+            pass
+    rospy.logdebug("joint_pub Publisher Connected")
 
 
 def randomly_spawn_object():
