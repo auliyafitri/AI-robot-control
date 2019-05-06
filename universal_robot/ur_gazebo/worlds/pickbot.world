@@ -104,7 +104,7 @@
     <model name='stand'>
       <static>1</static>
       <pose frame=''>0 1.5 1.6   1.5708 -0 -3.14159</pose>
-      <link name='stand'>
+      <link name='container'>
         <self_collide>1</self_collide>
         <inertial>
           <mass>10</mass>
@@ -212,7 +212,7 @@
 
     <model name='unit_box_0'>
       <pose frame=''>0 0.919858 1.047203 0 -0 0</pose>
-      <link name='link'>
+      <link name='target'>
         <inertial>
           <mass>1</mass>
           <inertia>

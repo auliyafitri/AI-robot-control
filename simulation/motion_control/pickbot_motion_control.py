@@ -227,7 +227,7 @@ def TiltAboutAxis(pose_target, resolution, tilt_axis, tilt_direction):
 ###___JOINT VALUE MANIPULATION___###
 ## Manipulate by assigning joint values
 def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
-    group.set_max_velocity_scaling_factor(0.1)
+    # group.set_max_velocity_scaling_factor(0.1)
     group_variable_values = group.get_current_joint_values() #create variable that stores joint values
 
     #Assign values to joints
@@ -239,10 +239,11 @@ def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
     group_variable_values[5] = joint_5
 
     group.set_joint_value_target(group_variable_values) #set target joint values for 'manipulator' group
- 
+
     plan1 = group.plan() #call plan function to plan the path (visualize on rviz)
-    group.go(wait=True) #execute plan on real/simulation (gazebo) robot 
-    rospy.sleep(2) #sleep 2 seconds
+    group.go(group_variable_values, wait=True) #execute plan on real/simulation (gazebo) robot
+    group.stop()
+    rospy.sleep(0.1)
 
 ###___POSE TARGET MANIPULATION___###
 ## Manipulate by assigning pose target
@@ -579,6 +580,13 @@ def photo_shooter():
 
 ###___MAIN___###
 if __name__ == '__main__':
+
+    # box_pose = geometry_msgs.msg.PoseStamped()
+    # box_pose.header.frame_id = "panda_leftfinger"
+    # box_pose.pose.orientation.w = 1.0
+    # box_name = "box"
+    # scene.add_box(box_name, box_pose, size=(0.1, 0.1, 0.1))
+
     rospy.Subscriber('/pickbot/target_joint_positions/', JointState, joint_callback)
     print("listenning to joint states now")
     rospy.spin()

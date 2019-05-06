@@ -334,6 +334,12 @@ class PickbotEnv(gym.Env):
 
         # 4) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
+
+        # while no collsion:
+        #     if collision:
+        #         then reset
+        #         ?? how to cut the moveit
+
         rospy.wait_for_message("/pickbot/movement_complete", String)
 
         """
