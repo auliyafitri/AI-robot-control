@@ -265,11 +265,6 @@ class PickbotEnv(gym.Env):
         17) Return State 
         """
 
-        # self.gazebo.change_gravity(0, 0, 0)
-        # self.controllers_object.turn_off_controllers()
-        # self.gazebo.pauseSim()
-        # self.gazebo.resetSim()
-        # self.pickbot_joint_pubisher_object.set_joints()
         self.publisher_to_moveit_object.set_joints()
 
         print(">>>>>>>>>>>>>>>>>>> RESET: waiting for the movement to complete")
@@ -277,9 +272,6 @@ class PickbotEnv(gym.Env):
         print(">>>>>>>>>>>>>>>>>>> RESET: Waiting complete")
 
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
-        # self.gazebo.unpauseSim()
-        # self.controllers_object.turn_on_controllers()
-        # self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
         # self.randomly_spawn_object()
 
@@ -340,12 +332,8 @@ class PickbotEnv(gym.Env):
         print("Last Position: : "+str(last_position))
         """
 
-        # 4) unpause, move to position for certain time
-        # self.gazebo.unpauseSim()
-        # self.pickbot_joint_pubisher_object.move_joints(next_action_position)
+        # 4) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
-        time.sleep(self.running_step)
-
         rospy.wait_for_message("/pickbot/movement_complete", String)
 
         """
@@ -354,24 +342,20 @@ class PickbotEnv(gym.Env):
         while np.linalg.norm(np.asarray(self.joints_state.position)-np.asarray(next_action_position))>0.1 and self.get_collisions()==False and time.time()-time1<0.1:         
             rospy.loginfo("Not yet reached target position and no collision")
         """
-        # 5) Get Observations and pause Simulation
+        # 5) Get Observations
         observation = self.get_obs()
-        # self.gazebo.pauseSim()
 
         # 6) Convert Observations into state
         state = self.get_state(observation)
 
-        # 7) Unpause Simulation check if its done, calculate done_reward
-        # self.gazebo.unpauseSim()
+        # 7) Check if its done, calculate done_reward
         done, done_reward, invalid_contact = self.is_done(observation)
-        # self.gazebo.pauseSim()
 
         # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
         self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
-        # self.gazebo.unpauseSim()
 
         self.episode_steps += 1
         # 10) Return State, Reward, Done
