@@ -52,31 +52,27 @@ def main():
                        gamestate=None)
 
 
-
-    a = [1.5,-1.2,1.4,-1.87,-1.57,0]
-    b = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
-    # rate = rospy.Rate(10)
-
-    jointPub = JointArrayPub()
-    mov_sub = rospy.Subscriber('/pickbot/movement_complete/', String, mov_complete_callback)
-
-
-    # for i in range(10):
-    #     jointPub.pub_joints_to_moveit(a)
-    #     jointPub.pub_joints_to_moveit(b)
-    #     rate.sleep()
-    jointPub.pub_joints_to_moveit(a)
-
-    print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
-    rospy.wait_for_message("/pickbot/movement_complete", String)
-    print(">>>>>>>>>>>>>>>>>>> Waiting complete")
-
-    jointPub.pub_joints_to_moveit(b)
-
-    print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
-    rospy.wait_for_message("/pickbot/movement_complete", String)
-    print(">>>>>>>>>>>>>>>>>>> Waiting complete")
+    ############################################################
+    ##                Experiments with MoveIt                 ##
+    ############################################################
+    # a = [1.5,-1.2,1.4,-1.87,-1.57,0]
+    # b = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    #
+    # jointPub = JointArrayPub()
+    # jointPub.pub_joints_to_moveit(a)
+    #
+    # print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
+    # rospy.wait_for_message("/pickbot/movement_complete", String)
+    # print(">>>>>>>>>>>>>>>>>>> Waiting complete")
+    #
+    # jointPub.pub_joints_to_moveit(b)
+    #
+    # print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
+    # rospy.wait_for_message("/pickbot/movement_complete", String)
+    # print(">>>>>>>>>>>>>>>>>>> Waiting complete")
+    ############################################################
+    #                     End of experiment                    #
+    ############################################################
 
     act = trpo_mpi.learn(
         env=env,

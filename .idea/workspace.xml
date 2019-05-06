@@ -2,15 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1582d3d6-59dc-43a2-9ff4-2659ece12c29" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/algorithms/baselines" beforeDir="false" afterPath="$PROJECT_DIR$/algorithms/baselines" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/algorithms/baselines/baselines/common/distributions.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithms/baselines/baselines/common/distributions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/algorithms/baselines/baselines/trpo_mpi/trpo_mpi.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithms/baselines/baselines/trpo_mpi/trpo_mpi.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/environments/joint_array_publisher.py" beforeDir="false" afterPath="$PROJECT_DIR$/environments/joint_array_publisher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/environments/object_information.yml" beforeDir="false" afterPath="$PROJECT_DIR$/environments/object_information.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/environments/pickbot_env_continuous.py" beforeDir="false" afterPath="$PROJECT_DIR$/environments/pickbot_env_continuous.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simulation/motion_control/pickbot_motion_control.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation/motion_control/pickbot_motion_control.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/universal_robot/ur_gazebo/launch/pickbot.launch" beforeDir="false" afterPath="$PROJECT_DIR$/universal_robot/ur_gazebo/launch/pickbot.launch" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,13 +15,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="585">
-              <caret line="75" selection-start-line="75" selection-end-line="75" />
+            <state relative-caret-position="681">
+              <caret line="66" column="5" selection-start-line="66" selection-start-column="4" selection-end-line="66" selection-end-column="5" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
+                <marker date="1557128654269" expanded="true" signature="1757:2341" ph="..." />
               </folding>
             </state>
           </provider>
@@ -89,11 +85,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/environments/pickbot_env_continuous.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="230">
-              <caret line="354" column="37" lean-forward="true" selection-start-line="354" selection-start-column="37" selection-end-line="354" selection-end-column="37" />
+            <state relative-caret-position="455">
+              <caret line="369" column="43" lean-forward="true" selection-start-line="369" selection-start-column="43" selection-end-line="369" selection-end-column="43" />
               <folding>
                 <element signature="e#32#42#0" expanded="true" />
               </folding>
@@ -150,13 +146,13 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py" />
         <option value="$PROJECT_DIR$/environments/object_information.yml" />
         <option value="$PROJECT_DIR$/environments/joint_array_publisher.py" />
         <option value="$PROJECT_DIR$/simulation/motion_control/pickbot_motion_control.py" />
         <option value="$PROJECT_DIR$/algorithms/baselines/baselines/trpo_mpi/trpo_mpi.py" />
         <option value="$PROJECT_DIR$/algorithms/baselines/baselines/common/distributions.py" />
         <option value="$PROJECT_DIR$/environments/pickbot_env_continuous.py" />
+        <option value="$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py" />
       </list>
     </option>
   </component>
@@ -248,12 +244,12 @@
       <option name="presentableId" value="Default" />
       <updated>1557073150088</updated>
       <workItem from="1557073153692" duration="8064000" />
-      <workItem from="1557124492609" duration="3797000" />
+      <workItem from="1557124492609" duration="4177000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11861000" />
+    <option name="totallyTimeSpent" value="12241000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="1080" width="1920" height="1080" extended-state="6" />
@@ -361,16 +357,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="585">
-          <caret line="75" selection-start-line="75" selection-end-line="75" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/simulation/script/gz_subscriber.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -380,10 +366,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/environments/pickbot_env_continuous.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="354" column="37" lean-forward="true" selection-start-line="354" selection-start-column="37" selection-end-line="354" selection-end-column="37" />
+        <state relative-caret-position="455">
+          <caret line="369" column="43" lean-forward="true" selection-start-line="369" selection-start-column="43" selection-end-line="369" selection-end-column="43" />
           <folding>
             <element signature="e#32#42#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="681">
+          <caret line="66" column="5" selection-start-line="66" selection-start-column="4" selection-end-line="66" selection-end-column="5" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+            <marker date="1557128654269" expanded="true" signature="1757:2341" ph="..." />
           </folding>
         </state>
       </provider>
