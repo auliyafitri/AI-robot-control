@@ -1,2 +1,0 @@
-Logging to /home/robotics/catkin_ws/src/AI-robot-control/evaluations/reach/trpo/PickbotReachContinuous-v1/2019-05-03_14h39min
-********** Iteration 0 ************

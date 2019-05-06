@@ -46,15 +46,17 @@ register(
     max_episode_steps=240,
 )
 
+# MoveIt Env
 register(
     id='PickbotReachContinuous-v0',
-    entry_point='environments.pickbot_env_continuous:PickbotEnv',
+    entry_point='environments.pickbot_reach_env:PickbotEnv',
     max_episode_steps=300,
 )
 
+# MoveIt Env
 register(
     id='PickbotReachContinuous-v1',
-    entry_point='environments.pickbot_env_continuous:PickbotEnv',
+    entry_point='environments.pickbot_reach_env:PickbotEnv',
     kwargs={
         'random_object': False,
         'random_position': True,
@@ -62,9 +64,10 @@ register(
     max_episode_steps=300,
 )
 
+# MoveIt Env
 register(
     id='PickbotReachContinuous-v2',
-    entry_point='environments.pickbot_env_continuous:PickbotEnv',
+    entry_point='environments.pickbot_reach_env:PickbotEnv',
     kwargs={
         'random_object': True,
         'random_position': False,
@@ -74,9 +77,10 @@ register(
     max_episode_steps=300,
 )
 
+# MoveIt Env
 register(
     id='PickbotReachContinuous-v3',
-    entry_point='environments.pickbot_env_continuous:PickbotEnv',
+    entry_point='environments.pickbot_reach_env:PickbotEnv',
     kwargs={
         'random_object': True,
         'random_position': True,
