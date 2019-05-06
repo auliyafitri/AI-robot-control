@@ -2,10 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1582d3d6-59dc-43a2-9ff4-2659ece12c29" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/algorithms/baselines" beforeDir="false" afterPath="$PROJECT_DIR$/algorithms/baselines" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/algorithms/baselines/baselines/common/distributions.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithms/baselines/baselines/common/distributions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/algorithms/baselines/baselines/trpo_mpi/trpo_mpi.py" beforeDir="false" afterPath="$PROJECT_DIR$/algorithms/baselines/baselines/trpo_mpi/trpo_mpi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/environments/joint_array_publisher.py" beforeDir="false" afterPath="$PROJECT_DIR$/environments/joint_array_publisher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/environments/object_information.yml" beforeDir="false" afterPath="$PROJECT_DIR$/environments/object_information.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/environments/pickbot_env_continuous.py" beforeDir="false" afterPath="$PROJECT_DIR$/environments/pickbot_env_continuous.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simulation/motion_control/pickbot_motion_control.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation/motion_control/pickbot_motion_control.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/universal_robot/ur_gazebo/launch/pickbot.launch" beforeDir="false" afterPath="$PROJECT_DIR$/universal_robot/ur_gazebo/launch/pickbot.launch" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,7 +19,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -30,8 +35,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/environments/joint_publisher.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="30" column="29" selection-start-line="30" selection-start-column="29" selection-end-line="30" selection-end-column="29" />
+            <state relative-caret-position="-14">
+              <caret line="32" column="38" selection-start-line="32" selection-start-column="38" selection-end-line="32" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -39,8 +44,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/environments/joint_array_publisher.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="26" selection-start-line="26" selection-end-line="26" />
+            <state relative-caret-position="541">
+              <caret line="59" selection-start-line="59" selection-end-line="59" />
               <folding>
                 <element signature="e#23#35#0" expanded="true" />
               </folding>
@@ -51,8 +56,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/simulation/motion_control/pickbot_motion_control.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="63" selection-start-line="63" selection-end-line="63" />
+            <state relative-caret-position="930">
+              <caret line="62" column="72" selection-start-line="62" selection-start-column="72" selection-end-line="62" selection-end-column="72" />
               <folding>
                 <element signature="e#34#43#0" expanded="true" />
               </folding>
@@ -60,11 +65,23 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/algorithms/baselines/baselines/common/distributions.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="695">
+              <caret line="248" column="52" selection-start-line="248" selection-start-column="52" selection-end-line="248" selection-end-column="52" />
+              <folding>
+                <element signature="e#0#23#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/algorithms/baselines/baselines/trpo_mpi/trpo_mpi.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="178" column="34" selection-start-line="178" selection-start-column="34" selection-end-line="178" selection-end-column="34" />
+            <state relative-caret-position="390">
+              <caret line="26" column="20" selection-start-line="26" selection-start-column="20" selection-end-line="26" selection-end-column="20" />
               <folding>
                 <element signature="e#0#65#0" expanded="true" />
               </folding>
@@ -72,14 +89,39 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/environments/pickbot_env_continuous.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2235">
-              <caret line="353" column="64" selection-start-line="353" selection-start-column="64" selection-end-line="353" selection-end-column="64" />
+            <state relative-caret-position="230">
+              <caret line="354" column="37" lean-forward="true" selection-start-line="354" selection-start-column="37" selection-end-line="354" selection-end-column="37" />
               <folding>
                 <element signature="e#32#42#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/environments/gazebo_connection.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-810" />
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/simulation/script/gz_subscriber.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret line="27" column="13" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/environments/object_information.yml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="3" column="2" selection-start-line="3" selection-start-column="2" selection-end-line="3" selection-end-column="2" />
             </state>
           </provider>
         </entry>
@@ -89,20 +131,32 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>running_step</find>
-      <find>step(</find>
       <find>joint_position_sub</find>
+      <find>seg_gen</find>
+      <find>get_state(</find>
+      <find>_check_all_systems_ready</find>
+      <find>check_joint_states</find>
+      <find>reset</find>
+      <find>sample(</find>
+      <find>step(</find>
+      <find>collision_callback</find>
+      <find>collision</find>
+      <find>is_done</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/algorithms/baselines" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/environments/pickbot_env_continuous.py" />
-        <option value="$PROJECT_DIR$/simulation/motion_control/pickbot_motion_control.py" />
         <option value="$PROJECT_DIR$/experiments/reach/TRPO/continuous/train_Pickbot-v1_trpo_continuous.py" />
+        <option value="$PROJECT_DIR$/environments/object_information.yml" />
+        <option value="$PROJECT_DIR$/environments/joint_array_publisher.py" />
+        <option value="$PROJECT_DIR$/simulation/motion_control/pickbot_motion_control.py" />
         <option value="$PROJECT_DIR$/algorithms/baselines/baselines/trpo_mpi/trpo_mpi.py" />
+        <option value="$PROJECT_DIR$/algorithms/baselines/baselines/common/distributions.py" />
+        <option value="$PROJECT_DIR$/environments/pickbot_env_continuous.py" />
       </list>
     </option>
   </component>
@@ -117,10 +171,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="216" />
-    <option name="y" value="81" />
-    <option name="width" value="950" />
-    <option name="height" value="1078" />
+    <option name="y" value="1080" />
+    <option name="width" value="940" />
+    <option name="height" value="1076" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -128,7 +181,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -144,41 +196,28 @@
             <path>
               <item name="AI-robot-control" type="b2602c69:ProjectViewProjectNode" />
               <item name="AI-robot-control" type="462c0819:PsiDirectoryNode" />
-              <item name="algorithms" type="462c0819:PsiDirectoryNode" />
-              <item name="baselines" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="AI-robot-control" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AI-robot-control" type="462c0819:PsiDirectoryNode" />
-              <item name="algorithms" type="462c0819:PsiDirectoryNode" />
-              <item name="baselines" type="462c0819:PsiDirectoryNode" />
-              <item name="baselines" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="AI-robot-control" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AI-robot-control" type="462c0819:PsiDirectoryNode" />
-              <item name="algorithms" type="462c0819:PsiDirectoryNode" />
-              <item name="baselines" type="462c0819:PsiDirectoryNode" />
-              <item name="baselines" type="462c0819:PsiDirectoryNode" />
-              <item name="trpo_mpi" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="AI-robot-control" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AI-robot-control" type="462c0819:PsiDirectoryNode" />
-              <item name="environments" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="AI-robot-control" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AI-robot-control" type="462c0819:PsiDirectoryNode" />
               <item name="experiments" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="AI-robot-control" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AI-robot-control" type="462c0819:PsiDirectoryNode" />
+              <item name="simulation" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="AI-robot-control" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AI-robot-control" type="462c0819:PsiDirectoryNode" />
+              <item name="simulation" type="462c0819:PsiDirectoryNode" />
+              <item name="script" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -208,26 +247,21 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1557073150088</updated>
-      <workItem from="1557073153692" duration="3808000" />
+      <workItem from="1557073153692" duration="8064000" />
+      <workItem from="1557124492609" duration="3797000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3808000" />
+    <option name="totallyTimeSpent" value="11861000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1920" height="1080" extended-state="6" />
+    <frame x="0" y="1080" width="1920" height="1080" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12059765" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12166489" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Python Console" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -235,11 +269,17 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="SciView" />
-      <window_info anchor="right" id="Database" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" />
+      <window_info anchor="bottom" id="Database Changes" order="9" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Terminal" order="11" />
+      <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="SciView" order="3" />
+      <window_info anchor="right" id="Database" order="4" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -262,29 +302,61 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/environments/object_information.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="2" selection-start-line="3" selection-start-column="2" selection-end-line="3" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/environments/joint_publisher.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="30" column="29" selection-start-line="30" selection-start-column="29" selection-end-line="30" selection-end-column="29" />
+        <state relative-caret-position="-14">
+          <caret line="32" column="38" selection-start-line="32" selection-start-column="38" selection-end-line="32" selection-end-column="38" />
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environments/gazebo_connection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-810" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/environments/joint_array_publisher.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" selection-start-line="26" selection-end-line="26" />
+        <state relative-caret-position="541">
+          <caret line="59" selection-start-line="59" selection-end-line="59" />
           <folding>
             <element signature="e#23#35#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/environments/pickbot_env_continuous.py">
+    <entry file="file://$PROJECT_DIR$/algorithms/baselines/baselines/trpo_mpi/trpo_mpi.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2235">
-          <caret line="353" column="64" selection-start-line="353" selection-start-column="64" selection-end-line="353" selection-end-column="64" />
+        <state relative-caret-position="390">
+          <caret line="26" column="20" selection-start-line="26" selection-start-column="20" selection-end-line="26" selection-end-column="20" />
           <folding>
-            <element signature="e#32#42#0" expanded="true" />
+            <element signature="e#0#65#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/simulation/motion_control/pickbot_motion_control.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="930">
+          <caret line="62" column="72" selection-start-line="62" selection-start-column="72" selection-end-line="62" selection-end-column="72" />
+          <folding>
+            <element signature="e#34#43#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/algorithms/baselines/baselines/common/distributions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="695">
+          <caret line="248" column="52" selection-start-line="248" selection-start-column="52" selection-end-line="248" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -299,22 +371,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/simulation/motion_control/pickbot_motion_control.py">
+    <entry file="file://$PROJECT_DIR$/simulation/script/gz_subscriber.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="63" selection-start-line="63" selection-end-line="63" />
-          <folding>
-            <element signature="e#34#43#0" expanded="true" />
-          </folding>
+        <state>
+          <caret line="27" column="13" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/algorithms/baselines/baselines/trpo_mpi/trpo_mpi.py">
+    <entry file="file://$PROJECT_DIR$/environments/pickbot_env_continuous.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="178" column="34" selection-start-line="178" selection-start-column="34" selection-end-line="178" selection-end-column="34" />
+        <state relative-caret-position="230">
+          <caret line="354" column="37" lean-forward="true" selection-start-line="354" selection-start-column="37" selection-end-line="354" selection-end-column="37" />
           <folding>
-            <element signature="e#0#65#0" expanded="true" />
+            <element signature="e#32#42#0" expanded="true" />
           </folding>
         </state>
       </provider>

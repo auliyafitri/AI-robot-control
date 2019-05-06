@@ -30,4 +30,7 @@
   <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur10.yaml" command="load"/>
   <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn arm_controller" respawn="false" output="screen"/>
 
+  <!-- Launch the republisher gz topic to ros topic -->
+  <node pkg="simulation" name="gz_topic_republisher" type="gz_subscriber.py" output="screen"/>
+
 </launch>

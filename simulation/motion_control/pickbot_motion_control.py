@@ -62,8 +62,6 @@ def joint_callback(data):
     check_publishers_connection(pub)
     pub.publish("Pickbot_motion_control: Published <Movement complete>")
 
-    print("Joint assigned successfull")
-
 
 def check_publishers_connection(pub):
     """

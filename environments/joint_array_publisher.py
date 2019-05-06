@@ -21,8 +21,10 @@ class JointArrayPub(object):
         Sets joints to initial position 
         :return:
         """
+        self.check_publishers_connection()
         self.pub_joints_to_moveit(self.init_pos)
-        self.reset_joints =  rospy.ServiceProxy('/gazebo/set_model_configuration', SetModelConfiguration)
+        # self.reset_joints =  rospy.ServiceProxy('/gazebo/set_model_configuration', SetModelConfiguration)
+
 
 
     def check_publishers_connection(self):
@@ -54,16 +56,17 @@ class JointArrayPub(object):
         jointState.velocity = []
         jointState.effort = []
         self.joint_pub.publish(jointState)
-        print("I've published: {}".format(jointState.position))
+        # print("I've published: {}".format(jointState.position))
 
 
     def set_joints(self, array=[1.5,-1.2,1.4,-1.87,-1.57,0]):
-        reset_req = SetModelConfigurationRequest()
-        reset_req.model_name = 'pickbot'
-        reset_req.urdf_param_name = 'robot_description'
-        reset_req.joint_names =[ 'elbow_joint', 'shoulder_lift_joint','shoulder_pan_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-        reset_req.joint_positions = array
-        res = self.reset_joints(reset_req) 
+        # reset_req = SetModelConfigurationRequest()
+        # reset_req.model_name = 'pickbot'
+        # reset_req.urdf_param_name = 'robot_description'
+        # reset_req.joint_names =[ 'elbow_joint', 'shoulder_lift_joint','shoulder_pan_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+        # reset_req.joint_positions = array
+        # res = self.reset_joints(reset_req)
+        self.pub_joints_to_moveit(self.init_pos)
 
 
         

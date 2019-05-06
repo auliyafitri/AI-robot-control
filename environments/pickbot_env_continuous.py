@@ -54,7 +54,7 @@ reg = register(
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, running_step=0.001, step_size=0.04, random_object=False, random_position=False,
+    def __init__(self, joint_increment_value=0.02, running_step=0.001, step_size=1.0, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False):
         """
         initializing all the relevant variables and connections
@@ -273,16 +273,21 @@ class PickbotEnv(gym.Env):
         17) Return State 
         """
 
-        self.gazebo.change_gravity(0, 0, 0)
-        self.controllers_object.turn_off_controllers()
-        self.gazebo.pauseSim()
-        self.gazebo.resetSim()
+        # self.gazebo.change_gravity(0, 0, 0)
+        # self.controllers_object.turn_off_controllers()
+        # self.gazebo.pauseSim()
+        # self.gazebo.resetSim()
         # self.pickbot_joint_pubisher_object.set_joints()
         self.publisher_to_moveit_object.set_joints()
+
+        print(">>>>>>>>>>>>>>>>>>> RESET: waiting for the movement to complete")
+        rospy.wait_for_message("/pickbot/movement_complete", String)
+        print(">>>>>>>>>>>>>>>>>>> RESET: Waiting complete")
+
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
-        self.gazebo.unpauseSim()
-        self.controllers_object.turn_on_controllers()
-        self.gazebo.change_gravity(0, 0, -9.81)
+        # self.gazebo.unpauseSim()
+        # self.controllers_object.turn_on_controllers()
+        # self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
         # self.randomly_spawn_object()
 
@@ -298,10 +303,10 @@ class PickbotEnv(gym.Env):
         observation = self.get_obs()
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = self.get_distance_gripper_to_object()
-        self.gazebo.pauseSim()
+        # self.gazebo.pauseSim()
         state = self.get_state(observation)
         self._update_episode()
-        self.gazebo.unpauseSim()
+        # self.gazebo.unpauseSim()
         return state
 
     def step(self, action):
@@ -331,8 +336,7 @@ class PickbotEnv(gym.Env):
             except yaml.YAMLError as exc:
                 print(exc)
         # 2) get the new joint positions according to chosen action
-        next_action_position = self.get_action_to_position(np.clip(action, -self.stepsize, self.stepsize),
-                                                           last_position)
+        next_action_position = self.get_action_to_position(action, last_position)
 
         # 3) write last_position into YAML File
         with open('last_position.yml', 'w') as yaml_file:
@@ -345,14 +349,12 @@ class PickbotEnv(gym.Env):
         """
 
         # 4) unpause, move to position for certain time
-        self.gazebo.unpauseSim()
+        # self.gazebo.unpauseSim()
         # self.pickbot_joint_pubisher_object.move_joints(next_action_position)
         self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
         time.sleep(self.running_step)
 
-        print(">>>>>>>>>>>>>>>>>>> I am waiting for the movement to complete")
         rospy.wait_for_message("/pickbot/movement_complete", String)
-        print(">>>>>>>>>>>>>>>>>>> Waiting complete")
 
         """
         #execute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
@@ -362,22 +364,22 @@ class PickbotEnv(gym.Env):
         """
         # 5) Get Observations and pause Simulation
         observation = self.get_obs()
-        self.gazebo.pauseSim()
+        # self.gazebo.pauseSim()
 
         # 6) Convert Observations into state
         state = self.get_state(observation)
 
         # 7) Unpause Simulation check if its done, calculate done_reward
-        self.gazebo.unpauseSim()
+        # self.gazebo.unpauseSim()
         done, done_reward, invalid_contact = self.is_done(observation)
-        self.gazebo.pauseSim()
+        # self.gazebo.pauseSim()
 
         # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
         self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
-        self.gazebo.unpauseSim()
+        # self.gazebo.unpauseSim()
 
         self.episode_steps += 1
         # 10) Return State, Reward, Done
@@ -410,7 +412,7 @@ class PickbotEnv(gym.Env):
         joint_states_msg = None
         while joint_states_msg is None and not rospy.is_shutdown():
             try:
-                joint_states_msg = rospy.wait_for_message("/pickbot/joint_states", JointState, timeout=0.1)
+                joint_states_msg = rospy.wait_for_message("/joint_states", JointState, timeout=0.1)
                 self.joints_state = joint_states_msg
                 rospy.logdebug("Current joint_states READY")
             except Exception as e:
