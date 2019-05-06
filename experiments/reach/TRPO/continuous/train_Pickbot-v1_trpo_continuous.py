@@ -56,15 +56,15 @@ def main():
     ##                Experiments with MoveIt                 ##
     ############################################################
     # a = [1.5,-1.2,1.4,-1.87,-1.57,0]
-    # b = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    # b = [0.1, 0.5, 0.1, 0.0, 0.0, 0.0]
     #
     # jointPub = JointArrayPub()
-    # jointPub.pub_joints_to_moveit(a)
+    # jointPub.pub_joints_to_moveit(b)
     #
     # print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
     # rospy.wait_for_message("/pickbot/movement_complete", String)
     # print(">>>>>>>>>>>>>>>>>>> Waiting complete")
-    #
+
     # jointPub.pub_joints_to_moveit(b)
     #
     # print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
