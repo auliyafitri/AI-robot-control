@@ -39,6 +39,7 @@ from gazebo_msgs.msg import ModelState
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 from openai_ros.msg import RLExperimentInfo
+from moveit_msgs.msg import MoveGroupActionFeedback
 
 from simulation.msg import VacuumGripperState
 from simulation.srv import VacuumGripperControl
@@ -70,6 +71,8 @@ class PickbotEnv(gym.Env):
         self.contact_1_force = Vector3()
         self.contact_2_force = Vector3()
         self.gripper_state = VacuumGripperState()
+        self.moveit_action_feedback = MoveGroupActionFeedback()
+        self.feedback_list = []
 
         self._list_of_observations = ["distance_gripper_to_object",
                                       "elbow_joint_state",
@@ -114,6 +117,7 @@ class PickbotEnv(gym.Env):
         rospy.Subscriber("/gripper_contactsensor_1_state", ContactsState, self.contact_1_callback)
         rospy.Subscriber("/gripper_contactsensor_2_state", ContactsState, self.contact_2_callback)
         rospy.Subscriber("/gz_collisions", Bool, self.collision_callback)
+        rospy.Subscriber("/move_group/feedback", MoveGroupActionFeedback, self.move_group_action_feedback_callback, queue_size=4)
         # rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
         # rospy.Subscriber("/camera_rgb/image_raw", Image, self.camera_rgb_callback)
         # rospy.Subscriber("/camera_depth/depth/image_raw", Image, self.camera_depth_callback)
@@ -238,9 +242,13 @@ class PickbotEnv(gym.Env):
     def gripper_state_callback(self, msg):
         self.gripper_state = msg
 
+    def move_group_action_feedback_callback(self, msg):
+        self.moveit_action_feedback = msg
+
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
+
 
     def reset(self):
         """
@@ -322,9 +330,6 @@ class PickbotEnv(gym.Env):
         # 2) get the new joint positions according to chosen action
         next_action_position = self.get_action_to_position(action, last_position)
 
-        # 3) write last_position into YAML File
-        with open('last_position.yml', 'w') as yaml_file:
-            yaml.dump(next_action_position, yaml_file, default_flow_style=False)
         """
         print("ACTION PUPLISHED: " +str(next_action_position))
         print("action from agent: "+str(action))
@@ -334,7 +339,12 @@ class PickbotEnv(gym.Env):
 
         # 4) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
+
+        # self.moveit_action_feedback = rospy.wait_for_message("/move_group/feedback", MoveGroupActionFeedback)
+        self.get_moveit_action_feedback()
+        print("Length of {}".format(len(self.feedback_list)))
         rospy.wait_for_message("/pickbot/movement_complete", String)
+
 
         """
         #execute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
@@ -351,11 +361,14 @@ class PickbotEnv(gym.Env):
         # 7) Check if its done, calculate done_reward
         done, done_reward, invalid_contact = self.is_done(observation)
 
-        print(">Last_pos: {}".format(last_position))
-        print(">Observat: {}".format(observation[1:7]))
-        if last_position == observation[1:7]:
+
+        # if last_position == observation[1:7]:
             # The arm didn't move --> means the MoveIt didn't find a plan
-            done = True
+        #     done = True
+        # else:
+        # 3) write last_position into YAML File, only when the action is actually being carried out
+        with open('last_position.yml', 'w') as yaml_file:
+            yaml.dump(next_action_position, yaml_file, default_flow_style=False)
 
         # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
@@ -464,6 +477,16 @@ class PickbotEnv(gym.Env):
                 rospy.logdebug("gripper_state READY")
             except Exception as e:
                 rospy.logdebug("EXCEPTION: gripper_state not ready yet, retrying==>" + str(e))
+
+    def get_moveit_action_feedback(self):
+        feedback_msg = None
+        i = 0
+        while feedback_msg is None and not rospy.is_shutdown() and i < 4:
+            feedback_msg = rospy.wait_for_message("/move_group/feedback", MoveGroupActionFeedback)
+            self.moveit_action_feedback = feedback_msg
+            self.feedback_list.append(feedback_msg)
+            rospy.logdebug("moveit_action_feedback READY")
+            i += 1
 
     # Set target object
     # randomize: spawn object randomly from the object pool. If false, object will be the first entry of the object list
@@ -801,6 +824,13 @@ class PickbotEnv(gym.Env):
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()  # TODO: don't really need this anymore
 
+        print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
+        # print(self.moveit_action_feedback)
+        if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted.":
+            print("###### NO MOTION PLAN!!!")
+            done = True
+            done_reward = reward_crashing
+
 
         # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
         if observations[7] != 0 and observations[8] != 0 and invalid_collision == False:
@@ -808,7 +838,7 @@ class PickbotEnv(gym.Env):
             done_reward = reward_reached_goal
 
         # Crashing with itself, shelf, base
-        if invalid_collision:
+        if invalid_collision:           # TODO: don't really need this anymore
             done = True
             print('>>>>>>>>>>>>>>>>>>>> crashing')
             done_reward = reward_crashing
