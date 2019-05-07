@@ -796,7 +796,7 @@ class PickbotEnv(gym.Env):
         done_reward = 0
         reward_reached_goal = 500
         reward_crashing = -200
-        reward_join_range = -150
+        reward_joint_range = -150
 
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
@@ -812,31 +812,11 @@ class PickbotEnv(gym.Env):
             print('>>>>>>>>>>>>>>>>>>>> crashing')
             done_reward = reward_crashing
 
-        # Joints are going into limits set
-        if self.joints_state.position[0] < -2.9 or self.joints_state.position[0] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 3 exceeds limit')
-        elif self.joints_state.position[1] < -2.9 or self.joints_state.position[1] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 2 exceeds limit')
-        elif self.joints_state.position[2] < -2.9 or self.joints_state.position[2] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 1 exceeds limit')
-        elif self.joints_state.position[3] < -2.9 or self.joints_state.position[3] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 4 exceeds limit')
-        elif self.joints_state.position[4] < -2.9 or self.joints_state.position[4] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 5 exceeds limit')
-        elif self.joints_state.position[5] < -2.9 or self.joints_state.position[5] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>>>>>>>>>>>>>>>> joint 6 exceeds limit')
+        for joint_pos in self.joints_state.position:
+            if joint_pos < -math.pi or joint_pos > math.pi:
+                done = True
+                done_reward = reward_joint_range
+                print('>>>>>>>>>>>>>>>>>>>> joint exceeds limit')
 
         return done, done_reward, invalid_collision
 
