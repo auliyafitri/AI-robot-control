@@ -100,7 +100,7 @@ class PickbotEnv(gym.Env):
 
         # Define Subscribers as Sensordata
         """
-        1) /pickbot/joint_states
+        1) /joint_states
         2) /gripper_contactsensor_1_state
         3) /gripper_contactsensor_2_state
         4) /gz_collisions
@@ -110,7 +110,7 @@ class PickbotEnv(gym.Env):
         6) /camera_rgb/image_raw   
         7) /camera_depth/depth/image_raw
         """
-        rospy.Subscriber("/pickbot/joint_states", JointState, self.joints_state_callback)
+        rospy.Subscriber("/joint_states", JointState, self.joints_state_callback)
         rospy.Subscriber("/gripper_contactsensor_1_state", ContactsState, self.contact_1_callback)
         rospy.Subscriber("/gripper_contactsensor_2_state", ContactsState, self.contact_2_callback)
         rospy.Subscriber("/gz_collisions", Bool, self.collision_callback)
@@ -334,12 +334,6 @@ class PickbotEnv(gym.Env):
 
         # 4) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
-
-        # while no collsion:
-        #     if collision:
-        #         then reset
-        #         ?? how to cut the moveit
-
         rospy.wait_for_message("/pickbot/movement_complete", String)
 
         """
@@ -357,6 +351,12 @@ class PickbotEnv(gym.Env):
         # 7) Check if its done, calculate done_reward
         done, done_reward, invalid_contact = self.is_done(observation)
 
+        print(">Last_pos: {}".format(last_position))
+        print(">Observat: {}".format(observation[1:7]))
+        if last_position == observation[1:7]:
+            # The arm didn't move --> means the MoveIt didn't find a plan
+            done = True
+
         # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
         self.accumulated_episode_reward += reward
@@ -371,7 +371,7 @@ class PickbotEnv(gym.Env):
         """
         Checks that all subscribers for sensortopics are working
 
-        1) /pickbot/joint_states
+        1) /joint_states
         2) /gripper_contactsensor_1_state
         3) /gripper_contactsensor_2_state
         7) Collisions
@@ -799,7 +799,8 @@ class PickbotEnv(gym.Env):
         reward_joint_range = -150
 
         # Check if there are invalid collisions
-        invalid_collision = self.get_collisions()
+        invalid_collision = self.get_collisions()  # TODO: don't really need this anymore
+
 
         # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
         if observations[7] != 0 and observations[8] != 0 and invalid_collision == False:
