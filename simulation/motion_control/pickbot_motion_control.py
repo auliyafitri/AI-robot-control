@@ -50,7 +50,6 @@ tf_listener = tf.TransformListener()
 tf_broadcaster = tf.TransformBroadcaster()
 
 
-
 def joint_position_sub():
     rospy.Subscriber('/pickbot/target_joint_positions/', JointState, joint_callback)
 
@@ -240,7 +239,8 @@ def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
 
     group.set_joint_value_target(group_variable_values) #set target joint values for 'manipulator' group
 
-    plan1 = group.plan() #call plan function to plan the path (visualize on rviz)
+
+    # group.plan() #call plan function to plan the path (visualize on rviz)
     group.go(group_variable_values, wait=True) #execute plan on real/simulation (gazebo) robot
     group.stop()
     rospy.sleep(1)
