@@ -243,7 +243,7 @@ def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
     plan1 = group.plan() #call plan function to plan the path (visualize on rviz)
     group.go(group_variable_values, wait=True) #execute plan on real/simulation (gazebo) robot
     group.stop()
-    rospy.sleep(0.1)
+    rospy.sleep(1)
 
 ###___POSE TARGET MANIPULATION___###
 ## Manipulate by assigning pose target
@@ -581,11 +581,10 @@ def photo_shooter():
 ###___MAIN___###
 if __name__ == '__main__':
 
-    # box_pose = geometry_msgs.msg.PoseStamped()
-    # box_pose.header.frame_id = "panda_leftfinger"
-    # box_pose.pose.orientation.w = 1.0
-    # box_name = "box"
-    # scene.add_box(box_name, box_pose, size=(0.1, 0.1, 0.1))
+
+    print(group.get_end_effector_link())
+    group.set_end_effector_link('vacuum_gripper_link')
+    print(group.get_end_effector_link())
 
     rospy.Subscriber('/pickbot/target_joint_positions/', JointState, joint_callback)
     print("listenning to joint states now")
