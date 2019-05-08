@@ -47,7 +47,7 @@ from simulation.srv import VacuumGripperControl
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, running_step=0.001, step_size=1.0, random_object=False, random_position=False,
+    def __init__(self, joint_increment_value=0.02, running_step=0.001, step_size=0.5, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False):
         """
         initializing all the relevant variables and connections
