@@ -332,14 +332,10 @@ class PickbotEnv(gym.Env):
 
         # 1) read last_obs out of YAML File
         old_observation = self.get_obs()
+        # print("##################################################")
         # print("Old_observation: {}".format(old_observation[1:7]))
+        # print("Joint position: {}".format(self.joints_state.position))
         # print("action: {}".format(action))
-
-        # with open("last_position.yml", 'r') as stream:
-        #     try:
-        #         last_position = (yaml.load(stream, Loader=yaml.Loader))
-        #     except yaml.YAMLError as exc:
-        #         print(exc)
 
         # 2) get the new joint positions according to chosen action
         next_action_position = self.get_action_to_position(action, old_observation[1:7])
@@ -364,15 +360,16 @@ class PickbotEnv(gym.Env):
         # 5) Get Observations
         new_observation = self.get_obs()
         # print("New_observation: {}".format(new_observation[1:7]))
+        # print("##################################################")
 
         # 6) Convert Observations into state
         state = self.get_state(new_observation)
 
         # 7) Check if its done, calculate done_reward
         done, done_reward, invalid_contact = self.is_done(new_observation)
-        if old_observation == new_observation:
-            print("@@@@@@@@@ The robot didn't move @@@@@@@@")
-            done = True
+        # if old_observation == new_observation:
+        #     print("@@@@@@@@@ The robot didn't move @@@@@@@@")
+        #     done = True
 
 
         # if last_position == observation[1:7]:
@@ -490,17 +487,6 @@ class PickbotEnv(gym.Env):
                 rospy.logdebug("gripper_state READY")
             except Exception as e:
                 rospy.logdebug("EXCEPTION: gripper_state not ready yet, retrying==>" + str(e))
-
-    # TODO: delete this function after determine it's safe to do so
-    # def get_moveit_action_feedback(self):
-    #     feedback_msg = None
-    #     i = 0
-    #     while feedback_msg is None and not rospy.is_shutdown() and i < 4:
-    #         feedback_msg = rospy.wait_for_message("/move_group/feedback", MoveGroupActionFeedback)
-    #         self.moveit_action_feedback = feedback_msg
-    #         self.feedback_list.append(feedback_msg)
-    #         rospy.logdebug("moveit_action_feedback READY")
-    #         i += 1
 
     # Set target object
     # randomize: spawn object randomly from the object pool. If false, object will be the first entry of the object list
@@ -838,12 +824,12 @@ class PickbotEnv(gym.Env):
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
 
-        print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
+        # print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
         if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or  \
                 self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
                 self.moveit_action_feedback.status.text == "Motion plan was found but it seems to be invalid (possibly due to postprocessing).Not executing.":
 
-            print("###### NO MOTION PLAN!!!")
+            print(">>>>>>>>>>>> NO MOTION PLAN!!!")
             done = True
             done_reward = reward_crashing
 
