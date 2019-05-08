@@ -71,6 +71,8 @@ class PickbotEnv(gym.Env):
         self.contact_1_force = Vector3()
         self.contact_2_force = Vector3()
         self.gripper_state = VacuumGripperState()
+        self.movement_complete = Bool()
+        self.movement_complete.data = False
         self.moveit_action_feedback = MoveGroupActionFeedback()
         self.feedback_list = []
 
@@ -117,6 +119,7 @@ class PickbotEnv(gym.Env):
         rospy.Subscriber("/gripper_contactsensor_1_state", ContactsState, self.contact_1_callback)
         rospy.Subscriber("/gripper_contactsensor_2_state", ContactsState, self.contact_2_callback)
         rospy.Subscriber("/gz_collisions", Bool, self.collision_callback)
+        rospy.Subscriber("/pickbot/movement_complete", Bool, self.movement_complete_callback)
         rospy.Subscriber("/move_group/feedback", MoveGroupActionFeedback, self.move_group_action_feedback_callback, queue_size=4)
         # rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
         # rospy.Subscriber("/camera_rgb/image_raw", Image, self.camera_rgb_callback)
@@ -242,6 +245,9 @@ class PickbotEnv(gym.Env):
     def gripper_state_callback(self, msg):
         self.gripper_state = msg
 
+    def movement_complete_callback(self, msg):
+        self.movement_complete = msg
+
     def move_group_action_feedback_callback(self, msg):
         self.moveit_action_feedback = msg
 
@@ -276,7 +282,9 @@ class PickbotEnv(gym.Env):
         self.publisher_to_moveit_object.set_joints()
 
         print(">>>>>>>>>>>>>>>>>>> RESET: waiting for the movement to complete")
-        rospy.wait_for_message("/pickbot/movement_complete", String)
+        # rospy.wait_for_message("/pickbot/movement_complete", Bool)
+        while not self.movement_complete.data:
+            pass
         print(">>>>>>>>>>>>>>>>>>> RESET: Waiting complete")
 
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
@@ -319,31 +327,32 @@ class PickbotEnv(gym.Env):
         10) Return State, Reward, Done
         """
 
-        print("action: {}".format(action))
+        self.movement_complete.data = False
+        # print("action: {}".format(action))
 
-        # 1) read last_position out of YAML File
-        with open("last_position.yml", 'r') as stream:
-            try:
-                last_position = (yaml.load(stream, Loader=yaml.Loader))
-            except yaml.YAMLError as exc:
-                print(exc)
+        # 1) read last_obs out of YAML File
+        old_observation = self.get_obs()
+        # print("Old_observation: {}".format(old_observation[1:7]))
+        # print("action: {}".format(action))
+
+        # with open("last_position.yml", 'r') as stream:
+        #     try:
+        #         last_position = (yaml.load(stream, Loader=yaml.Loader))
+        #     except yaml.YAMLError as exc:
+        #         print(exc)
+
         # 2) get the new joint positions according to chosen action
-        next_action_position = self.get_action_to_position(action, last_position)
-
-        """
-        print("ACTION PUPLISHED: " +str(next_action_position))
-        print("action from agent: "+str(action))
-        print("clipped actiont: "+str(np.clip(action,-self.stepsize,self.stepsize)))
-        print("Last Position: : "+str(last_position))
-        """
+        next_action_position = self.get_action_to_position(action, old_observation[1:7])
 
         # 4) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
 
         # self.moveit_action_feedback = rospy.wait_for_message("/move_group/feedback", MoveGroupActionFeedback)
-        self.get_moveit_action_feedback()
-        print("Length of {}".format(len(self.feedback_list)))
-        rospy.wait_for_message("/pickbot/movement_complete", String)
+        # self.get_moveit_action_feedback()
+
+        # rospy.wait_for_message("/pickbot/movement_complete", Bool)
+        while not self.movement_complete.data:
+            pass
 
 
         """
@@ -353,13 +362,17 @@ class PickbotEnv(gym.Env):
             rospy.loginfo("Not yet reached target position and no collision")
         """
         # 5) Get Observations
-        observation = self.get_obs()
+        new_observation = self.get_obs()
+        # print("New_observation: {}".format(new_observation[1:7]))
 
         # 6) Convert Observations into state
-        state = self.get_state(observation)
+        state = self.get_state(new_observation)
 
         # 7) Check if its done, calculate done_reward
-        done, done_reward, invalid_contact = self.is_done(observation)
+        done, done_reward, invalid_contact = self.is_done(new_observation)
+        if old_observation == new_observation:
+            print("@@@@@@@@@ The robot didn't move @@@@@@@@")
+            done = True
 
 
         # if last_position == observation[1:7]:
@@ -371,7 +384,7 @@ class PickbotEnv(gym.Env):
             yaml.dump(next_action_position, yaml_file, default_flow_style=False)
 
         # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
-        reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
+        reward = UMath.compute_reward(new_observation, done_reward, invalid_contact, self.max_distance)
         self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
@@ -478,15 +491,16 @@ class PickbotEnv(gym.Env):
             except Exception as e:
                 rospy.logdebug("EXCEPTION: gripper_state not ready yet, retrying==>" + str(e))
 
-    def get_moveit_action_feedback(self):
-        feedback_msg = None
-        i = 0
-        while feedback_msg is None and not rospy.is_shutdown() and i < 4:
-            feedback_msg = rospy.wait_for_message("/move_group/feedback", MoveGroupActionFeedback)
-            self.moveit_action_feedback = feedback_msg
-            self.feedback_list.append(feedback_msg)
-            rospy.logdebug("moveit_action_feedback READY")
-            i += 1
+    # TODO: delete this function after determine it's safe to do so
+    # def get_moveit_action_feedback(self):
+    #     feedback_msg = None
+    #     i = 0
+    #     while feedback_msg is None and not rospy.is_shutdown() and i < 4:
+    #         feedback_msg = rospy.wait_for_message("/move_group/feedback", MoveGroupActionFeedback)
+    #         self.moveit_action_feedback = feedback_msg
+    #         self.feedback_list.append(feedback_msg)
+    #         rospy.logdebug("moveit_action_feedback READY")
+    #         i += 1
 
     # Set target object
     # randomize: spawn object randomly from the object pool. If false, object will be the first entry of the object list
@@ -822,11 +836,13 @@ class PickbotEnv(gym.Env):
         reward_joint_range = -150
 
         # Check if there are invalid collisions
-        invalid_collision = self.get_collisions()  # TODO: don't really need this anymore
+        invalid_collision = self.get_collisions()
 
         print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
-        # print(self.moveit_action_feedback)
-        if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted.":
+        if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or  \
+                self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
+                self.moveit_action_feedback.status.text == "Motion plan was found but it seems to be invalid (possibly due to postprocessing).Not executing.":
+
             print("###### NO MOTION PLAN!!!")
             done = True
             done_reward = reward_crashing
@@ -838,7 +854,7 @@ class PickbotEnv(gym.Env):
             done_reward = reward_reached_goal
 
         # Crashing with itself, shelf, base
-        if invalid_collision:           # TODO: don't really need this anymore
+        if invalid_collision:
             done = True
             print('>>>>>>>>>>>>>>>>>>>> crashing')
             done_reward = reward_crashing
