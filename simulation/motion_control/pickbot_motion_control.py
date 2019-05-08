@@ -55,11 +55,17 @@ def joint_position_sub():
 
 def joint_callback(data):
     pos = data.position
+    pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
+    complete_msg = Bool()
+    complete_msg.data = False
+    check_publishers_connection(pub)
+    pub.publish(complete_msg)
+
     assign_joint_value(pos[2], pos[1], pos[0], pos[3], pos[4], pos[5])
 
-    pub = rospy.Publisher('/pickbot/movement_complete/', String, queue_size=10)
-    check_publishers_connection(pub)
-    pub.publish("Pickbot_motion_control: Published <Movement complete>")
+    # check_publishers_connection(pub)
+    complete_msg.data = True
+    pub.publish(complete_msg)
 
 
 def check_publishers_connection(pub):
@@ -243,7 +249,7 @@ def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
     # group.plan() #call plan function to plan the path (visualize on rviz)
     group.go(group_variable_values, wait=True) #execute plan on real/simulation (gazebo) robot
     group.stop()
-    rospy.sleep(2)
+    # rospy.sleep(0.1)
 
 ###___POSE TARGET MANIPULATION___###
 ## Manipulate by assigning pose target
