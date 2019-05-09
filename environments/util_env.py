@@ -11,6 +11,7 @@ from transformations import quaternion_from_euler
 
 from geometry_msgs.msg import Point, Pose
 from gazebo_msgs.msg import ModelState
+from gazebo_msgs.srv import GetLinkState
 from gazebo_msgs.srv import SetModelState
 from gazebo_msgs.srv import DeleteModel
 from gazebo_msgs.srv import SpawnModel
@@ -115,6 +116,61 @@ def change_object_position(object_name, model_position):
         change_position(box)
     except rospy.ServiceException as e:
         rospy.loginfo("Set Model State service call failed:  {0}".format(e))
+
+
+def get_target_position():
+    try:
+        model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
+        linkNameTarget = "target"
+        ReferenceFrame = "ground_plane"
+        object_resp_coordinates = model_coordinates(linkNameTarget, ReferenceFrame)
+        Object = np.array((object_resp_coordinates.link_state.pose.position.x, object_resp_coordinates.link_state.pose.position.y, object_resp_coordinates.link_state.pose.position.z))
+
+    except rospy.ServiceException as e:
+        rospy.loginfo("Get Model State service call failed:  {0}".format(e))
+        print("Exception get model state")
+    
+    return Object
+
+
+def get_distance_gripper_to_object():
+    """
+    Get the Position of the endeffektor and the object via rosservice call /gazebo/get_model_state and /gazebo/get_link_state
+    Calculate distance between them
+
+    In this case
+
+    Object:     unite_box_0 link
+    Gripper:    vacuum_gripper_link ground_plane
+    """
+
+    try:
+        model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
+        linkNameTarget = "target"
+        ReferenceFrame = "ground_plane"
+        object_resp_coordinates = model_coordinates(linkNameTarget, ReferenceFrame)
+        Object = np.array((object_resp_coordinates.link_state.pose.position.x, object_resp_coordinates.link_state.pose.position.y,
+                            object_resp_coordinates.link_state.pose.position.z))
+
+    except rospy.ServiceException as e:
+        rospy.loginfo("Get Model State service call failed:  {0}".format(e))
+        print("Exception get model state")
+
+    try:
+        model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
+        LinkName = "vacuum_gripper_link"
+        ReferenceFrame = "ground_plane"
+        resp_coordinates_gripper = model_coordinates(LinkName, ReferenceFrame)
+        Gripper = np.array((resp_coordinates_gripper.link_state.pose.position.x,
+                            resp_coordinates_gripper.link_state.pose.position.y,
+                            resp_coordinates_gripper.link_state.pose.position.z))
+
+    except rospy.ServiceException as e:
+        rospy.loginfo("Get Link State service call failed:  {0}".format(e))
+        print("Exception get Gripper position")
+    distance = np.linalg.norm(Object - Gripper)
+
+    return distance, Object
 
 
 def get_random_door_handle_pos():
