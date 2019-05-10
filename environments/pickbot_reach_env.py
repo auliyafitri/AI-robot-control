@@ -258,24 +258,15 @@ class PickbotEnv(gym.Env):
     def reset(self):
         """
         Reset The Robot to its initial Position and restart the Controllers 
-
-        1) Change Gravity to 0 ->That arm doesnt fall
-        2) Turn Controllers off
-        3) Pause Simulation
-        4) Reset Simulation
-        5) Set Model Pose to desired one 
-        6) Unpause Simulation 
-        7) Turn on Controllers
-        8) Restore Gravity
-        9) Get Observations and return current State
-        10) Check all Systems work
-        11) Pause Simulation
-        12) Write initial Position into Yaml File 
-        13) Create YAML Files for contact forces in order to get the average over 2 contacts 
-        14) Create YAML Files for collision to make shure to see a collision due to high noise in topic
-        15) Unpause Simulation cause in next Step Sysrem must be running otherwise no data is seen by Subscribers 
-        16) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
-        17) Return State 
+        1) Publish the initial joint_positions to MoveIt
+        2) Busy waiting until the movement is completed by MoveIt
+        3) set target_object to random position
+        4) Check all Systems work
+        5) Create YAML Files for contact forces in order to get the average over 2 contacts
+        6) Create YAML Files for collision to make shure to see a collision due to high noise in topic
+        7) Get Observations and return current State
+        8) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
+        9) Return State
         """
 
         self.publisher_to_moveit_object.set_joints()
@@ -290,9 +281,6 @@ class PickbotEnv(gym.Env):
         self._check_all_systems_ready()
         # self.randomly_spawn_object()
 
-        last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
-        with open('last_position.yml', 'w') as yaml_file:
-            yaml.dump(last_position, yaml_file, default_flow_style=False)
         with open('contact_1_force.yml', 'w') as yaml_file:
             yaml.dump(0.0, yaml_file, default_flow_style=False)
         with open('contact_2_force.yml', 'w') as yaml_file:
@@ -301,13 +289,11 @@ class PickbotEnv(gym.Env):
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
         self.object_position = observation[9:12]
-        print("position : {}".format(self.object_position))
+
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
-        # self.gazebo.pauseSim()
         state = self.get_state(observation)
         self._update_episode()
-        # self.gazebo.unpauseSim()
         return state
 
     def step(self, action):
@@ -490,10 +476,12 @@ class PickbotEnv(gym.Env):
             except Exception as e:
                 rospy.logdebug("EXCEPTION: gripper_state not ready yet, retrying==>" + str(e))
 
-    # Set target object
-    # randomize: spawn object randomly from the object pool. If false, object will be the first entry of the object list
-    # random_position: spawn object with random position
     def set_target_object(self, random_object=False, random_position=False):
+        """
+        Set target object
+        :param random_object: spawn object randomly from the object pool. If false, object will be the first entry of the object list
+        :param random_position: spawn object with random position
+        """
         if random_object:
             rand_object = random.choice(self.object_list)
             self.object_name = rand_object["name"]
