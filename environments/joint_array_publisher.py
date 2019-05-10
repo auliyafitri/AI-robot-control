@@ -14,7 +14,7 @@ import numpy as np
 class JointArrayPub(object):
     def __init__(self):
         self.joint_pub = rospy.Publisher('/pickbot/target_joint_positions/', JointState, queue_size=10)
-        self.init_pos = [1.5,-1.2,1.4,-1.87,-1.57,0]
+        self.init_pos = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
 
     def set_init_pose(self):
         """
