@@ -47,14 +47,14 @@ from simulation.srv import VacuumGripperControl
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, running_step=0.001, step_size=0.1, random_object=False, random_position=False,
+    def __init__(self, joint_increment=0.1, running_step=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False):
         """
         initializing all the relevant variables and connections
         """
 
         # Assign Parameters
-        self._joint_increment_value = joint_increment_value
+        self._joint_increment = joint_increment  # joint_increment in rad
         self.running_step = running_step
         self._random_object = random_object
         self._random_position = random_position
@@ -133,22 +133,21 @@ class PickbotEnv(gym.Env):
 
         Reward Range: -infitity to infinity 
         """
-        self.stepsize = step_size
         low_action = np.array([
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize])
+            -self._joint_increment,
+            -self._joint_increment,
+            -self._joint_increment,
+            -self._joint_increment,
+            -self._joint_increment,
+            -self._joint_increment])
 
         high_action = np.array([
-            self.stepsize,
-            self.stepsize,
-            self.stepsize,
-            self.stepsize,
-            self.stepsize,
-            self.stepsize])
+            self._joint_increment,
+            self._joint_increment,
+            self._joint_increment,
+            self._joint_increment,
+            self._joint_increment,
+            self._joint_increment])
 
         self.action_space = spaces.Box(low_action, high_action)
         high = np.array([
