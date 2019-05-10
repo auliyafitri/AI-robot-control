@@ -135,7 +135,7 @@ def get_target_position():
 
 def get_distance_gripper_to_object():
     """
-    Get the Position of the endeffektor and the object via rosservice call /gazebo/get_model_state and /gazebo/get_link_state
+    Get the Position of the endeffektor and the object via rosservice /gazebo/get_link_state
     Calculate distance between them
 
     In this case
