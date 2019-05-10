@@ -302,41 +302,30 @@ class PickbotEnv(gym.Env):
         we perform the corresponding movement of the robot
         return: the state of the robot, the corresponding reward for the step and if its done(terminal State)
         
-        1) read last published joint from YAML
-        2) define ne joints acording to chosen action
-        3) Write joint position into YAML to save last published joints for next step
-        4) Unpause, Move to that pos for defined time, Pause
-        5) Get Observations and pause Simulation
-        6) Convert Observations into State
-        7) Unpause Simulation check if its done, calculate done_reward and pause Simulation again
-        8) Calculate reward based on Observatin and done_reward 
-        9) Unpause that topics can be received in next step
-        10) Return State, Reward, Done
+        1) Read last joint positions by getting the observation before acting
+        2) Get the new joint positions according to chosen action (actions here are the joint increments)
+        3) Publish the joint_positions to MoveIt, meanwhile busy waiting, until the movement is complete
+        4) Get new observation after performing the action
+        5) Convert Observations into State
+        6) Check if the task is done or crashing happens, calculate done_reward and pause Simulation again
+        7) Calculate reward based on Observatin and done_reward
+        8) Return State, Reward, Done
         """
 
         self.movement_complete.data = False
         # print("action: {}".format(action))
 
-        # 1) read last_obs out of YAML File
+        # 1) Read last joint positions by getting the observation before acting
         old_observation = self.get_obs()
-        # print("##################################################")
-        # print("Old_observation: {}".format(old_observation[1:7]))
-        # print("Joint position: {}".format(self.joints_state.position))
-        # print("action: {}".format(action))
 
-        # 2) get the new joint positions according to chosen action
+        # 2) Get the new joint positions according to chosen action (actions here are the joint increments)
         next_action_position = self.get_action_to_position(action, old_observation[1:7])
 
-        # 4) Move to position and wait for moveit to complete the execution
+        # 3) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
-
-        # self.moveit_action_feedback = rospy.wait_for_message("/move_group/feedback", MoveGroupActionFeedback)
-        # self.get_moveit_action_feedback()
-
         # rospy.wait_for_message("/pickbot/movement_complete", Bool)
         while not self.movement_complete.data:
             pass
-
 
         """
         #execute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
@@ -344,38 +333,25 @@ class PickbotEnv(gym.Env):
         while np.linalg.norm(np.asarray(self.joints_state.position)-np.asarray(next_action_position))>0.1 and self.get_collisions()==False and time.time()-time1<0.1:         
             rospy.loginfo("Not yet reached target position and no collision")
         """
-        # 5) Get Observations
+        # 4) Get new observation after performing the action
         new_observation = self.get_obs()
-        # print("New_observation: {}".format(new_observation[1:7]))
-        # print("##################################################")
 
-        # 6) Convert Observations into state
+        # 5) Convert Observations into state
         state = self.get_state(new_observation)
 
-        # 7) Check if its done, calculate done_reward
+        # 6) Check if its done, calculate done_reward
         done, done_reward, invalid_contact = self.is_done(new_observation)
         # if old_observation == new_observation:
         #     print("@@@@@@@@@ The robot didn't move @@@@@@@@")
         #     done = True
 
-
-        # if last_position == observation[1:7]:
-            # The arm didn't move --> means the MoveIt didn't find a plan
-        #     done = True
-        # else:
-        # 3) write last_position into YAML File, only when the action is actually being carried out
-        with open('last_position.yml', 'w') as yaml_file:
-            yaml.dump(next_action_position, yaml_file, default_flow_style=False)
-
-        # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
+        # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(new_observation, done_reward, invalid_contact, self.max_distance)
         print("Reward : {}".format(reward))
         self.accumulated_episode_reward += reward
 
-        # 9) Unpause that topics can be received in next step
-
         self.episode_steps += 1
-        # 10) Return State, Reward, Done
+
         return state, reward, done, {}
 
     def _check_all_systems_ready(self):
