@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+
+    <!-- Load the init file if needed -->
+    <!-- <rosparam command="load" file="$(find experiments)/<init filename>.yaml" /> -->
+
+    <!-- Launch the motion control with MoveIt! -->
+    <node pkg="simulation" name="motion_control" type="pickbot_motion_control.py" output="screen"/>
+</launch>

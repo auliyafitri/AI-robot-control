@@ -575,23 +575,11 @@ def photo_shooter():
             time.sleep(1)
 
 
-
-
-
-
-
-
-
-
-
 ###___MAIN___###
 if __name__ == '__main__':
 
-
-    print(group.get_end_effector_link())
     group.set_end_effector_link('vacuum_gripper_link')
-    print(group.get_end_effector_link())
 
     rospy.Subscriber('/pickbot/target_joint_positions/', JointState, joint_callback)
-    print("listenning to joint states now")
+    print("listening to joint states now")
     rospy.spin()

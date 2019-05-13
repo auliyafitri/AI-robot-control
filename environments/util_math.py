@@ -20,8 +20,7 @@ def compute_reward(observation, done_reward, invalid_contact, max_distance):
     distance = observation[0]
     # reward_distance = 1 - math.pow(distance / max_distance, 0.4)
     relative_distance = max_distance - distance
-    reward_distance = relative_distance * 20  if relative_distance < 0 else relative_distance * 10
-    print("Max distance {} with reward distance: {}".format(max_distance, reward_distance))
+    reward_distance = relative_distance * 20 if relative_distance < 0 else relative_distance * 10
 
     # Reward for Contact
     contact_1 = observation[7]

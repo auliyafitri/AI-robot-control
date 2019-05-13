@@ -199,6 +199,8 @@ class PickbotEnv(gym.Env):
         self.csv_name = logger.get_dir() + '/result_log'
         print("CSV NAME")
         print(self.csv_name)
+        self.csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
+        self.successful_attempts = 0
 
         # object name: name of the target object
         # object type: index of the object name in the object list
@@ -347,7 +349,6 @@ class PickbotEnv(gym.Env):
 
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(new_observation, done_reward, invalid_contact, self.max_distance)
-        print("Reward : {}".format(reward))
         self.accumulated_episode_reward += reward
 
         self.episode_steps += 1
@@ -785,8 +786,7 @@ class PickbotEnv(gym.Env):
         done_reward = 0
         reward_reached_goal = 5000
         reward_crashing = -200
-        reward_noMotionPlanFound = -50
-        reward_target_moved = -25
+        reward_no_motion_plan = -50
         reward_joint_range = -150
 
         # Check if there are invalid collisions
@@ -797,34 +797,37 @@ class PickbotEnv(gym.Env):
                 self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
                 self.moveit_action_feedback.status.text == "Motion plan was found but it seems to be invalid (possibly due to postprocessing).Not executing.":
 
-            print(">>>>>>>>>>>> NO MOTION PLAN!!!")
+            print(">>>>>>>>>>>> NO MOTION PLAN!!! <<<<<<<<<<<<<<<")
             done = True
-            done_reward = reward_noMotionPlanFound
-
+            done_reward = reward_no_motion_plan
 
         # Successfully reached goal: Contact with at least one contact sensor and there is no invalid contact
-        if observations[7] != 0 or observations[8] != 0 and invalid_collision == False:
+        if observations[7] != 0 or observations[8] != 0 and not invalid_collision:
             done = True
-            print('!!!!!!!!!!!! get one contact')
+            print('!!!!!!!!!!!! get one contact !!!!!!!!!!!!!!!!!!')
             done_reward = reward_reached_goal
+            # save state in csv file
+            U.append_to_csv(self.csv_success_exp, observations)
+            self.successful_attempts += 1
+            print("Successful contact so far: {} attempts".format(self.successful_attempts))
 
         # Check if the box has been moved compared to the last observation
         target_pos = U.get_target_position()
         if not np.allclose(self.object_position, target_pos, rtol=0.0, atol=0.0001):
-            print(">>>>>>>>>>>>>>>>>>> Target moved")
+            print(">>>>>>>>>>>>>>>>>>> Target moved <<<<<<<<<<<<<<<<<<<<<<<")
             done = True
 
         # Crashing with itself, shelf, base
         if invalid_collision:
             done = True
-            print('>>>>>>>>>>>>>>>>>>>> crashing')
+            print('>>>>>>>>>>>>>>>>>>>> crashing <<<<<<<<<<<<<<<<<<<<<<<')
             done_reward = reward_crashing
 
         for joint_pos in self.joints_state.position:
             if joint_pos < -math.pi or joint_pos > math.pi:
                 done = True
                 done_reward = reward_joint_range
-                print('>>>>>>>>>>>>>>>>>>>> joint exceeds limit')
+                print('>>>>>>>>>>>>>>>>>>>> joint exceeds limit <<<<<<<<<<<<<<<<<<<<<<<')
 
         return done, done_reward, invalid_collision
 

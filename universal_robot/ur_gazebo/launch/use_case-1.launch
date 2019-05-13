@@ -9,7 +9,7 @@
 
   <!-- startup simulated world -->
   <include file="$(find ur_gazebo)/worlds/empty_world.launch">
-    <arg name="world_name" value="$(find ur_gazebo)/worlds/pickbot.world"/>
+    <arg name="world_name" value="$(find simulation)/worlds/pickbot_uc1.world"/>
     <arg name="debug" value="$(arg debug)"/>
     <arg name="gui" value="$(arg gui)"/>
     <arg name="paused" value="$(arg paused)"/>
