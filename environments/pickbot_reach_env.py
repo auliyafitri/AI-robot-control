@@ -48,9 +48,17 @@ from simulation.srv import VacuumGripperControl
 class PickbotEnv(gym.Env):
 
     def __init__(self, joint_increment=0.1, running_step=0.001, random_object=False, random_position=False,
-                 use_object_type=False, populate_object=False):
+                 use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
+        :param joint_increment: increment of the joints
+        :param running_step: gazebo simulation time factor
+        :param random_object: spawn random object in the simulation
+        :param random_position: change object position in each reset
+        :param use_object_type: assign IDs to objects and used them in the observation space
+        :param populate_object: to populate object(s) in the simulation using sdf file
+        :param env_object_type: object type for environment, free_shapes for boxes while others are related to use_case
+            'door_handle', 'combox', ...
         """
 
         # Assign Parameters
@@ -208,7 +216,8 @@ class PickbotEnv(gym.Env):
         self.object_name = ''
         self.object_type_str = ''
         self.object_type = 0
-        self.object_list = U.get_target_object()
+        self.object_list = U.get_target_object(env_object_type)
+        print("object list {}".format(self.object_list))
         self.object_initial_position = Pose(position=Point(x=-0.13, y=0.848, z=1.06),  # x=0.0, y=0.9, z=1.05
                                             orientation=quaternion_from_euler(0.002567, 0.102, 1.563))
 
@@ -281,7 +290,6 @@ class PickbotEnv(gym.Env):
 
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         self._check_all_systems_ready()
-        # self.randomly_spawn_object()
 
         with open('contact_1_force.yml', 'w') as yaml_file:
             yaml.dump(0.0, yaml_file, default_flow_style=False)
@@ -482,21 +490,6 @@ class PickbotEnv(gym.Env):
 
         U.change_object_position(self.object_name, box_pos)
         print("Current target: ", self.object_name)
-
-    def randomly_spawn_object(self):
-        """
-        spawn the object unit_box_0 in a random position in the shelf
-        """
-        try:
-            spawn_box = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
-            box = ModelState()
-            box.model_name = self.object_name
-            box.pose.position.x = np.random.uniform(low=-0.35, high=0.3, size=None)
-            box.pose.position.y = np.random.uniform(low=0.7, high=0.9, size=None)
-            box.pose.position.z = 1.05
-            spawn_box(box)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Set Model State service call failed:  {0}".format(e))
 
     def populate_objects(self):
         """

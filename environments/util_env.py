@@ -19,12 +19,13 @@ from gazebo_msgs.srv import SpawnModel
 from simulation.srv import VacuumGripperControl
 
 
-def get_target_object():
+def get_target_object(object_type='free_shapes'):
     # get list of target object
     targetobj_fname = os.path.dirname(environments.__file__) + '/object_information.yml'
     with open(targetobj_fname, "r") as stream:
         out = yaml.load(stream)
-        return out['items']
+        filtered_object = list(filter(lambda x: x["type"] == object_type, out['items']))
+        return filtered_object
 
 
 def get_state(observation):

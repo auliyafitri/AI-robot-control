@@ -89,3 +89,49 @@ register(
     },
     max_episode_steps=300,
 )
+
+register(
+    id='PickbotReachContinuousDoorHandle-v0',
+    entry_point='environments.pickbot_env_continuous:PickbotEnv',
+    kwargs={
+        'env_object_type': 'door_handle',
+    },
+    max_episode_steps=300,
+)
+
+register(
+    id='PickbotReachContinuousDoorHandle-v1',
+    entry_point='environments.pickbot_env_continuous:PickbotEnv',
+    kwargs={
+        'random_object': False,
+        'random_position': True,
+        'env_object_type': 'door_handle',
+    },
+    max_episode_steps=300,
+)
+
+register(
+    id='PickbotReachContinuousDoorHandle-v2',
+    entry_point='environments.pickbot_env_continuous:PickbotEnv',
+    kwargs={
+        'random_object': True,
+        'random_position': False,
+        'use_object_type': True,
+        'populate_object': True,
+        'env_object_type': 'door_handle',
+    },
+    max_episode_steps=300,
+)
+
+register(
+    id='PickbotReachContinuousDoorHandle-v3',
+    entry_point='environments.pickbot_env_continuous:PickbotEnv',
+    kwargs={
+        'random_object': True,
+        'random_position': True,
+        'use_object_type': True,
+        'populate_object': True,
+        'env_object_type': 'door_handle',
+    },
+    max_episode_steps=300,
+)

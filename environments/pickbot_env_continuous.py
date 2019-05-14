@@ -22,11 +22,10 @@ import environments.util_math as UMath
 from environments.gazebo_connection import GazeboConnection
 from environments.controllers_connection import ControllersConnection
 from environments.joint_publisher import JointPub
-from environments.joint_array_publisher import JointArrayPub
 from baselines import logger
 
 # MESSAGES/SERVICES
-from std_msgs.msg import String
+from std_msgs.msg import Float64
 from std_msgs.msg import Bool
 from sensor_msgs.msg import JointState
 from gazebo_msgs.msg import ContactsState
@@ -54,14 +53,22 @@ reg = register(
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, running_step=0.001, step_size=1.0, random_object=False, random_position=False,
-                 use_object_type=False, populate_object=False):
+    def __init__(self, joint_increment=0.04, running_step=0.001, random_object=False, random_position=False,
+                 use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
+        :param joint_increment: increment of the joints
+        :param running_step: gazebo simulation time factor
+        :param random_object: spawn random object in the simulation
+        :param random_position: change object position in each reset
+        :param use_object_type: assign IDs to objects and used them in the observation space
+        :param populate_object: to populate object(s) in the simulation using sdf file
+        :param env_object_type: object type for environment, free_shapes for boxes while others are related to use_case
+            'door_handle', 'combox', ...
         """
 
         # Assign Parameters
-        self._joint_increment_value = joint_increment_value
+        self._joint_increment = joint_increment
         self.running_step = running_step
         self._random_object = random_object
         self._random_position = random_position
@@ -104,7 +111,6 @@ class PickbotEnv(gym.Env):
         self.gazebo = GazeboConnection()
         self.controllers_object = ControllersConnection()
         self.pickbot_joint_pubisher_object = JointPub()
-        self.publisher_to_moveit_object = JointArrayPub()
 
         # Define Subscribers as Sensordata
         """
@@ -132,24 +138,23 @@ class PickbotEnv(gym.Env):
         
         State Space: Box Space with 12 values. It is a numpy array with shape (12,)
 
-        Reward Range: -infitity to infinity 
+        Reward Range: -infinity to infinity 
         """
-        self.stepsize = step_size
         low_action = np.array([
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize])
+            -self._joint_increment,
+            -self._joint_increment,
+            -self._joint_increment,
+            -self._joint_increment,
+            -self._joint_increment,
+            -self._joint_increment])
 
         high_action = np.array([
-            self.stepsize,
-            self.stepsize,
-            self.stepsize,
-            self.stepsize,
-            self.stepsize,
-            self.stepsize])
+            self._joint_increment,
+            self._joint_increment,
+            self._joint_increment,
+            self._joint_increment,
+            self._joint_increment,
+            self._joint_increment])
 
         self.action_space = spaces.Box(low_action, high_action)
         high = np.array([
@@ -201,6 +206,8 @@ class PickbotEnv(gym.Env):
         self.csv_name = logger.get_dir() + '/result_log'
         print("CSV NAME")
         print(self.csv_name)
+        self.csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
+        self.successful_attempts = 0
 
         # object name: name of the target object
         # object type: index of the object name in the object list
@@ -208,7 +215,8 @@ class PickbotEnv(gym.Env):
         self.object_name = ''
         self.object_type_str = ''
         self.object_type = 0
-        self.object_list = U.get_target_object()
+        self.object_list = U.get_target_object(env_object_type)
+        print("object list {}".format(self.object_list))
         self.object_initial_position = Pose(position=Point(x=-0.13, y=0.848, z=1.06),  # x=0.0, y=0.9, z=1.05
                                             orientation=quaternion_from_euler(0.002567, 0.102, 1.563))
 
@@ -222,7 +230,7 @@ class PickbotEnv(gym.Env):
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
 
         # get maximum distance to the object to calculate reward, renewed in the reset function
-        self.max_distance, _ = self.get_distance_gripper_to_object()
+        self.max_distance, _ = U.get_distance_gripper_to_object()
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized 
     def joints_state_callback(self, msg):
@@ -273,23 +281,16 @@ class PickbotEnv(gym.Env):
         17) Return State 
         """
 
-        # self.gazebo.change_gravity(0, 0, 0)
-        # self.controllers_object.turn_off_controllers()
-        # self.gazebo.pauseSim()
-        # self.gazebo.resetSim()
-        # self.pickbot_joint_pubisher_object.set_joints()
-        self.publisher_to_moveit_object.set_joints()
-
-        print(">>>>>>>>>>>>>>>>>>> RESET: waiting for the movement to complete")
-        rospy.wait_for_message("/pickbot/movement_complete", String)
-        print(">>>>>>>>>>>>>>>>>>> RESET: Waiting complete")
-
+        self.gazebo.change_gravity(0, 0, 0)
+        self.controllers_object.turn_off_controllers()
+        self.gazebo.pauseSim()
+        self.gazebo.resetSim()
+        self.pickbot_joint_pubisher_object.set_joints()
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
-        # self.gazebo.unpauseSim()
-        # self.controllers_object.turn_on_controllers()
-        # self.gazebo.change_gravity(0, 0, -9.81)
+        self.gazebo.unpauseSim()
+        self.controllers_object.turn_on_controllers()
+        self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
-        # self.randomly_spawn_object()
 
         last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
         with open('last_position.yml', 'w') as yaml_file:
@@ -302,11 +303,11 @@ class PickbotEnv(gym.Env):
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
         # get maximum distance to the object to calculate reward
-        self.max_distance, _ = self.get_distance_gripper_to_object()
-        # self.gazebo.pauseSim()
+        self.max_distance, _ = U.get_distance_gripper_to_object()
+        self.gazebo.pauseSim()
         state = self.get_state(observation)
         self._update_episode()
-        # self.gazebo.unpauseSim()
+        self.gazebo.unpauseSim()
         return state
 
     def step(self, action):
@@ -327,7 +328,7 @@ class PickbotEnv(gym.Env):
         10) Return State, Reward, Done
         """
 
-        print("action: {}".format(action))
+        # print("action: {}".format(action))
 
         # 1) read last_position out of YAML File
         with open("last_position.yml", 'r') as stream:
@@ -336,25 +337,16 @@ class PickbotEnv(gym.Env):
             except yaml.YAMLError as exc:
                 print(exc)
         # 2) get the new joint positions according to chosen action
-        next_action_position = self.get_action_to_position(action, last_position)
-
+        next_action_position = self.get_action_to_position(np.clip(action, -self._joint_increment, self._joint_increment),
+                                                           last_position)
         # 3) write last_position into YAML File
         with open('last_position.yml', 'w') as yaml_file:
             yaml.dump(next_action_position, yaml_file, default_flow_style=False)
-        """
-        print("ACTION PUPLISHED: " +str(next_action_position))
-        print("action from agent: "+str(action))
-        print("clipped actiont: "+str(np.clip(action,-self.stepsize,self.stepsize)))
-        print("Last Position: : "+str(last_position))
-        """
 
         # 4) unpause, move to position for certain time
-        # self.gazebo.unpauseSim()
-        # self.pickbot_joint_pubisher_object.move_joints(next_action_position)
-        self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
+        self.gazebo.unpauseSim()
+        self.pickbot_joint_pubisher_object.move_joints(next_action_position)
         time.sleep(self.running_step)
-
-        rospy.wait_for_message("/pickbot/movement_complete", String)
 
         """
         #execute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
@@ -364,22 +356,22 @@ class PickbotEnv(gym.Env):
         """
         # 5) Get Observations and pause Simulation
         observation = self.get_obs()
-        # self.gazebo.pauseSim()
+        self.gazebo.pauseSim()
 
         # 6) Convert Observations into state
         state = self.get_state(observation)
 
         # 7) Unpause Simulation check if its done, calculate done_reward
-        # self.gazebo.unpauseSim()
+        self.gazebo.unpauseSim()
         done, done_reward, invalid_contact = self.is_done(observation)
-        # self.gazebo.pauseSim()
+        self.gazebo.pauseSim()
 
-        # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
+        # 8) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
         self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
-        # self.gazebo.unpauseSim()
+        self.gazebo.unpauseSim()
 
         self.episode_steps += 1
         # 10) Return State, Reward, Done
@@ -412,7 +404,7 @@ class PickbotEnv(gym.Env):
         joint_states_msg = None
         while joint_states_msg is None and not rospy.is_shutdown():
             try:
-                joint_states_msg = rospy.wait_for_message("/joint_states", JointState, timeout=0.1)
+                joint_states_msg = rospy.wait_for_message("/pickbot/joint_states", JointState, timeout=0.1)
                 self.joints_state = joint_states_msg
                 rospy.logdebug("Current joint_states READY")
             except Exception as e:
@@ -556,7 +548,7 @@ class PickbotEnv(gym.Env):
         try:
             model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
             blockName = self.object_name
-            relative_entity_name = "target"
+            relative_entity_name = "link"
             object_resp_coordinates = model_coordinates(blockName, relative_entity_name)
             Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
                                object_resp_coordinates.pose.position.z))
@@ -647,7 +639,7 @@ class PickbotEnv(gym.Env):
         """
 
         # Get Distance Object to Gripper and Objectposition from Service Call. Needs to be done a second time cause we need the distance and position after the Step execution
-        distance_gripper_to_object, position_xyz_object = self.get_distance_gripper_to_object()
+        distance_gripper_to_object, position_xyz_object = U.get_distance_gripper_to_object()
         object_pos_x = position_xyz_object[0]
         object_pos_y = position_xyz_object[1]
         object_pos_z = position_xyz_object[2]
@@ -820,9 +812,13 @@ class PickbotEnv(gym.Env):
         invalid_collision = self.get_collisions()
 
         # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
-        if observations[7] != 0 and observations[8] != 0 and invalid_collision == False:
+        if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
             done = True
             done_reward = reward_reached_goal
+            # save state in csv file
+            U.append_to_csv(self.csv_success_exp, observations)
+            self.successful_attempts += 1
+            print("Successful contact so far: {} attempts".format(self.successful_attempts))
 
         # Crashing with itself, shelf, base
         if invalid_collision:
