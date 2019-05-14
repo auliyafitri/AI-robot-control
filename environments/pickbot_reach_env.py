@@ -47,7 +47,7 @@ from simulation.srv import VacuumGripperControl
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment=0.1, running_step=0.001, random_object=False, random_position=False,
+    def __init__(self, joint_increment=None, running_step=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False):
         """
         initializing all the relevant variables and connections
@@ -133,21 +133,41 @@ class PickbotEnv(gym.Env):
 
         Reward Range: -infitity to infinity 
         """
-        low_action = np.array([
-            -self._joint_increment,
-            -self._joint_increment,
-            -self._joint_increment,
-            -self._joint_increment,
-            -self._joint_increment,
-            -self._joint_increment])
+        # Directly use joint_positions as action
+        if self._joint_increment == None:
+            low_action = np.array([
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05)])
 
-        high_action = np.array([
-            self._joint_increment,
-            self._joint_increment,
-            self._joint_increment,
-            self._joint_increment,
-            self._joint_increment,
-            self._joint_increment])
+            high_action = np.array([
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05])
+        else: # Use joint_increments as action
+            low_action = np.array([
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment])
+
+            high_action = np.array([
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment])
+
+        
 
         self.action_space = spaces.Box(low_action, high_action)
         high = np.array([
@@ -314,6 +334,8 @@ class PickbotEnv(gym.Env):
         8) Return State, Reward, Done
         """
 
+        print("action: {}".format(action))
+
         self.movement_complete.data = False
         # print("action: {}".format(action))
 
@@ -321,7 +343,10 @@ class PickbotEnv(gym.Env):
         old_observation = self.get_obs()
 
         # 2) Get the new joint positions according to chosen action (actions here are the joint increments)
-        next_action_position = self.get_action_to_position(action, old_observation[1:7])
+        if self._joint_increment == None:
+            next_action_position = action
+        else:
+            next_action_position = self.get_action_to_position(action, old_observation[1:7])
 
         # 3) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
@@ -582,7 +607,7 @@ class PickbotEnv(gym.Env):
         """
         action_position = np.asarray(last_position) + action
         # clip action that is going to be published to -2.9 and 2.9 just to make sure to avoid loosing controll of controllers
-        x = np.clip(action_position, -2.9, 2.9)
+        x = np.clip(action_position, -(math.pi-0.05), math.pi-0.05)
 
         return x.tolist()
 
