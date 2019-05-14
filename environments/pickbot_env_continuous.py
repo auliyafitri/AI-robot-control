@@ -53,7 +53,7 @@ reg = register(
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment=0.04, running_step=0.001, random_object=False, random_position=False,
+    def __init__(self, joint_increment=None, running_step=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
@@ -140,21 +140,40 @@ class PickbotEnv(gym.Env):
 
         Reward Range: -infinity to infinity 
         """
-        low_action = np.array([
-            -self._joint_increment,
-            -self._joint_increment,
-            -self._joint_increment,
-            -self._joint_increment,
-            -self._joint_increment,
-            -self._joint_increment])
+        # Directly use joint_positions as action
+        if self._joint_increment is None:
+            low_action = np.array([
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05)])
 
-        high_action = np.array([
-            self._joint_increment,
-            self._joint_increment,
-            self._joint_increment,
-            self._joint_increment,
-            self._joint_increment,
-            self._joint_increment])
+            high_action = np.array([
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05])
+        else: # Use joint_increments as action
+            low_action = np.array([
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment])
+
+            high_action = np.array([
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment])
+
 
         self.action_space = spaces.Box(low_action, high_action)
         high = np.array([
@@ -337,7 +356,10 @@ class PickbotEnv(gym.Env):
             except yaml.YAMLError as exc:
                 print(exc)
         # 2) get the new joint positions according to chosen action
-        next_action_position = self.get_action_to_position(np.clip(action, -self._joint_increment, self._joint_increment),
+        if self._joint_increment is None:
+            next_action_position = action
+        else:
+            next_action_position = self.get_action_to_position(np.clip(action, -self._joint_increment, self._joint_increment),
                                                            last_position)
         # 3) write last_position into YAML File
         with open('last_position.yml', 'w') as yaml_file:
