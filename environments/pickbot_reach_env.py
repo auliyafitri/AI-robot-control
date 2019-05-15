@@ -47,7 +47,7 @@ from simulation.srv import VacuumGripperControl
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment=None, running_step=0.001, random_object=False, random_position=False,
+    def __init__(self, joint_increment=None, sim_time_factor=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
@@ -63,7 +63,6 @@ class PickbotEnv(gym.Env):
 
         # Assign Parameters
         self._joint_increment = joint_increment  # joint_increment in rad
-        self.running_step = running_step
         self._random_object = random_object
         self._random_position = random_position
         self._use_object_type = use_object_type
@@ -106,7 +105,7 @@ class PickbotEnv(gym.Env):
         2) Controller Connection
         3) Joint Publisher 
         """
-        self.gazebo = GazeboConnection()
+        self.gazebo = GazeboConnection(sim_time_factor=sim_time_factor)
         self.controllers_object = ControllersConnection()
         self.pickbot_joint_pubisher_object = JointPub()
         self.publisher_to_moveit_object = JointArrayPub()

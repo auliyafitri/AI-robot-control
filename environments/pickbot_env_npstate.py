@@ -55,7 +55,7 @@ register(
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, running_step=0.001, random_object=False, random_position=False,
+    def __init__(self, joint_increment_value=0.02, sim_time_factor=0.001, running_step=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
@@ -109,7 +109,7 @@ class PickbotEnv(gym.Env):
         2) Controller Connection
         3) Joint Publisher 
         """
-        self.gazebo = GazeboConnection()
+        self.gazebo = GazeboConnection(sim_time_factor=sim_time_factor)
         self.controllers_object = ControllersConnection()
         self.pickbot_joint_publisher_object = JointPub()
 
