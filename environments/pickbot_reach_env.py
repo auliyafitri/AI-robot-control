@@ -650,6 +650,8 @@ class PickbotEnv(gym.Env):
 
         for joint in joint_states.position:
             if joint > math.pi or joint < -math.pi:
+                print(joint_states.name)
+                print(joint_states.position)
                 sys.exit("Joint exceeds limit")
 
         # Get Contact Forces out of get_contact_force Functions to be able to take an average over some iterations otherwise chances are high that not both sensors are showing contact the same time
