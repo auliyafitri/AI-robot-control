@@ -74,8 +74,11 @@ class GazeboConnection():
         We initialise the physics parameters of the simulation, like gravity,
         friction coeficients and so on.
         """
-        self._time_step = Float64(0.001)
+        # self._time_step = Float64(0.001)
+        self._time_step = Float64(0.01)
         self._max_update_rate = Float64(speed)
+
+
 
         self._gravity = Vector3()
         self._gravity.x = 0.0

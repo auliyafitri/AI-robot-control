@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # general things to ignore
 build/
 dist/
@@ -8,22 +7,19 @@ dist/
 __pycache__/
 *.so
 *~
-=======
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
->>>>>>> 4e86571b07313b888ee35322de9697afc4f1d28f
 *$py.class
+.idea/
 
 # generated yaml file for logging
 collision.yml
 contact_1_force.yml
 contact_2_force.yml
 last_position.yml
-<<<<<<< HEAD
 
 # due to using tox and pytest
 .tox
 .cache
-=======
->>>>>>> 4e86571b07313b888ee35322de9697afc4f1d28f
+
+# local model and evaluation
+evaluations/
+models/

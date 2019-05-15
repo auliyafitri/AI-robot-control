@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import gym
 import os
 import datetime
@@ -11,6 +12,9 @@ from baselines.trpo_mpi import trpo_mpi
 from baselines.bench import Monitor
 from baselines import logger
 from baselines.common.cmd_util import make_vec_env
+
+from environments.joint_array_publisher import JointArrayPub
+from std_msgs.msg import String
 
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
 
@@ -30,6 +34,11 @@ format_strs = ['stdout', 'log', 'csv', 'tensorboard']
 logger.configure(os.path.abspath(logdir), format_strs)
 
 
+def mov_complete_callback(data):
+    msg = data.data
+    print(msg)
+
+
 def main():
     # unpause Simulation so that robot receives data on all topics
     gazebo_connection.GazeboConnection().unpauseSim()
@@ -42,6 +51,29 @@ def main():
                        reward_scale=1.0,
                        flatten_dict_observations=True,
                        gamestate=None)
+
+
+    ############################################################
+    ##                Experiments with MoveIt                 ##
+    ############################################################
+    # a = [1.5,-1.2,1.4,-1.87,-1.57,0]
+    # b = [0.1, 0.5, 0.1, 0.0, 0.0, 0.0]
+    #
+    # jointPub = JointArrayPub()
+    # jointPub.pub_joints_to_moveit(b)
+    #
+    # print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
+    # rospy.wait_for_message("/pickbot/movement_complete", String)
+    # print(">>>>>>>>>>>>>>>>>>> Waiting complete")
+
+    # jointPub.pub_joints_to_moveit(b)
+    #
+    # print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
+    # rospy.wait_for_message("/pickbot/movement_complete", String)
+    # print(">>>>>>>>>>>>>>>>>>> Waiting complete")
+    ############################################################
+    #                     End of experiment                    #
+    ############################################################
 
     act = trpo_mpi.learn(
         env=env,

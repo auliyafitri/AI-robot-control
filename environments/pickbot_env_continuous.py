@@ -53,14 +53,22 @@ reg = register(
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, running_step=0.001, step_size=0.04, random_object=False, random_position=False,
-                 use_object_type=False, populate_object=False):
+    def __init__(self, joint_increment=None, running_step=0.001, random_object=False, random_position=False,
+                 use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
+        :param joint_increment: increment of the joints
+        :param running_step: gazebo simulation time factor
+        :param random_object: spawn random object in the simulation
+        :param random_position: change object position in each reset
+        :param use_object_type: assign IDs to objects and used them in the observation space
+        :param populate_object: to populate object(s) in the simulation using sdf file
+        :param env_object_type: object type for environment, free_shapes for boxes while others are related to use_case
+            'door_handle', 'combox', ...
         """
 
         # Assign Parameters
-        self._joint_increment_value = joint_increment_value
+        self._joint_increment = joint_increment
         self.running_step = running_step
         self._random_object = random_object
         self._random_position = random_position
@@ -130,24 +138,42 @@ class PickbotEnv(gym.Env):
         
         State Space: Box Space with 12 values. It is a numpy array with shape (12,)
 
-        Reward Range: -infitity to infinity 
+        Reward Range: -infinity to infinity 
         """
-        self.stepsize = step_size
-        low_action = np.array([
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize,
-            -self.stepsize])
+        # Directly use joint_positions as action
+        if self._joint_increment is None:
+            low_action = np.array([
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05),
+                -(math.pi - 0.05)])
 
-        high_action = np.array([
-            self.stepsize,
-            self.stepsize,
-            self.stepsize,
-            self.stepsize,
-            self.stepsize,
-            self.stepsize])
+            high_action = np.array([
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05,
+                math.pi - 0.05])
+        else: # Use joint_increments as action
+            low_action = np.array([
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment,
+                -self._joint_increment])
+
+            high_action = np.array([
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment,
+                self._joint_increment])
+
 
         self.action_space = spaces.Box(low_action, high_action)
         high = np.array([
@@ -199,6 +225,8 @@ class PickbotEnv(gym.Env):
         self.csv_name = logger.get_dir() + '/result_log'
         print("CSV NAME")
         print(self.csv_name)
+        self.csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
+        self.successful_attempts = 0
 
         # object name: name of the target object
         # object type: index of the object name in the object list
@@ -206,7 +234,8 @@ class PickbotEnv(gym.Env):
         self.object_name = ''
         self.object_type_str = ''
         self.object_type = 0
-        self.object_list = U.get_target_object()
+        self.object_list = U.get_target_object(env_object_type)
+        print("object list {}".format(self.object_list))
         self.object_initial_position = Pose(position=Point(x=-0.13, y=0.848, z=1.06),  # x=0.0, y=0.9, z=1.05
                                             orientation=quaternion_from_euler(0.002567, 0.102, 1.563))
 
@@ -220,7 +249,7 @@ class PickbotEnv(gym.Env):
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
 
         # get maximum distance to the object to calculate reward, renewed in the reset function
-        self.max_distance, _ = self.get_distance_gripper_to_object()
+        self.max_distance, _ = U.get_distance_gripper_to_object()
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized 
     def joints_state_callback(self, msg):
@@ -281,7 +310,6 @@ class PickbotEnv(gym.Env):
         self.controllers_object.turn_on_controllers()
         self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
-        # self.randomly_spawn_object()
 
         last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
         with open('last_position.yml', 'w') as yaml_file:
@@ -294,7 +322,7 @@ class PickbotEnv(gym.Env):
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
         # get maximum distance to the object to calculate reward
-        self.max_distance, _ = self.get_distance_gripper_to_object()
+        self.max_distance, _ = U.get_distance_gripper_to_object()
         self.gazebo.pauseSim()
         state = self.get_state(observation)
         self._update_episode()
@@ -319,7 +347,7 @@ class PickbotEnv(gym.Env):
         10) Return State, Reward, Done
         """
 
-        print("action: {}".format(action))
+        # print("action: {}".format(action))
 
         # 1) read last_position out of YAML File
         with open("last_position.yml", 'r') as stream:
@@ -328,18 +356,14 @@ class PickbotEnv(gym.Env):
             except yaml.YAMLError as exc:
                 print(exc)
         # 2) get the new joint positions according to chosen action
-        next_action_position = self.get_action_to_position(np.clip(action, -self.stepsize, self.stepsize),
+        if self._joint_increment is None:
+            next_action_position = action
+        else:
+            next_action_position = self.get_action_to_position(np.clip(action, -self._joint_increment, self._joint_increment),
                                                            last_position)
-
         # 3) write last_position into YAML File
         with open('last_position.yml', 'w') as yaml_file:
             yaml.dump(next_action_position, yaml_file, default_flow_style=False)
-        """
-        print("ACTION PUPLISHED: " +str(next_action_position))
-        print("action from agent: "+str(action))
-        print("clipped actiont: "+str(np.clip(action,-self.stepsize,self.stepsize)))
-        print("Last Position: : "+str(last_position))
-        """
 
         # 4) unpause, move to position for certain time
         self.gazebo.unpauseSim()
@@ -364,7 +388,7 @@ class PickbotEnv(gym.Env):
         done, done_reward, invalid_contact = self.is_done(observation)
         self.gazebo.pauseSim()
 
-        # 8) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
+        # 8) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
         self.accumulated_episode_reward += reward
 
@@ -546,7 +570,7 @@ class PickbotEnv(gym.Env):
         try:
             model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
             blockName = self.object_name
-            relative_entity_name = "target"
+            relative_entity_name = "link"
             object_resp_coordinates = model_coordinates(blockName, relative_entity_name)
             Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
                                object_resp_coordinates.pose.position.z))
@@ -637,7 +661,7 @@ class PickbotEnv(gym.Env):
         """
 
         # Get Distance Object to Gripper and Objectposition from Service Call. Needs to be done a second time cause we need the distance and position after the Step execution
-        distance_gripper_to_object, position_xyz_object = self.get_distance_gripper_to_object()
+        distance_gripper_to_object, position_xyz_object = U.get_distance_gripper_to_object()
         object_pos_x = position_xyz_object[0]
         object_pos_y = position_xyz_object[1]
         object_pos_z = position_xyz_object[2]
@@ -810,9 +834,13 @@ class PickbotEnv(gym.Env):
         invalid_collision = self.get_collisions()
 
         # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
-        if observations[7] != 0 and observations[8] != 0 and invalid_collision == False:
+        if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
             done = True
             done_reward = reward_reached_goal
+            # save state in csv file
+            U.append_to_csv(self.csv_success_exp, observations)
+            self.successful_attempts += 1
+            print("Successful contact so far: {} attempts".format(self.successful_attempts))
 
         # Crashing with itself, shelf, base
         if invalid_collision:
