@@ -801,8 +801,9 @@ class PickbotEnv(gym.Env):
             else:
                 joint_correction.append(0.0)
 
-        print("is_done: Joints: {}".format(self.joints_state.position))
         if joint_exceeds_limits:
+            print("is_done: Joints: {}".format(np.round(self.joints_state.position, decimals=3)))
+            self.publisher_to_moveit_object.pub_joints_to_moveit([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
             self.publisher_to_moveit_object.pub_relative_joints_to_moveit(joint_correction)
             while not self.movement_complete.data:
                 pass
