@@ -135,3 +135,22 @@ register(
     },
     max_episode_steps=300,
 )
+
+# Combox
+register(
+    id='PickbotReachDiscreteCombox-v0',
+    entry_point='environments.pickbot_env_npstate:PickbotEnv',
+    kwargs={
+        'env_object_type': 'combox',
+    },
+    max_episode_steps=300,
+)
+
+register(
+    id='PickbotReachContinuousCombox-v0',
+    entry_point='environments.pickbot_env_continuous:PickbotEnv',
+    kwargs={
+        'env_object_type': 'combox',
+    },
+    max_episode_steps=300,
+)

@@ -515,10 +515,16 @@ class PickbotEnv(gym.Env):
             self.object_name = rand_object["name"]
             self.object_type_str = rand_object["type"]
             self.object_type = self.object_list.index(rand_object)
+            init_pos = rand_object["init_pos"]
+            self.object_initial_position = Pose(position=Point(x=init_pos[0], y=init_pos[1], z=init_pos[2]),
+                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4], init_pos[5]))
         else:
             self.object_name = self.object_list[0]["name"]
             self.object_type_str = self.object_list[0]["type"]
             self.object_type = 0
+            init_pos = self.object_list[0]["init_pos"]
+            self.object_initial_position = Pose(position=Point(x=init_pos[0], y=init_pos[1], z=init_pos[2]),
+                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4], init_pos[5]))
 
         if random_position:
             if self.object_type_str == "door_handle":
@@ -790,6 +796,7 @@ class PickbotEnv(gym.Env):
             print("Successful 2 contacts so far: {} attempts".format(self.success_2_contact))
 
         if observations[7] != 0 or observations[8] != 0 and not invalid_collision:
+            U.append_to_csv(self.csv_success_exp, observations)
             done = True
             self.success_1_contact += 1
             print("Successful 1 contacts so far: {} attempts".format(self.success_1_contact))
