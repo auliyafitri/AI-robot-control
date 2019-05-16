@@ -53,7 +53,7 @@ reg = register(
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment=None, sim_time_factor=0.001, running_step=0.001, random_object=False, random_position=False,
+    def __init__(self, joint_increment=0.05, sim_time_factor=0.001, running_step=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
