@@ -338,7 +338,7 @@ class PickbotEnv(gym.Env):
         7) Calculate reward based on Observatin and done_reward
         8) Return State, Reward, Done
         """
-
+        print("############################")
         print("action: {}".format(action))
 
         self.movement_complete.data = False
@@ -367,6 +367,7 @@ class PickbotEnv(gym.Env):
         """
         # 4) Get new observation after performing the action
         new_observation = self.get_obs()
+        print("observ: {}".format( np.around(new_observation[1:7], decimals=3)))
 
         # 5) Convert Observations into state
         state = self.get_state(new_observation)

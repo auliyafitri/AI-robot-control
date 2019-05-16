@@ -1,7 +1,7 @@
 import math
 
 
-def compute_reward(observation, done_reward, invalid_contact, max_distance):
+def compute_reward(observation, done_reward, invalid_contact):
     """
     Calculates the reward in each Step
     Reward for:
@@ -19,7 +19,7 @@ def compute_reward(observation, done_reward, invalid_contact, max_distance):
     # Reward for Distance to encourage approaching the box
     distance = observation[0]
     # reward_distance = 1 - math.pow(distance / max_distance, 0.4)
-    relative_distance = max_distance - distance
+    relative_distance = observation[-1] - distance
     reward_distance = relative_distance * 20 if relative_distance < 0 else relative_distance * 10
 
     # Reward for Contact
@@ -30,7 +30,7 @@ def compute_reward(observation, done_reward, invalid_contact, max_distance):
         reward_contact = 0
     elif contact_1 != 0 and contact_2 == 0 and not invalid_contact or contact_1 == 0 and contact_2 != 0 and \
             not invalid_contact:
-        reward_contact = 100
+        reward_contact = 2000
         reward_distance = 0
 
     total_reward = reward_distance + reward_contact + done_reward

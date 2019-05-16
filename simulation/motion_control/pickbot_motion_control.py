@@ -234,6 +234,7 @@ def TiltAboutAxis(pose_target, resolution, tilt_axis, tilt_direction):
 def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
     # group.set_max_velocity_scaling_factor(0.1)
     group_variable_values = group.get_current_joint_values() #create variable that stores joint values
+    # print("group: {}".format(np.round(group_variable_values, decimals=3)))
 
     #Assign values to joints
     group_variable_values[0] = joint_0

@@ -97,7 +97,8 @@ class PickbotEnv(gym.Env):
                                       "contact_2_force",
                                       "object_pos_x",
                                       "object_pos_y",
-                                      "object_pos_z"]
+                                      "object_pos_z",
+                                      "min_distance_gripper_to_object"]
 
         if self._use_object_type:
             self._list_of_observations.append("object_type")
@@ -174,35 +175,37 @@ class PickbotEnv(gym.Env):
                 self._joint_increment,
                 self._joint_increment])
 
-
         self.action_space = spaces.Box(low_action, high_action)
+
         high = np.array([
-            1,
-            math.pi,
-            math.pi,
-            math.pi,
-            math.pi,
-            math.pi,
-            math.pi,
-            np.finfo(np.float32).max,
-            np.finfo(np.float32).max,
-            1,
-            1.4,
-            1.5])
+            999,                            # distance_gripper_to_object
+            math.pi,                        # elbow_joint_state
+            math.pi,                        # shoulder_lift_joint_state
+            math.pi,                        # shoulder_pan_joint_state
+            math.pi,                        # wrist_1_joint_state
+            math.pi,                        # wrist_2_joint_state
+            math.pi,                        # wrist_3_joint_state
+            np.finfo(np.float32).max,       # contact_1_force
+            np.finfo(np.float32).max,       # contact_2_force
+            1,                              # object_pos_x
+            1.4,                            # object_pos_y
+            1.5,                            # object_pos_z
+            999])                           # min_distance_gripper_to_object
 
         low = np.array([
-            0,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            0,
-            0,
-            -1,
-            0,
-            0])
+            0,                              # distance_gripper_to_object
+            -math.pi,                       # elbow_joint_state
+            -math.pi,                       # shoulder_lift_joint_state
+            -math.pi,                       # shoulder_pan_joint_state
+            -math.pi,                       # wrist_1_joint_state
+            -math.pi,                       # wrist_2_joint_state
+            -math.pi,                       # wrist_3_joint_state
+            0,                              # contact_1_force
+            0,                              # contact_2_force
+            -1,                             # object_pos_x
+            0,                              # object_pos_y
+            0,                              # object_pos_z
+            0])                             # min distance
 
         if self._use_object_type:
             high = np.append(high, 9)
@@ -226,7 +229,8 @@ class PickbotEnv(gym.Env):
         print("CSV NAME")
         print(self.csv_name)
         self.csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
-        self.successful_attempts = 0
+        self.success_2_contact = 0
+        self.success_1_contact = 0
 
         # object name: name of the target object
         # object type: index of the object name in the object list
@@ -248,8 +252,10 @@ class PickbotEnv(gym.Env):
         # else get the first entry of object_list
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
 
-        # get maximum distance to the object to calculate reward, renewed in the reset function
+        # The distance between gripper and object, when the arm is in initial pose
         self.max_distance, _ = U.get_distance_gripper_to_object()
+        # The minimum distance between gripper and object during training
+        self.min_distance = 999
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized 
     def joints_state_callback(self, msg):
@@ -323,6 +329,7 @@ class PickbotEnv(gym.Env):
         observation = self.get_obs()
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
+        self.min_distance = self.max_distance
         self.gazebo.pauseSim()
         state = self.get_state(observation)
         self._update_episode()
@@ -376,8 +383,10 @@ class PickbotEnv(gym.Env):
         while np.linalg.norm(np.asarray(self.joints_state.position)-np.asarray(next_action_position))>0.1 and self.get_collisions()==False and time.time()-time1<0.1:         
             rospy.loginfo("Not yet reached target position and no collision")
         """
-        # 5) Get Observations and pause Simulation
+        # 5) Get Observations, update the minimum distance, and pause Simulation
         observation = self.get_obs()
+        if observation[0] < self.min_distance:
+            self.min_distance = observation[0]
         self.gazebo.pauseSim()
 
         # 6) Convert Observations into state
@@ -389,7 +398,7 @@ class PickbotEnv(gym.Env):
         self.gazebo.pauseSim()
 
         # 8) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
-        reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
+        reward = UMath.compute_reward(observation, done_reward, invalid_contact)
         self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
@@ -654,7 +663,8 @@ class PickbotEnv(gym.Env):
                                     "object_pos_x",
                                     "object_pos_y",
                                     "object_pos_z",
-                                    "object_type"] -- if use_object_type set to True
+                                    "object_type", -- if use_object_type set to True
+                                    "min_distance_gripper_to_object]
 
 
         :return: observation
@@ -714,6 +724,8 @@ class PickbotEnv(gym.Env):
                 observation.append(object_pos_z)
             elif obs_name == "object_type":
                 observation.append(self.object_type)
+            elif obs_name == "min_distance_gripper_to_object":
+                observation.append(self.min_distance)
             else:
                 raise NameError('Observation Asked does not exist==' + str(obs_name))
 
@@ -878,38 +890,6 @@ class PickbotEnv(gym.Env):
 
         return done, done_reward, invalid_collision
 
-    def compute_reward(self, observation, done_reward, invalid_contact):
-        """
-        Calculates the reward in each Step
-        Reward for:
-        Distance:       Reward for Distance to the Object   
-        Contact:        Reward for Contact with one contact sensor and invalid_contact must be false. As soon as both contact sensors have contact and there is no invalid contact the goal is considert to be reached and the episode is over. Reward is then set in is_done
-
-        Calculates the Reward for the Terminal State 
-        Done Reward:    Reward when episode is Done. Negative Reward for Crashing and going into set Joint Limits. High Positiv Reward for having contact with both contact sensors and not having an invalid collision  
-        """
-        reward_distance = 0
-        reward_contact = 0
-
-        # Reward for Distance
-        distance = observation[0]
-        reward_distance = 1 - math.pow(distance / self.max_distance, 0.4)
-
-        # Reward distance will be 1.4 at distance 0.01 and 0.18 at distance 0.55. Inbetween logarythmic curve
-        # reward_distance = math.log10(distance) * (-1) * 0.7
-
-        # Reward for Contact
-        contact_1 = observation[7]
-        contact_2 = observation[8]
-
-        if contact_1 == 0 and contact_2 == 0:
-            reward_contact = 0
-        elif contact_1 != 0 and contact_2 == 0 and invalid_contact == False or contact_1 == 0 and contact_2 != 0 and invalid_contact == False:
-            reward_contact = 5
-
-        total_reward = reward_distance + reward_contact + done_reward
-
-        return total_reward
 
     def _update_episode(self):
         """
