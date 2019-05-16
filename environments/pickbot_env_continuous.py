@@ -331,7 +331,7 @@ class PickbotEnv(gym.Env):
         self.max_distance, _ = U.get_distance_gripper_to_object()
         self.min_distance = self.max_distance
         self.gazebo.pauseSim()
-        state = self.get_state(observation)
+        state = U.get_state(observation)
         self._update_episode()
         self.gazebo.unpauseSim()
         return state
@@ -390,7 +390,7 @@ class PickbotEnv(gym.Env):
         self.gazebo.pauseSim()
 
         # 6) Convert Observations into state
-        state = self.get_state(observation)
+        state = U.get_state(observation)
 
         # 7) Unpause Simulation check if its done, calculate done_reward
         self.gazebo.unpauseSim()
@@ -565,67 +565,6 @@ class PickbotEnv(gym.Env):
                                               z=1.05))
                 U.spawn_object(obj, box_pos)
 
-    def get_distance_gripper_to_object(self):
-        """
-        Get the Position of the endeffektor and the object via rosservice call /gazebo/get_model_state and /gazebo/get_link_state
-        Calculate distance between them
-
-        In this case
-    
-        Object:     unite_box_0 link
-        Gripper:    vacuum_gripper_link ground_plane
-        """
-
-        try:
-            model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-            blockName = self.object_name
-            relative_entity_name = "link"
-            object_resp_coordinates = model_coordinates(blockName, relative_entity_name)
-            Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
-                               object_resp_coordinates.pose.position.z))
-
-        except rospy.ServiceException as e:
-            rospy.loginfo("Get Model State service call failed:  {0}".format(e))
-            print("Exception get model state")
-
-        try:
-            model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
-            LinkName = "vacuum_gripper_link"
-            ReferenceFrame = "ground_plane"
-            resp_coordinates_gripper = model_coordinates(LinkName, ReferenceFrame)
-            Gripper = np.array((resp_coordinates_gripper.link_state.pose.position.x,
-                                resp_coordinates_gripper.link_state.pose.position.y,
-                                resp_coordinates_gripper.link_state.pose.position.z))
-
-        except rospy.ServiceException as e:
-            rospy.loginfo("Get Link State service call failed:  {0}".format(e))
-            print("Exception get Gripper position")
-        distance = np.linalg.norm(Object - Gripper)
-
-        return distance, Object
-
-    def turn_on_gripper(self):
-        """
-        turn on the Gripper by calling the service 
-        """
-        try:
-            turn_on_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
-            enable = True
-            turn_on_gripper_service(enable)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Turn on Gripper service call failed:  {0}".format(e))
-
-    def turn_off_gripper(self):
-        """
-        sturn off the Gripper by calling the service 
-        """
-        try:
-            turn_off_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
-            enable = False
-            turn_off_gripper_service(enable)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Turn off Gripper service call failed:  {0}".format(e))
-
     def get_action_to_position(self, action, last_position):
         """
         takes the last position and adds the increments for each joint
@@ -731,12 +670,6 @@ class PickbotEnv(gym.Env):
 
         return observation
 
-    def get_state(self, observation):
-        """
-        convert observation list intp a numpy array 
-        """
-        x = np.asarray(observation)
-        return x
 
     def get_contact_force_1(self):
         """
