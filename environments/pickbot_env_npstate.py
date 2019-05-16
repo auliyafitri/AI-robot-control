@@ -99,7 +99,8 @@ class PickbotEnv(gym.Env):
                                       "contact_2_force",
                                       "object_pos_x",
                                       "object_pos_y",
-                                      "object_pos_z"]
+                                      "object_pos_z",
+                                      "min_distance_gripper_to_object"]
         if self._use_object_type:
             self._list_of_observations.append("object_type")
 
@@ -150,8 +151,9 @@ class PickbotEnv(gym.Env):
         """
 
         self.action_space = spaces.Discrete(12)
+
         high = np.array([
-            1,
+            999,
             math.pi,
             math.pi,
             math.pi,
@@ -162,7 +164,8 @@ class PickbotEnv(gym.Env):
             np.finfo(np.float32).max,
             1,
             1.4,
-            1.5])
+            1.5,
+            999])
 
         low = np.array([
             0,
@@ -175,6 +178,7 @@ class PickbotEnv(gym.Env):
             0,
             0,
             -1,
+            0,
             0,
             0])
 
@@ -200,7 +204,8 @@ class PickbotEnv(gym.Env):
         print("CSV NAME")
         print(self.csv_name)
         self.csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
-        self.successful_attempts = 0
+        self.success_2_contacts = 0
+        self.success_1_contact = 0
 
         # object name: name of the target object
         # object type: index of the object name in the object list
@@ -222,8 +227,10 @@ class PickbotEnv(gym.Env):
         # else get the first entry of object_list
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
 
-        # get maximum distance to the object to calculate reward, renewed in the reset function
+        # The distance between gripper and object, when the robot is in initial pose
         self.max_distance, _ = U.get_distance_gripper_to_object()
+        # The closest distance during training
+        self.min_distance = 999
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized
     def joints_state_callback(self, msg):
@@ -300,6 +307,7 @@ class PickbotEnv(gym.Env):
         observation = self.get_obs()
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
+        self.min_distance = self.max_distance
         self.gazebo.pauseSim()
         state = self.get_state(observation)
         self._update_episode()
@@ -344,6 +352,8 @@ class PickbotEnv(gym.Env):
 
         # 5) Get Observations and pause Simulation
         observation = self.get_obs()
+        if observation[0] < self.min_distance:
+            self.min_distance = observation[0]
         self.gazebo.pauseSim()
 
         # 6) Convert Observations into state
@@ -771,8 +781,8 @@ class PickbotEnv(gym.Env):
                                     "object_pos_x",
                                     "object_pos_y",
                                     "object_pos_z",
-                                    "object_type"] -- if use_object_type set to True
-
+                                    "object_type", -- if use_object_type set to True
+                                    "min_distance_gripper_to_object]
 
         :return: observation
         """
@@ -825,6 +835,8 @@ class PickbotEnv(gym.Env):
                 observation.append(object_pos_z)
             elif obs_name == "object_type":
                 observation.append(self.object_type)
+            elif obs_name == "min_distance_gripper_to_object":
+                observation.append(self.min_distance)
             else:
                 raise NameError('Observation Asked does not exist==' + str(obs_name))
 
@@ -939,7 +951,7 @@ class PickbotEnv(gym.Env):
 
         done = False
         done_reward = 0
-        reward_reached_goal = 500
+        reward_reached_goal = 20000
         reward_crashing = -200
         reward_join_range = -150
 
@@ -953,8 +965,13 @@ class PickbotEnv(gym.Env):
             done_reward = reward_reached_goal
             # save state in csv file
             U.append_to_csv(self.csv_success_exp, observations)
-            self.successful_attempts += 1
-            print("Successful contact so far: {} attempts".format(self.successful_attempts))
+            self.success_2_contacts += 1
+            print("Successful 2-contacts so far: {} attempts".format(self.success_2_contacts))
+
+        if observations[7] != 0 or observations[8] != 0 and not invalid_collision:
+            done = True
+            self.success_1_contact += 1
+            print("Successful 1-contact so far: {} attempts".format(self.success_1_contact))
 
         # Crashing with itself, shelf, base
         if invalid_collision:
