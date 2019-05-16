@@ -20,8 +20,8 @@ timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
 
 
 num_env = 1
-# env_id = "PickbotReachContinuous-v1"
-env_id = "PickbotReachContinuousDoorHandle-v1"
+env_id = "PickbotReachContinuous-v1"
+# env_id = "PickbotReachContinuousDoorHandle-v1"
 env_type = "classic_control"
 seed = None
 task_name = "reach"

@@ -35,6 +35,6 @@ def compute_reward(observation, done_reward, invalid_contact):
 
     total_reward = reward_distance + reward_contact + done_reward
 
-    # print("reward_distance: {}".format(reward_distance))
+    print("reward_distance: {}".format(reward_distance))
 
     return total_reward

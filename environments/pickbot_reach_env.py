@@ -597,7 +597,7 @@ class PickbotEnv(gym.Env):
         wrist_3_joint_state = joint_states.position[5]
 
         for joint in joint_states.position:
-            if joint > math.pi or joint < -math.pi:
+            if joint > 2 * math.pi or joint < -2 * math.pi:
                 print(joint_states.name)
                 print(joint_states.position)
                 sys.exit("Joint exceeds limit")
@@ -789,11 +789,24 @@ class PickbotEnv(gym.Env):
             print('>>>>>>>>>>>>>>>>>>>> crashing <<<<<<<<<<<<<<<<<<<<<<<')
             done_reward = reward_crashing
 
+        joint_exceeds_limits = False
         for joint_pos in self.joints_state.position:
+            joint_correction = []
             if joint_pos < -math.pi or joint_pos > math.pi:
+                joint_exceeds_limits = True
                 done = True
                 done_reward = reward_joint_range
                 print('>>>>>>>>>>>>>>>>>>>> joint exceeds limit <<<<<<<<<<<<<<<<<<<<<<<')
+                joint_correction.append(-joint_pos)
+            else:
+                joint_correction.append(0.0)
+
+        print("is_done: Joints: {}".format(self.joints_state.position))
+        if joint_exceeds_limits:
+            self.publisher_to_moveit_object.pub_relative_joints_to_moveit(joint_correction)
+            while not self.movement_complete.data:
+                pass
+            print('>>>>>>>>>>>>>>>> joint corrected <<<<<<<<<<<<<<<<<')
 
         return done, done_reward, invalid_collision
 

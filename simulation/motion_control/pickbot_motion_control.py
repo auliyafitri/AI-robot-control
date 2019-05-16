@@ -51,7 +51,8 @@ tf_broadcaster = tf.TransformBroadcaster()
 
 
 def joint_position_sub():
-    rospy.Subscriber('/pickbot/target_joint_positions/', JointState, joint_callback)
+    rospy.Subscriber('/pickbot/target_joint_positions', JointState, joint_callback)
+    rospy.Subscriber('/pickbot/relative_joint_positions', JointState, relative_joint_callback)
 
 def joint_callback(data):
     pos = data.position
@@ -67,6 +68,19 @@ def joint_callback(data):
     complete_msg.data = True
     pub.publish(complete_msg)
 
+def relative_joint_callback(data):
+    pos = data.position
+    pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
+    complete_msg = Bool()
+    complete_msg.data = False
+    check_publishers_connection(pub)
+    pub.publish(complete_msg)
+
+    relative_joint_value(pos[2], pos[1], pos[0], pos[3], pos[4], pos[5])
+
+    # check_publishers_connection(pub)
+    complete_msg.data = True
+    pub.publish(complete_msg)
 
 def check_publishers_connection(pub):
     """
@@ -312,7 +326,7 @@ def relative_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
  
     plan1 = group.plan() #call plan function to plan the path (visualize on rviz)
     group.go(wait=True) #execute plan on real/simulation (gazebo) robot 
-    rospy.sleep(2) #sleep 2 seconds
+    # rospy.sleep(2) #sleep 2 seconds
 
 ###___RELATIVE POSE TARGET MANIPULATION___###
 ## Manipulate by moving gripper linearly with respect to world frame
@@ -582,5 +596,6 @@ if __name__ == '__main__':
     group.set_end_effector_link('vacuum_gripper_link')
 
     rospy.Subscriber('/pickbot/target_joint_positions/', JointState, joint_callback)
+    rospy.Subscriber('/pickbot/relative_joint_positions', JointState, relative_joint_callback)
     print("listening to joint states now")
     rospy.spin()
