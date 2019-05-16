@@ -94,7 +94,8 @@ class PickbotEnv(gym.Env):
                                       "contact_2_force",
                                       "object_pos_x",
                                       "object_pos_y",
-                                      "object_pos_z"]
+                                      "object_pos_z",
+                                      "min_distance_gripper_to_object"]
 
         if self._use_object_type:
             self._list_of_observations.append("object_type")
@@ -173,10 +174,10 @@ class PickbotEnv(gym.Env):
                 self._joint_increment,
                 self._joint_increment,
                 self._joint_increment])
-
         self.action_space = spaces.Box(low_action, high_action)
+
         high = np.array([
-            1,
+            999,
             math.pi,
             math.pi,
             math.pi,
@@ -187,7 +188,8 @@ class PickbotEnv(gym.Env):
             np.finfo(np.float32).max,
             1,
             1.4,
-            1.5])
+            1.5,
+            999])
 
         low = np.array([
             0,
@@ -200,6 +202,7 @@ class PickbotEnv(gym.Env):
             0,
             0,
             -1,
+            0,
             0,
             0])
 
@@ -225,7 +228,8 @@ class PickbotEnv(gym.Env):
         print("CSV NAME")
         print(self.csv_name)
         self.csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
-        self.successful_attempts = 0
+        self.success_2_contacts = 0
+        self.success_1_contact = 0
 
         # object name: name of the target object
         # object type: index of the object name in the object list
@@ -249,6 +253,7 @@ class PickbotEnv(gym.Env):
 
         # get maximum distance to the object to calculate reward, renewed in the reset function
         self.max_distance, _ = U.get_distance_gripper_to_object()
+        self.min_distace = 999
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized 
     def joints_state_callback(self, msg):
@@ -319,7 +324,8 @@ class PickbotEnv(gym.Env):
 
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
-        state = self.get_state(observation)
+        self.min_distace = self.max_distance
+        state = U.get_state(observation)
         self._update_episode()
         return state
 
@@ -365,17 +371,19 @@ class PickbotEnv(gym.Env):
         while np.linalg.norm(np.asarray(self.joints_state.position)-np.asarray(next_action_position))>0.1 and self.get_collisions()==False and time.time()-time1<0.1:         
             rospy.loginfo("Not yet reached target position and no collision")
         """
-        # 4) Get new observation after performing the action
+        # 4) Get new observation and update min_distance after performing the action
         new_observation = self.get_obs()
+        if new_observation[0] < self.min_distace:
+            self.min_distace = new_observation[0]
         print("observ: {}".format( np.around(new_observation[1:7], decimals=3)))
 
         # 5) Convert Observations into state
-        state = self.get_state(new_observation)
+        state = U.get_state(new_observation)
 
         # 6) Check if its done, calculate done_reward
         done, done_reward, invalid_contact = self.is_done(new_observation)
         # if old_observation == new_observation:
-        #     print("@@@@@@@@@ The robot didn't move @@@@@@@@")
+        #     print(">>>>>> The robot didn't move <<<<<<<")
         #     done = True
 
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
@@ -530,67 +538,6 @@ class PickbotEnv(gym.Env):
                                               z=1.05))
                 U.spawn_object(obj, box_pos)
 
-    def get_distance_gripper_to_object(self):
-        """
-        Get the Position of the endeffektor and the object via rosservice call /gazebo/get_model_state and /gazebo/get_link_state
-        Calculate distance between them
-
-        In this case
-    
-        Object:     unite_box_0 link
-        Gripper:    vacuum_gripper_link ground_plane
-        """
-
-        try:
-            model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
-            linkNameTarget = "target"
-            ReferenceFrame = "ground_plane"
-            object_resp_coordinates = model_coordinates(linkNameTarget, ReferenceFrame)
-            Object = np.array((object_resp_coordinates.link_state.pose.position.x, object_resp_coordinates.link_state.pose.position.y,
-                               object_resp_coordinates.link_state.pose.position.z))
-
-        except rospy.ServiceException as e:
-            rospy.loginfo("Get Model State service call failed:  {0}".format(e))
-            print("Exception get model state")
-
-        try:
-            model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
-            LinkName = "vacuum_gripper_link"
-            ReferenceFrame = "ground_plane"
-            resp_coordinates_gripper = model_coordinates(LinkName, ReferenceFrame)
-            Gripper = np.array((resp_coordinates_gripper.link_state.pose.position.x,
-                                resp_coordinates_gripper.link_state.pose.position.y,
-                                resp_coordinates_gripper.link_state.pose.position.z))
-
-        except rospy.ServiceException as e:
-            rospy.loginfo("Get Link State service call failed:  {0}".format(e))
-            print("Exception get Gripper position")
-        distance = np.linalg.norm(Object - Gripper)
-
-        return distance, Object
-
-    def turn_on_gripper(self):
-        """
-        turn on the Gripper by calling the service 
-        """
-        try:
-            turn_on_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
-            enable = True
-            turn_on_gripper_service(enable)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Turn on Gripper service call failed:  {0}".format(e))
-
-    def turn_off_gripper(self):
-        """
-        sturn off the Gripper by calling the service 
-        """
-        try:
-            turn_off_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
-            enable = False
-            turn_off_gripper_service(enable)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Turn off Gripper service call failed:  {0}".format(e))
-
     def get_action_to_position(self, action, last_position):
         """
         takes the last position and adds the increments for each joint
@@ -628,8 +575,8 @@ class PickbotEnv(gym.Env):
                                     "object_pos_x",
                                     "object_pos_y",
                                     "object_pos_z",
-                                    "object_type"] -- if use_object_type set to True
-
+                                    "object_type", -- if use_object_type set to True
+                                    "min_distance_gripper_to_object"]
 
         :return: observation
         """
@@ -688,17 +635,12 @@ class PickbotEnv(gym.Env):
                 observation.append(object_pos_z)
             elif obs_name == "object_type":
                 observation.append(self.object_type)
+            elif obs_name == "min_distance_gripper_to_object":
+                observation.append(self.min_distace)
             else:
                 raise NameError('Observation Asked does not exist==' + str(obs_name))
 
         return observation
-
-    def get_state(self, observation):
-        """
-        convert observation list intp a numpy array 
-        """
-        x = np.asarray(observation)
-        return x
 
     def get_contact_force_1(self):
         """
@@ -802,7 +744,7 @@ class PickbotEnv(gym.Env):
 
         done = False
         done_reward = 0
-        reward_reached_goal = 5000
+        reward_reached_goal = 20000
         reward_crashing = -200
         reward_no_motion_plan = -50
         reward_joint_range = -150
@@ -820,14 +762,20 @@ class PickbotEnv(gym.Env):
             done_reward = reward_no_motion_plan
 
         # Successfully reached goal: Contact with at least one contact sensor and there is no invalid contact
-        if observations[7] != 0 or observations[8] != 0 and not invalid_collision:
+        if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
             done = True
-            print('!!!!!!!!!!!! get one contact !!!!!!!!!!!!!!!!!!')
+            print('>>>>>>>>>>>>> get two contacts <<<<<<<<<<<<<<<<<<')
             done_reward = reward_reached_goal
             # save state in csv file
             U.append_to_csv(self.csv_success_exp, observations)
-            self.successful_attempts += 1
-            print("Successful contact so far: {} attempts".format(self.successful_attempts))
+            self.success_2_contacts += 1
+            print("Successful 2 contacts so far: {} attempts".format(self.success_2_contacts))
+
+        if observations[7] != 0 or observations[8] != 0 and not invalid_collision:
+            done = True
+            print('>>>>>>>>>>>>> get one contacts <<<<<<<<<<<<<<<<<<')
+            self.success_1_contacts += 1
+            print("Successful 1 contact so far: {} attempts".format(self.success_1_contacts))
 
         # Check if the box has been moved compared to the last observation
         target_pos = U.get_target_position()
