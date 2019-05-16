@@ -840,7 +840,7 @@ class PickbotEnv(gym.Env):
 
         done = False
         done_reward = 0
-        reward_reached_goal = 500
+        reward_reached_goal = 20000
         reward_crashing = -200
         reward_join_range = -150
 
@@ -853,8 +853,13 @@ class PickbotEnv(gym.Env):
             done_reward = reward_reached_goal
             # save state in csv file
             U.append_to_csv(self.csv_success_exp, observations)
-            self.successful_attempts += 1
-            print("Successful contact so far: {} attempts".format(self.successful_attempts))
+            self.success_2_contact += 1
+            print("Successful 2 contacts so far: {} attempts".format(self.success_2_contact))
+
+        if observations[7] != 0 or observations[8] != 0 and not invalid_collision:
+            done = True
+            self.success_1_contact += 1
+            print("Successful 1 contacts so far: {} attempts".format(self.success_1_contact))
 
         # Crashing with itself, shelf, base
         if invalid_collision:
