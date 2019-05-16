@@ -20,7 +20,8 @@ timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
 
 
 num_env = 1
-env_id = "PickbotReachContinuous-v1"
+# env_id = "PickbotReachContinuous-v1"
+env_id = "PickbotReachContinuousDoorHandle-v1"
 env_type = "classic_control"
 seed = None
 task_name = "reach"
@@ -51,29 +52,6 @@ def main():
                        reward_scale=1.0,
                        flatten_dict_observations=True,
                        gamestate=None)
-
-
-    ############################################################
-    ##                Experiments with MoveIt                 ##
-    ############################################################
-    # a = [1.5,-1.2,1.4,-1.87,-1.57,0]
-    # b = [0.1, 0.5, 0.1, 0.0, 0.0, 0.0]
-    #
-    # jointPub = JointArrayPub()
-    # jointPub.pub_joints_to_moveit(b)
-    #
-    # print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
-    # rospy.wait_for_message("/pickbot/movement_complete", String)
-    # print(">>>>>>>>>>>>>>>>>>> Waiting complete")
-
-    # jointPub.pub_joints_to_moveit(b)
-    #
-    # print(">>>>>>>>>>>>>>>>>>> I am waiting for a ros message")
-    # rospy.wait_for_message("/pickbot/movement_complete", String)
-    # print(">>>>>>>>>>>>>>>>>>> Waiting complete")
-    ############################################################
-    #                     End of experiment                    #
-    ############################################################
 
     act = trpo_mpi.learn(
         env=env,
