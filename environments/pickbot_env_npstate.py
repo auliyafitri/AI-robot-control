@@ -366,7 +366,7 @@ class PickbotEnv(gym.Env):
 
         # 8) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
         # reward = self.compute_reward(observation, done_reward, invalid_contact)
-        reward = UMath.compute_reward(observation, done_reward, invalid_contact, self.max_distance)
+        reward = UMath.compute_reward(observation, done_reward, invalid_contact)
         self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step

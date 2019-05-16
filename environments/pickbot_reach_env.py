@@ -387,7 +387,7 @@ class PickbotEnv(gym.Env):
         #     done = True
 
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
-        reward = UMath.compute_reward(new_observation, done_reward, invalid_contact, self.max_distance)
+        reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
         self.accumulated_episode_reward += reward
 
         self.episode_steps += 1
