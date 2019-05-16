@@ -309,7 +309,7 @@ class PickbotEnv(gym.Env):
         self.max_distance, _ = U.get_distance_gripper_to_object()
         self.min_distance = self.max_distance
         self.gazebo.pauseSim()
-        state = self.get_state(observation)
+        state = U.get_state(observation)
         self._update_episode()
         self.gazebo.unpauseSim()
         return state
@@ -357,7 +357,7 @@ class PickbotEnv(gym.Env):
         self.gazebo.pauseSim()
 
         # 6) Convert Observations into state
-        state = self.get_state(observation)
+        state = U.get_state(observation)
 
         # 7) Unpause Simulation check if its done, calculate done_reward
         self.gazebo.unpauseSim()
@@ -517,62 +517,6 @@ class PickbotEnv(gym.Env):
         except rospy.ServiceException as e:
             rospy.loginfo("Set Model State service call failed:  {0}".format(e))
 
-    def spawn_object(self, object_name, model_position, model_sdf=None):
-        """
-        spawn object using gazebo service
-        :param object_name: name of the object
-        :param model_position: position of the spawned object
-        :param model_sdf: description of the object in sdf format
-        :return: -
-        """
-        if model_sdf is None:  # take sdf file from default folder
-            # get model from sdf file
-            rospack = rospkg.RosPack()
-            sdf_fname = rospack.get_path('simulation') + "/meshes/environments/sdf/" + object_name + ".sdf"
-            with open(sdf_fname, "r") as f:
-                model_sdf = f.read()
-
-        try:
-            spawn_model = rospy.ServiceProxy("gazebo/spawn_sdf_model", SpawnModel)
-            spawn_model(object_name, model_sdf, "/", model_position, "world")
-            print("SPAWN %s finished" % object_name)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
-
-    def delete_object(self, object_name):
-        """
-        delete object using gazebo service
-        :param object_name: the name of the object
-        :return: -
-        """
-        try:
-            delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
-            delete_model(object_name)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Delete Model service call failed:  {0}".format(e))
-
-    def change_object_position(self, object_name, model_position):
-        """
-        change object postion using gazebo service
-        :param object_name: name of the object
-        :param model_position: destination
-        :return: -
-        """
-        try:
-            change_position = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
-            box = ModelState()
-            box.model_name = object_name
-            box.pose.position.x = model_position.position.x
-            box.pose.position.y = model_position.position.y
-            box.pose.position.z = model_position.position.z
-            box.pose.orientation.x = model_position.orientation[1]
-            box.pose.orientation.y = model_position.orientation[2]
-            box.pose.orientation.z = model_position.orientation[3]
-            box.pose.orientation.w = model_position.orientation[0]
-            change_position(box)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Set Model State service call failed:  {0}".format(e))
-
     def populate_objects(self):
         """
         populate objects, called in init
@@ -588,66 +532,6 @@ class PickbotEnv(gym.Env):
                                               y=rand_y[idx],
                                               z=1.05))
                 U.spawn_object(obj, box_pos)
-
-    def get_distance_gripper_to_object(self):
-        """
-        Get the Position of the endeffektor and the object via rosservice call /gazebo/get_model_state and /gazebo/get_link_state
-        Calculate distance between them
-
-        In this case
-
-        Object:     unite_box_0 link
-        Gripper:    vacuum_gripper_link ground_plane
-        """
-        try:
-            model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-            blockName = self.object_name
-            relative_entity_name = "link"
-            object_resp_coordinates = model_coordinates(blockName, relative_entity_name)
-            Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
-                               object_resp_coordinates.pose.position.z))
-
-        except rospy.ServiceException as e:
-            rospy.loginfo("Get Model State service call failed:  {0}".format(e))
-            print("Exception get model state")
-
-        try:
-            model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
-            LinkName = "vacuum_gripper_link"
-            ReferenceFrame = "ground_plane"
-            resp_coordinates_gripper = model_coordinates(LinkName, ReferenceFrame)
-            Gripper = np.array((resp_coordinates_gripper.link_state.pose.position.x,
-                                resp_coordinates_gripper.link_state.pose.position.y,
-                                resp_coordinates_gripper.link_state.pose.position.z))
-
-        except rospy.ServiceException as e:
-            rospy.loginfo("Get Link State service call failed:  {0}".format(e))
-            print("Exception get Gripper position")
-        distance = np.linalg.norm(Object - Gripper)
-
-        return distance, Object
-
-    def turn_on_gripper(self):
-        """
-        turn on the Gripper by calling the service
-        """
-        try:
-            turn_on_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
-            enable = True
-            turn_on_gripper_service(enable)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Turn on Gripper service call failed:  {0}".format(e))
-
-    def turn_off_gripper(self):
-        """
-        sturn off the Gripper by calling the service
-        """
-        try:
-            turn_off_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
-            enable = False
-            turn_off_gripper_service(enable)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Turn off Gripper service call failed:  {0}".format(e))
 
     def get_action_to_position(self, action, last_position):
         """
@@ -842,13 +726,6 @@ class PickbotEnv(gym.Env):
 
         return observation
 
-    def get_state(self, observation):
-        """
-        convert observation list intp a numpy array
-        """
-        x = np.asarray(observation)
-        return x
-
     def get_contact_force_1(self):
         """
         Get Contact Force of contact sensor 1
@@ -1006,40 +883,6 @@ class PickbotEnv(gym.Env):
             print('>>>>>> reset, joint 6 exceeds limit')
 
         return done, done_reward, invalid_collision
-
-    def compute_reward(self, observation, done_reward, invalid_contact):
-        """
-        Calculates the reward in each Step
-        Reward for:
-        Distance:       Reward for Distance to the Object
-        Contact:        Reward for Contact with one contact sensor and invalid_contact must be false. As soon as both contact sensors have contact and there is no invallid contact the goal is considert to be reached and the episode is over. Reward is then set in is_done
-
-        Calculates the Reward for the Terminal State
-        Done Reward:    Reward when episode is Done. Negative Reward for Crashing and going into set Joint Limits. High Positiv Reward for having contact with both contact sensors and not having an invalid collision
-        """
-        reward_distance = 0
-        reward_contact = 0
-
-        # Reward for Distance to encourage approaching the box
-        distance = observation[0]
-        reward_distance = 1 - math.pow(distance / self.max_distance, 0.4)
-
-        # Reward distance will be 1.4 at distance 0.01 and 0.18 at distance 0.55. In between logarithmic curve
-        # reward_distance = math.log10(distance) * (-1) * 0.7
-
-        # Reward for Contact
-        contact_1 = observation[7]
-        contact_2 = observation[8]
-
-        if contact_1 == 0 and contact_2 == 0:
-            reward_contact = 0
-        elif contact_1 != 0 and contact_2 == 0 and invalid_contact == False or contact_1 == 0 and contact_2 != 0 and invalid_contact == False:
-            reward_contact = 5
-            reward_distance = 0
-
-        total_reward = reward_distance + reward_contact + done_reward
-
-        return total_reward
 
     def _update_episode(self):
         """
