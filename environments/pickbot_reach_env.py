@@ -47,7 +47,7 @@ from simulation.srv import VacuumGripperControl
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment=None, sim_time_factor=0.001, random_object=False, random_position=False,
+    def __init__(self, joint_increment=None, sim_time_factor=0.005, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
@@ -774,8 +774,8 @@ class PickbotEnv(gym.Env):
         if observations[7] != 0 or observations[8] != 0 and not invalid_collision:
             done = True
             print('>>>>>>>>>>>>> get one contacts <<<<<<<<<<<<<<<<<<')
-            self.success_1_contacts += 1
-            print("Successful 1 contact so far: {} attempts".format(self.success_1_contacts))
+            self.success_1_contact += 1
+            print("Successful 1 contact so far: {} attempts".format(self.success_1_contact))
 
         # Check if the box has been moved compared to the last observation
         target_pos = U.get_target_position()
