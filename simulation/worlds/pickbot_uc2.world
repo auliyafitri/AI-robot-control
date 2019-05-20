@@ -229,7 +229,7 @@
           <pose frame=''>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <uri>/home/robotics/catkin_ws/src/AI-robot-control/simulation/meshes/environments/collision/combox_container.stl</uri>
+              <uri>/home/robotics/catkin_ws/src/AI-robot-control/simulation/meshes/environments/visual/combox_container.dae</uri>
 <!--              <uri>model://environments/collision/combox_container.stl</uri>-->
               <scale>0.001 0.001 0.001</scale>
             </mesh>
