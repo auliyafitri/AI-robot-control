@@ -154,3 +154,15 @@ register(
     },
     max_episode_steps=300,
 )
+
+# Pick
+register(
+    id='PickbotPickDiscreteDoorHandle-v1',
+    entry_point='environments.pickbot_lift_npstate:PickbotEnv',
+    kwargs={
+        'env_object_type': 'door_handle',
+        'sim_time_factor': 0.001,
+        'joint_increment_value': 0.1
+    },
+    max_episode_steps=300,
+)
