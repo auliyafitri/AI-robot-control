@@ -134,7 +134,7 @@ def get_target_position():
     return Object
 
 
-def get_distance_gripper_to_object():
+def get_distance_gripper_to_object(height=None):
     """
     Get the Position of the endeffektor and the object via rosservice /gazebo/get_link_state
     Calculate distance between them
@@ -150,8 +150,9 @@ def get_distance_gripper_to_object():
         linkNameTarget = "target"
         ReferenceFrame = "ground_plane"
         object_resp_coordinates = model_coordinates(linkNameTarget, ReferenceFrame)
-        Object = np.array((object_resp_coordinates.link_state.pose.position.x, object_resp_coordinates.link_state.pose.position.y,
-                            object_resp_coordinates.link_state.pose.position.z))
+        Object = np.array((object_resp_coordinates.link_state.pose.position.x, 
+                            object_resp_coordinates.link_state.pose.position.y,
+                            object_resp_coordinates.link_state.pose.position.z if height is None else object_resp_coordinates.link_state.pose.position.z + height/2))
 
     except rospy.ServiceException as e:
         rospy.loginfo("Get Link State service call failed:  {0}".format(e))
