@@ -30,7 +30,7 @@ def compute_reward(observation, done_reward, invalid_contact):
         reward_contact = 0
     elif contact_1 != 0 and contact_2 == 0 and not invalid_contact or contact_1 == 0 and contact_2 != 0 and \
             not invalid_contact:
-        reward_contact = 2000
+        reward_contact = 20
         reward_distance = 0
 
     total_reward = reward_distance + reward_contact + done_reward
