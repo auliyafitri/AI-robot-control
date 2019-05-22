@@ -228,7 +228,7 @@ class PickbotEnv(gym.Env):
         self.csv_name = logger.get_dir() + '/result_log'
         print("CSV NAME")
         print(self.csv_name)
-        self.csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
+        self.csv_success_exp = logger.get_dir() + "/success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
         self.success_2_contact = 0
         self.success_1_contact = 0
 
