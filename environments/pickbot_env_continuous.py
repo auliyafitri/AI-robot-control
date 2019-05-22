@@ -368,6 +368,14 @@ class PickbotEnv(gym.Env):
         else:
             next_action_position = self.get_action_to_position(np.clip(action, -self._joint_increment, self._joint_increment),
                                                            last_position)
+        act_rearrange = np.zeros(6)
+        act_rearrange[0] = next_action_position[2]
+        act_rearrange[1] = next_action_position[1]
+        act_rearrange[2] = next_action_position[0]
+        act_rearrange[3] = next_action_position[3]
+        act_rearrange[4] = next_action_position[4]
+        act_rearrange[5] = next_action_position[5]
+
         # 3) write last_position into YAML File
         with open('last_position.yml', 'w') as yaml_file:
             yaml.dump(next_action_position, yaml_file, default_flow_style=False)
@@ -375,7 +383,19 @@ class PickbotEnv(gym.Env):
         # 4) unpause, move to position for certain time
         self.gazebo.unpauseSim()
         self.pickbot_joint_pubisher_object.move_joints(next_action_position)
+
+        # Busy waiting until all the joints reach the next_action_position (first the third joints are reversed)
+        start_ros_time = rospy.Time.now()
+        while True:
+            elapsed_time = rospy.Time.now() - start_ros_time
+            if np.isclose(act_rearrange, self.joints_state.position, rtol=0.0, atol=0.01).all():
+                break
+            elif elapsed_time > rospy.Duration(4):
+                break
         time.sleep(self.running_step)
+        print("################################")
+        print(np.around(act_rearrange, decimals=3))
+        print(np.around(self.joints_state.position, decimals=3))
 
         """
         #execute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
