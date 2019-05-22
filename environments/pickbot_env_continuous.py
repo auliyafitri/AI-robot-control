@@ -362,20 +362,15 @@ class PickbotEnv(gym.Env):
                 last_position = (yaml.load(stream, Loader=yaml.Loader))
             except yaml.YAMLError as exc:
                 print(exc)
+
+        old_observation = self.get_obs()
+        last_position = old_observation[1:7]
         # 2) get the new joint positions according to chosen action
         if self._joint_increment is None:
             next_action_position = action
         else:
             next_action_position = self.get_action_to_position(np.clip(action, -self._joint_increment, self._joint_increment),
                                                            last_position)
-        act_rearrange = np.zeros(6)
-        act_rearrange[0] = next_action_position[2]
-        act_rearrange[1] = next_action_position[1]
-        act_rearrange[2] = next_action_position[0]
-        act_rearrange[3] = next_action_position[3]
-        act_rearrange[4] = next_action_position[4]
-        act_rearrange[5] = next_action_position[5]
-
         # 3) write last_position into YAML File
         with open('last_position.yml', 'w') as yaml_file:
             yaml.dump(next_action_position, yaml_file, default_flow_style=False)
@@ -388,13 +383,13 @@ class PickbotEnv(gym.Env):
         start_ros_time = rospy.Time.now()
         while True:
             elapsed_time = rospy.Time.now() - start_ros_time
-            if np.isclose(act_rearrange, self.joints_state.position, rtol=0.0, atol=0.01).all():
+            if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
                 break
             elif elapsed_time > rospy.Duration(4):
                 break
         time.sleep(self.running_step)
         print("################################")
-        print(np.around(act_rearrange, decimals=3))
+        print(np.around(next_action_position, decimals=3))
         print(np.around(self.joints_state.position, decimals=3))
 
         """
