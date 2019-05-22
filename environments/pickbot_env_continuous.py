@@ -385,9 +385,9 @@ class PickbotEnv(gym.Env):
             elapsed_time = rospy.Time.now() - start_ros_time
             if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
                 break
-            elif elapsed_time > rospy.Duration(4):
+            elif elapsed_time > rospy.Duration(2):
                 break
-        time.sleep(self.running_step)
+        # time.sleep(self.running_step)
         print("################################")
         print(np.around(next_action_position, decimals=3))
         print(np.around(self.joints_state.position, decimals=3))
