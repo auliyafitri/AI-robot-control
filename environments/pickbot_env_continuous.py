@@ -386,8 +386,9 @@ class PickbotEnv(gym.Env):
             invalid_collision = self.get_collisions()
             if invalid_collision:
                 print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
-                self.reset()
-                break
+                observation = self.get_obs()
+                reward = UMath.compute_reward(observation, -200, True)
+                return U.get_state(observation), reward, True, {}
 
             elapsed_time = rospy.Time.now() - start_ros_time
             if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
