@@ -382,15 +382,19 @@ class PickbotEnv(gym.Env):
         # Busy waiting until all the joints reach the next_action_position (first the third joints are reversed)
         start_ros_time = rospy.Time.now()
         while True:
+            # Check collision:
+            invalid_collision = self.get_collisions()
+            if invalid_collision:
+                print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
+                self.reset()
+                break
+
             elapsed_time = rospy.Time.now() - start_ros_time
             if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
                 break
-            elif elapsed_time > rospy.Duration(2):
+            elif elapsed_time > rospy.Duration(2): # time out
                 break
         # time.sleep(self.running_step)
-        print("################################")
-        print(np.around(next_action_position, decimals=3))
-        print(np.around(self.joints_state.position, decimals=3))
 
         """
         #execute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
