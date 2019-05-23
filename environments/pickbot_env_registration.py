@@ -106,6 +106,8 @@ register(
         'random_object': False,
         'random_position': True,
         'env_object_type': 'door_handle',
+        'joint_increment': None,
+        'sim_time_factor': 0.001,
     },
     max_episode_steps=300,
 )

@@ -19,8 +19,9 @@ def compute_reward(observation, done_reward, invalid_contact):
     # Reward for Distance to encourage approaching the box
     distance = observation[0]
     # reward_distance = 1 - math.pow(distance / max_distance, 0.4)
-    relative_distance = observation[-1] - distance
-    reward_distance = relative_distance * 20 if relative_distance < 0 else relative_distance * 10
+    reward_distance = -distance
+    # relative_distance = observation[-1] - distance
+    # reward_distance = relative_distance * 20 if relative_distance < 0 else relative_distance * 10
 
     # Reward for Contact
     contact_1 = observation[7]
@@ -35,7 +36,7 @@ def compute_reward(observation, done_reward, invalid_contact):
 
     total_reward = reward_distance + reward_contact + done_reward
 
-    # print("reward_distance: {}".format(reward_distance))
+    print("reward_distance: {}".format(reward_distance))
 
     return total_reward
 
