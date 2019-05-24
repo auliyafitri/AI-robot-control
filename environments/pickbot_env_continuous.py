@@ -347,8 +347,13 @@ class PickbotEnv(gym.Env):
         ######  TEST
         init_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
         self.pickbot_joint_pubisher_object.move_joints(init_position)
+
+        start_ros_time = rospy.Time.now()
         while True:
+            elapsed_time = rospy.Time.now() - start_ros_time
             if np.isclose(init_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
+                break
+            elif elapsed_time > rospy.Duration(2): # time out
                 break
         ###### TEST
 
