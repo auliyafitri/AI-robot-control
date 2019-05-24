@@ -53,7 +53,7 @@ reg = register(
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment=0.05, sim_time_factor=0.001, running_step=0.001, random_object=False, random_position=False,
+    def __init__(self, joint_increment=None, sim_time_factor=0.001, running_step=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
@@ -306,16 +306,51 @@ class PickbotEnv(gym.Env):
         17) Return State 
         """
 
+        ###### TEST
+        obs = self.get_obs()
+        print("Before RESET Joint: {}".format(np.around(obs[1:7], decimals=3)))
+        ###### TEST
+
         self.gazebo.change_gravity(0, 0, 0)
         self.controllers_object.turn_off_controllers()
         self.gazebo.pauseSim()
         self.gazebo.resetSim()
-        self.pickbot_joint_pubisher_object.set_joints()
+
+        ##### TEST
+        idx = 0
+        sys_exit = False
+        correction_ids = []
+        reset_target_pos = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        current_joint_pos = obs[1:7]
+
+        for joint_pos in obs[1:7]:
+            if np.abs(joint_pos - math.pi) < 0.1:
+                sys_exit = True
+                correction_ids.append(idx)
+            idx += 1
+
+        if sys_exit:
+            for i in correction_ids:
+                print("i:{}".format(i))
+                reset_target_pos[i] = 2.0 if current_joint_pos[i] > 0 else -2.0
+
+        self.pickbot_joint_pubisher_object.set_joints(reset_target_pos)
+        self.pickbot_joint_pubisher_object.set_joints([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        #### TEST
+        # self.pickbot_joint_pubisher_object.set_joints()
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         self.gazebo.unpauseSim()
         self.controllers_object.turn_on_controllers()
         self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
+
+        ######  TEST
+        init_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
+        self.pickbot_joint_pubisher_object.move_joints(init_position)
+        while True:
+            if np.isclose(init_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
+                break
+        ###### TEST
 
         last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
         with open('last_position.yml', 'w') as yaml_file:
@@ -327,6 +362,13 @@ class PickbotEnv(gym.Env):
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
+        print("After  RESET Joint: {}".format(np.around(observation[1:7], decimals=3)))
+        if sys_exit:
+            print("##################################################")
+            print("############# Joint near Pi ######################")
+            print("Reset_target_pos:   {}".format(reset_target_pos))
+            print("##################################################")
+
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
         self.min_distance = self.max_distance
@@ -388,6 +430,8 @@ class PickbotEnv(gym.Env):
                 print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
                 observation = self.get_obs()
                 reward = UMath.compute_reward(observation, -200, True)
+                observation = self.get_obs()
+                print("Test Joint: {}".format(np.around(observation[1:7], decimals=3)))
                 return U.get_state(observation), reward, True, {}
 
             elapsed_time = rospy.Time.now() - start_ros_time
@@ -592,7 +636,7 @@ class PickbotEnv(gym.Env):
         """
         action_position = np.asarray(last_position) + action
         # clip action that is going to be published to -2.9 and 2.9 just to make sure to avoid loosing controll of controllers
-        x = np.clip(action_position, -2.9, 2.9)
+        x = np.clip(action_position, -math.pi, math.pi)
 
         return x.tolist()
 
@@ -647,7 +691,7 @@ class PickbotEnv(gym.Env):
         for joint in joint_states.position:
             if joint > math.pi or joint < -math.pi:
                 print(joint_states.name)
-                print(joint_states.position)
+                print(np.around(joint_states.position, decimals=3))
                 sys.exit("Joint exceeds limit")
 
         # Get Contact Forces out of get_contact_force Functions to be able to take an average over some iterations otherwise chances are high that not both sensors are showing contact the same time
