@@ -242,6 +242,8 @@ class PickbotEnv(gym.Env):
         print("object list {}".format(self.object_list))
         self.object_initial_position = Pose(position=Point(x=-0.13, y=0.848, z=1.06),  # x=0.0, y=0.9, z=1.05
                                             orientation=quaternion_from_euler(0.002567, 0.102, 1.563))
+        self.pickbot_initial_position = Pose(position=Point(x=0.0, y=0.0, z=1.12),
+                                             orientation=quaternion_from_euler(0.0, 0.0, 0.0))
 
         if self._populate_object:
             # populate objects from object list
@@ -309,53 +311,54 @@ class PickbotEnv(gym.Env):
         ###### TEST
         obs = self.get_obs()
         print("Before RESET Joint: {}".format(np.around(obs[1:7], decimals=3)))
-        ###### TEST
+        ###### END of TEST
 
         self.gazebo.change_gravity(0, 0, 0)
         self.controllers_object.turn_off_controllers()
         self.gazebo.pauseSim()
         self.gazebo.resetSim()
 
-        ##### TEST
-        idx = 0
-        sys_exit = False
-        correction_ids = []
-        reset_target_pos = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        current_joint_pos = obs[1:7]
+        ##### TEST #########
+        # idx = 0
+        # sys_exit = False
+        # correction_ids = []
+        # reset_target_pos = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        # current_joint_pos = obs[1:7]
+        #
+        # for joint_pos in obs[1:7]:
+        #     if np.abs(joint_pos - math.pi) < 0.1:
+        #         sys_exit = True
+        #         correction_ids.append(idx)
+        #     idx += 1
+        #
+        # if sys_exit:
+        #     for i in correction_ids:
+        #         print("i:{}".format(i))
+        #         reset_target_pos[i] = 2.0 if current_joint_pos[i] > 0 else -2.0
+        #
+        # self.pickbot_joint_pubisher_object.set_joints(reset_target_pos)
+        # self.pickbot_joint_pubisher_object.set_joints([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        ####  END of TEST #####
 
-        for joint_pos in obs[1:7]:
-            if np.abs(joint_pos - math.pi) < 0.1:
-                sys_exit = True
-                correction_ids.append(idx)
-            idx += 1
-
-        if sys_exit:
-            for i in correction_ids:
-                print("i:{}".format(i))
-                reset_target_pos[i] = 2.0 if current_joint_pos[i] > 0 else -2.0
-
-        self.pickbot_joint_pubisher_object.set_joints(reset_target_pos)
-        self.pickbot_joint_pubisher_object.set_joints([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        #### TEST
-        # self.pickbot_joint_pubisher_object.set_joints()
+        self.pickbot_joint_pubisher_object.set_joints()
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         self.gazebo.unpauseSim()
         self.controllers_object.turn_on_controllers()
         self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
 
-        ######  TEST
-        init_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
-        self.pickbot_joint_pubisher_object.move_joints(init_position)
-
-        start_ros_time = rospy.Time.now()
-        while True:
-            elapsed_time = rospy.Time.now() - start_ros_time
-            if np.isclose(init_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
-                break
-            elif elapsed_time > rospy.Duration(2): # time out
-                break
-        ###### TEST
+        ######  TEST  #########
+        # init_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
+        # self.pickbot_joint_pubisher_object.move_joints(init_position)
+        #
+        # start_ros_time = rospy.Time.now()
+        # while True:
+        #     elapsed_time = rospy.Time.now() - start_ros_time
+        #     if np.isclose(init_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
+        #         break
+        #     elif elapsed_time > rospy.Duration(2):  # time out
+        #         break
+        ###### END of TEST ########
 
         last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
         with open('last_position.yml', 'w') as yaml_file:
@@ -368,11 +371,11 @@ class PickbotEnv(gym.Env):
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
         print("After  RESET Joint: {}".format(np.around(observation[1:7], decimals=3)))
-        if sys_exit:
-            print("##################################################")
-            print("############# Joint near Pi ######################")
-            print("Reset_target_pos:   {}".format(reset_target_pos))
-            print("##################################################")
+        # if sys_exit:
+        #     print("##################################################")
+        #     print("############# Joint near Pi ######################")
+        #     print("Reset_target_pos:   {}".format(reset_target_pos))
+        #     print("##################################################")
 
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
@@ -697,7 +700,13 @@ class PickbotEnv(gym.Env):
             if joint > math.pi or joint < -math.pi:
                 print(joint_states.name)
                 print(np.around(joint_states.position, decimals=3))
-                sys.exit("Joint exceeds limit")
+
+                U.delete_object("pickbot")
+                U.spawn_urdf_object("pickbot", self.pickbot_initial_position)
+                print("###############################")
+                print("#####  Pickbot respawned  #####")
+                print("###############################")
+                # sys.exit("Joint exceeds limit")
 
         # Get Contact Forces out of get_contact_force Functions to be able to take an average over some iterations otherwise chances are high that not both sensors are showing contact the same time
         contact_1_force = self.get_contact_force_1()
