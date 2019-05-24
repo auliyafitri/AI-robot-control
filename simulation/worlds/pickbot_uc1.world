@@ -128,6 +128,7 @@
           <surface>
             <contact>
               <ode/>
+              <collide_without_contact>1</collide_without_contact>
             </contact>
             <bounce/>
             <friction>
@@ -182,6 +183,7 @@
           <surface>
             <contact>
               <ode/>
+              <collide_without_contact>1</collide_without_contact>
             </contact>
             <bounce/>
             <friction>
