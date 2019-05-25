@@ -36,7 +36,6 @@ from gazebo_msgs.srv import GetLinkState
 from geometry_msgs.msg import Point, Quaternion, Vector3
 from gazebo_msgs.msg import ModelState
 from geometry_msgs.msg import Pose
-from geometry_msgs.msg import Point
 from openai_ros.msg import RLExperimentInfo
 
 from simulation.msg import VacuumGripperState
@@ -243,7 +242,7 @@ class PickbotEnv(gym.Env):
         self.object_initial_position = Pose(position=Point(x=-0.13, y=0.848, z=1.06),  # x=0.0, y=0.9, z=1.05
                                             orientation=quaternion_from_euler(0.002567, 0.102, 1.563))
         self.pickbot_initial_position = Pose(position=Point(x=0.0, y=0.0, z=1.12),
-                                             orientation=quaternion_from_euler(0.0, 0.0, 0.0))
+                                             orientation=Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))
 
         if self._populate_object:
             # populate objects from object list
@@ -701,8 +700,14 @@ class PickbotEnv(gym.Env):
                 print(joint_states.name)
                 print(np.around(joint_states.position, decimals=3))
 
+                self.controllers_object.turn_off_controllers()
+                self.gazebo.pauseSim()
+                self.gazebo.resetSim()
                 U.delete_object("pickbot")
                 U.spawn_urdf_object("pickbot", self.pickbot_initial_position)
+                self.gazebo.unpauseSim()
+                self.controllers_object.turn_off_controllers()
+
                 print("###############################")
                 print("#####  Pickbot respawned  #####")
                 print("###############################")
@@ -752,7 +757,7 @@ class PickbotEnv(gym.Env):
     def get_contact_force_1(self):
         """
         Get Contact Force of contact sensor 1
-        Takes average over 2 contacts so the chances are higher that both sensors say there is contact the same time due to sensor noise 
+        Takes average over 2 contacts so the chances are higher that both sensors say there is contact the same time due to sensor noise
         :returns force value
         """
 
