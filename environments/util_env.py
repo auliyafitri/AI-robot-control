@@ -83,6 +83,29 @@ def spawn_object(object_name, model_position, model_sdf=None):
         rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
 
 
+def spawn_urdf_object(object_name, model_position, model_urdf=None):
+    """
+    spawn object using gazebo service
+    :param object_name: name of the object
+    :param model_position: position of the spawned object
+    :param model_sdf: description of the object in sdf format
+    :return: -
+    """
+    if model_urdf is None:  # take sdf file from default folder
+        # get model from sdf file
+        rospack = rospkg.RosPack()
+        urdf_fname = rospack.get_path('simulation') + "/urdf/" + object_name + ".urdf"
+        with open(urdf_fname, "r") as f:
+            model_urdf = f.read()
+
+    try:
+        spawn_model = rospy.ServiceProxy("/gazebo/spawn_urdf_model", SpawnModel)
+        spawn_model(object_name, model_urdf, "/", model_position, "world")
+        print("SPAWN %s finished" % object_name)
+    except rospy.ServiceException as e:
+        rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
+
+
 def delete_object(object_name):
     """
     delete object using gazebo service
