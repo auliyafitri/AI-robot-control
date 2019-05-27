@@ -301,6 +301,7 @@ class PickbotEnv(gym.Env):
         8) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
         9) Return State
         """
+        print("Joint (reset): {}".format(np.around(self.joints_state.position, decimals=3)))
 
         self.publisher_to_moveit_object.set_joints()
 
@@ -309,6 +310,26 @@ class PickbotEnv(gym.Env):
         while not self.movement_complete.data:
             pass
         # print(">>>>>>>>>>>>>>>>>>> RESET: Waiting complete")
+
+        start_ros_time = rospy.Time.now()
+        while True:
+            # Check collision:
+            # invalid_collision = self.get_collisions()
+            # if invalid_collision:
+            #     print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
+            #     observation = self.get_obs()
+            #     reward = UMath.compute_reward(observation, -200, True)
+            #     observation = self.get_obs()
+            #     print("Test Joint: {}".format(np.around(observation[1:7], decimals=3)))
+            #     return U.get_state(observation), reward, True, {}
+
+            elapsed_time = rospy.Time.now() - start_ros_time
+            if np.isclose([1.5, -1.2, 1.4, -1.87, -1.57, 0], self.joints_state.position, rtol=0.0, atol=0.01).all():
+                break
+            elif elapsed_time > rospy.Duration(2): # time out
+                break
+
+
 
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         self._check_all_systems_ready()
@@ -322,6 +343,8 @@ class PickbotEnv(gym.Env):
         observation = self.get_obs()
         self.object_position = observation[9:12]
 
+        print("Joint (after): {}".format(np.around(observation[1:7], decimals=3)))
+
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
         self.min_distace = self.max_distance
@@ -334,12 +357,12 @@ class PickbotEnv(gym.Env):
         Given the action selected by the learning algorithm,
         we perform the corresponding movement of the robot
         return: the state of the robot, the corresponding reward for the step and if its done(terminal State)
-        
+
         1) Read last joint positions by getting the observation before acting
         2) Get the new joint positions according to chosen action (actions here are the joint increments)
         3) Publish the joint_positions to MoveIt, meanwhile busy waiting, until the movement is complete
         4) Get new observation after performing the action
-        5) Convert Observations into State
+        5) Convert Observations into States
         6) Check if the task is done or crashing happens, calculate done_reward and pause Simulation again
         7) Calculate reward based on Observatin and done_reward
         8) Return State, Reward, Done
@@ -365,6 +388,25 @@ class PickbotEnv(gym.Env):
         while not self.movement_complete.data:
             pass
 
+        start_ros_time = rospy.Time.now()
+        while True:
+            # Check collision:
+            # invalid_collision = self.get_collisions()
+            # if invalid_collision:
+            #     print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
+            #     observation = self.get_obs()
+            #     reward = UMath.compute_reward(observation, -200, True)
+            #     observation = self.get_obs()
+            #     print("Test Joint: {}".format(np.around(observation[1:7], decimals=3)))
+            #     return U.get_state(observation), reward, True, {}
+
+            elapsed_time = rospy.Time.now() - start_ros_time
+            if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
+                break
+            elif elapsed_time > rospy.Duration(2): # time out
+                break
+        # time.sleep(s
+
         """
         #execute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
         time1=time.time()
@@ -388,6 +430,13 @@ class PickbotEnv(gym.Env):
 
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
+
+        ### TEST ###
+        if done:
+            joint_pos = self.joints_state.position
+            print("Joint (step): {}".format(np.around(joint_pos, decimals=3)))
+        ### END of TEST ###
+
         self.accumulated_episode_reward += reward
 
         self.episode_steps += 1
@@ -599,7 +648,7 @@ class PickbotEnv(gym.Env):
         for joint in joint_states.position:
             if joint > 2 * math.pi or joint < -2 * math.pi:
                 print(joint_states.name)
-                print(joint_states.position)
+                print(np.around(joint_states.position, decimals=3))
                 sys.exit("Joint exceeds limit")
 
         # Get Contact Forces out of get_contact_force Functions to be able to take an average over some iterations otherwise chances are high that not both sensors are showing contact the same time
