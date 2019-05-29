@@ -55,6 +55,9 @@ def compute_reward(observation, done_reward, invalid_contact):
     done = 0.02
     a = np.exp(-alpha*x) - np.exp(-alpha) + 10 * (np.exp(-alpha*x / done) - np.exp(-alpha))
     b = 1 - np.exp(-alpha)
-    total_reward = a/b - 1
+    reward_distance = a/b - 1
+    print("reward_distance: {}".format(reward_distance))
+
+    total_reward = reward_distance + done_reward
 
     return total_reward
