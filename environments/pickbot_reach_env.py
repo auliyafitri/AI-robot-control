@@ -302,8 +302,8 @@ class PickbotEnv(gym.Env):
         9) Return State
         """
         # print("Joint (reset): {}".format(np.around(self.joints_state.position, decimals=3)))
-
-        self.publisher_to_moveit_object.set_joints()
+        init_joint_pos = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
+        self.publisher_to_moveit_object.set_joints(init_joint_pos)
 
         # print(">>>>>>>>>>>>>>>>>>> RESET: waiting for the movement to complete")
         # rospy.wait_for_message("/pickbot/movement_complete", Bool)
@@ -324,12 +324,10 @@ class PickbotEnv(gym.Env):
             #     return U.get_state(observation), reward, True, {}
 
             elapsed_time = rospy.Time.now() - start_ros_time
-            if np.isclose([1.5, -1.2, 1.4, -1.87, -1.57, 0], self.joints_state.position, rtol=0.0, atol=0.01).all():
+            if np.isclose(init_joint_pos, self.joints_state.position, rtol=0.0, atol=0.01).all():
                 break
             elif elapsed_time > rospy.Duration(2): # time out
                 break
-
-
 
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         self._check_all_systems_ready()
@@ -367,11 +365,10 @@ class PickbotEnv(gym.Env):
         7) Calculate reward based on Observatin and done_reward
         8) Return State, Reward, Done
         """
-        print("############################")
-        print("action: {}".format(action))
+        # print("############################")
+        # print("action: {}".format(action))
 
         self.movement_complete.data = False
-        # print("action: {}".format(action))
 
         # 1) Read last joint positions by getting the observation before acting
         old_observation = self.get_obs()
@@ -417,7 +414,7 @@ class PickbotEnv(gym.Env):
         new_observation = self.get_obs()
         if new_observation[0] < self.min_distace:
             self.min_distace = new_observation[0]
-        print("observ: {}".format( np.around(new_observation[1:7], decimals=3)))
+        # print("observ: {}".format( np.around(new_observation[1:7], decimals=3)))
 
         # 5) Convert Observations into state
         state = U.get_state(new_observation)
