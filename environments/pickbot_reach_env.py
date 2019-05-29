@@ -301,7 +301,7 @@ class PickbotEnv(gym.Env):
         8) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
         9) Return State
         """
-        print("Joint (reset): {}".format(np.around(self.joints_state.position, decimals=3)))
+        # print("Joint (reset): {}".format(np.around(self.joints_state.position, decimals=3)))
 
         self.publisher_to_moveit_object.set_joints()
 
@@ -343,7 +343,7 @@ class PickbotEnv(gym.Env):
         observation = self.get_obs()
         self.object_position = observation[9:12]
 
-        print("Joint (after): {}".format(np.around(observation[1:7], decimals=3)))
+        # print("Joint (after): {}".format(np.around(observation[1:7], decimals=3)))
 
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
@@ -424,9 +424,6 @@ class PickbotEnv(gym.Env):
 
         # 6) Check if its done, calculate done_reward
         done, done_reward, invalid_contact = self.is_done(new_observation)
-        # if old_observation == new_observation:
-        #     print(">>>>>> The robot didn't move <<<<<<<")
-        #     done = True
 
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
@@ -434,7 +431,7 @@ class PickbotEnv(gym.Env):
         ### TEST ###
         if done:
             joint_pos = self.joints_state.position
-            print("Joint (step): {}".format(np.around(joint_pos, decimals=3)))
+            print("Joint in step (done): {}".format(np.around(joint_pos, decimals=3)))
         ### END of TEST ###
 
         self.accumulated_episode_reward += reward
@@ -790,13 +787,27 @@ class PickbotEnv(gym.Env):
         -Crashing with itself, shelf, base
         -Joints are going into limits set
         """
+        ####################################################################
+        #                        Plan0: init                               #
+        ####################################################################
+        # done = False
+        # done_reward = 0
+        # reward_reached_goal = 2000
+        # reward_crashing = -200
+        # reward_no_motion_plan = -50
+        # reward_joint_range = -150
 
+        ####################################################################################
+        # Plan1: Reach a point in 3D space (usually right above the target object)         #
+        # Reward only dependent on distance. Nu punishment for crashing or joint_limits    #
+        ####################################################################################
         done = False
         done_reward = 0
-        reward_reached_goal = 20000
-        reward_crashing = -200
-        reward_no_motion_plan = -50
-        reward_joint_range = -150
+        reward_reached_goal = 100
+        reward_crashing = 0
+        reward_no_motion_plan = 0
+        reward_joint_range = 0
+
 
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
