@@ -261,5 +261,30 @@ def get_obj_orient():
     return object_orient, gripper_orient
 
 
+def get_link_state(link_name):
+    """
+    Get the Position and quaternion of link with ground plane as reference
+    """
+
+    try:
+        model_geometry = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
+        linkNameTarget = link_name
+        ReferenceFrame = "ground_plane"
+        object_resp_geometry = model_geometry(linkNameTarget, ReferenceFrame)
+        geometry = np.array((object_resp_geometry.link_state.pose.position.x,
+                             object_resp_geometry.link_state.pose.position.y,
+                             object_resp_geometry.link_state.pose.position.z,
+                             object_resp_geometry.link_state.pose.orientation.w,
+                             object_resp_geometry.link_state.pose.orientation.x,
+                             object_resp_geometry.link_state.pose.orientation.y,
+                             object_resp_geometry.link_state.pose.orientation.z))
+
+    except rospy.ServiceException as e:
+        rospy.loginfo("Get Link State service call failed:  {0}".format(e))
+        print("Exception get link state")
+
+    return geometry
+
+
 if __name__ == '__main__':
     print(get_target_object())

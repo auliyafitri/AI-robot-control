@@ -14,7 +14,7 @@ import rospkg
 from gym import spaces
 from gym.utils import seeding
 from gym.envs.registration import register
-from transformations import quaternion_from_euler
+from transformations import quaternion_from_euler, euler_from_quaternion, quaternion_multiply, quaternion_conjugate
 
 # OTHER FILES
 import environments.util_env as U
@@ -49,8 +49,8 @@ from simulation.srv import VacuumGripperControl
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment_value=0.02, sim_time_factor=0.001, running_step=0.001, random_object=False, random_position=False,
-                 use_object_type=False, populate_object=False, env_object_type='free_shapes'):
+    def __init__(self, joint_increment_value=0.02, sim_time_factor=0.001, running_step=0.001, random_object=False,
+                 random_position=False, use_object_type=False, env_object_type='free_shapes', load_init_pos=False):
         """
         initializing all the relevant variables and connections
         :param joint_increment_value: increment of the joints
@@ -58,7 +58,6 @@ class PickbotEnv(gym.Env):
         :param random_object: spawn random object in the simulation
         :param random_position: change object position in each reset
         :param use_object_type: assign IDs to objects and used them in the observation space
-        :param populate_object: to populate object(s) in the simulation using sdf file
         :param env_object_type: object type for environment, free_shapes for boxes while others are related to use_case
             'door_handle', 'combox', ...
         """
@@ -69,7 +68,7 @@ class PickbotEnv(gym.Env):
         self._random_object = random_object
         self._random_position = random_position
         self._use_object_type = use_object_type
-        self._populate_object = populate_object
+        self._load_init_pos = load_init_pos
 
         # Assign MsgTypes
         self.joints_state = JointState()
@@ -82,22 +81,30 @@ class PickbotEnv(gym.Env):
         self.contact_2_force = Vector3()
         self.gripper_state = VacuumGripperState()
 
-        self._list_of_observations = ["distance_gripper_to_object",
-                                      "elbow_joint_state",
+        self._list_of_observations = ["elbow_joint_state",
                                       "shoulder_lift_joint_state",
                                       "shoulder_pan_joint_state",
                                       "wrist_1_joint_state",
                                       "wrist_2_joint_state",
                                       "wrist_3_joint_state",
-                                      "contact_1_force",
-                                      "contact_2_force",
+                                      "vacuum_gripper_pos_x",
+                                      "vacuum_gripper_pos_y",
+                                      "vacuum_gripper_pos_z",
+                                      "vacuum_gripper_ori_w",
+                                      "vacuum_gripper_ori_x",
+                                      "vacuum_gripper_ori_y",
+                                      "vacuum_gripper_ori_z",
                                       "object_pos_x",
                                       "object_pos_y",
                                       "object_pos_z",
-                                      "min_distance_gripper_to_object",
-                                      "orient_diff_gripper_to_object"]
-        if self._use_object_type:
-            self._list_of_observations.append("object_type")
+                                      "object_ori_w",
+                                      "object_ori_x",
+                                      "object_ori_y",
+                                      "object_ori_z",
+                                      ]
+
+        # if self._use_object_type:
+        #     self._list_of_observations.append("object_type")
 
         # Establishes connection with simulator
         """
@@ -115,8 +122,6 @@ class PickbotEnv(gym.Env):
         2) /gripper_contactsensor_1_state
         3) /gripper_contactsensor_2_state
         4) /gz_collisions
-
-        not used so far but available in the environment 
         5) /pickbot/gripper/state
         6) /camera_rgb/image_raw   
         7) /camera_depth/depth/image_raw
@@ -125,7 +130,7 @@ class PickbotEnv(gym.Env):
         rospy.Subscriber("/gripper_contactsensor_1_state", ContactsState, self.contact_1_callback)
         rospy.Subscriber("/gripper_contactsensor_2_state", ContactsState, self.contact_2_callback)
         rospy.Subscriber("/gz_collisions", Bool, self.collision_callback)
-        # rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
+        rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
         # rospy.Subscriber("/camera_rgb/image_raw", Image, self.camera_rgb_callback)
         # rospy.Subscriber("/camera_depth/depth/image_raw", Image, self.camera_depth_callback)
 
@@ -146,43 +151,17 @@ class PickbotEnv(gym.Env):
         """
 
         self.action_space = spaces.Discrete(12)
-        high = np.array([
-            1,
-            math.pi,
-            math.pi,
-            math.pi,
-            math.pi,
-            math.pi,
-            math.pi,
-            np.finfo(np.float32).max,
-            np.finfo(np.float32).max,
-            1,
-            1.4,
-            1.5,
-            999,
-            999])
 
-        low = np.array([
-            0,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            0,
-            0,
-            -1,
-            0,
-            0,
-            0,
-            0])
-
-        if self._use_object_type:
-            high = np.append(high, 9)
-            low = np.append(low, 0)
+        self.obs_dim = 20
+        high = np.inf * np.ones(self.obs_dim)
+        low = -high
 
         self.observation_space = spaces.Box(low, high)
+
+        # if self._use_object_type:
+        #     high = np.append(high, 9)
+        #     low = np.append(low, 0)
+
         self.reward_range = (-np.inf, np.inf)
 
         self._seed()
@@ -199,7 +178,7 @@ class PickbotEnv(gym.Env):
         self.csv_name = logger.get_dir() + '/result_log'
         print("CSV NAME")
         print(self.csv_name)
-        self.csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
+        self.csv_success_exp = logger.get_dir() + '/success_exp' + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + '.csv'
         self.successful_attempts = 0
 
         # object name: name of the target object
@@ -210,12 +189,8 @@ class PickbotEnv(gym.Env):
         self.object_type = 0
         self.object_list = U.get_target_object(env_object_type)
         print("object list {}".format(self.object_list))
-        self.object_initial_position = Pose(position=Point(x=-0.13, y=0.848, z=1.06),  # x=0.0, y=0.9, z=1.05
+        self.object_initial_position = Pose(position=Point(x=-0.13, y=0.848, z=1.06),
                                             orientation=quaternion_from_euler(0.002567, 0.102, 1.563))
-
-        if self._populate_object:
-            # populate objects from object list
-            self.populate_objects()
 
         # select first object, set object name and object type
         # if object is random, spawn random object
@@ -228,8 +203,10 @@ class PickbotEnv(gym.Env):
         self.min_distance = 999
 
         # get samples from reaching task
-        import environments
-        self.init_samples = U.load_samples_from_prev_task(os.path.dirname(environments.__file__) + "/contacts_sample/door_sample/success_exp2019-05-21_11h41min.csv")
+        if self._load_init_pos:
+            import environments
+            self.init_samples = U.load_samples_from_prev_task(os.path.dirname(environments.__file__) +
+                                                              "/contacts_sample/door_sample/success_exp2019-05-21_11h41min.csv")
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized
     def joints_state_callback(self, msg):
@@ -292,12 +269,27 @@ class PickbotEnv(gym.Env):
         # turn on the gripper
         U.turn_on_gripper()
 
-        # load sample from previous training result
-        sample_ep = random.choice(self.init_samples)
-        print("Joints from samples: {}".format(sample_ep[0:6]))
-        # self.pickbot_joint_publisher_object.set_joints()
-        self.pickbot_joint_publisher_object.set_joints(sample_ep[0:6])
-        self.set_target_object(sample_ep[-6:])
+        if self._load_init_pos:
+            # load sample from previous training result
+            sample_ep = random.choice(self.init_samples)
+            print("Joints from samples: {}".format(sample_ep[0:6]))
+            # self.pickbot_joint_publisher_object.set_joints()
+            self.pickbot_joint_publisher_object.set_joints(sample_ep[0:6])
+            self.set_target_object(sample_ep[-6:])
+        else:
+            self.pickbot_joint_publisher_object.set_joints([1.5, -1.2, 1.4, -1.87, -1.57, 1.57])
+            vg_geo = U.get_link_state("vacuum_gripper_link")
+            print(vg_geo[3:])
+
+            to_geo = U.get_link_state("target")
+            print(to_geo[3:])
+
+            orientation_error = quaternion_multiply(vg_geo[3:], quaternion_conjugate(to_geo[3:]))
+            print("Orientation error {}".format(orientation_error))
+            box_pos = U.get_random_door_handle_pos() if self._random_position else self.object_initial_position
+            U.change_object_position(self.object_name, box_pos)
+        # Code above is hard-coded for door handle, modify later.
+        # TO-DO: Modify reset wrt the object type as in the reach env
 
         self.gazebo.unpauseSim()
         self.controllers_object.turn_on_controllers()
@@ -314,7 +306,7 @@ class PickbotEnv(gym.Env):
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
-        print("current joints {}".format(observation[1:7]))
+        print("current joints {}".format(observation[:6]))
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
         self.min_distance = self.max_distance
@@ -360,20 +352,36 @@ class PickbotEnv(gym.Env):
         # 4) unpause, move to position for certain time
         self.gazebo.unpauseSim()
         self.pickbot_joint_publisher_object.move_joints(next_action_position)
-        time.sleep(self.running_step)
-        # while not (np.allclose(next_action_position, self.joints_state.position, rtol=0, atol=1e-02)):
-        #     pass
+        # time.sleep(self.running_step)
+
+        # Busy waiting until all the joints reach the next_action_position (first the third joints are reversed)
+        start_ros_time = rospy.Time.now()
+        while True:
+            # Check collision:
+            invalid_collision = self.get_collisions()
+            if invalid_collision:
+                print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
+                observation = self.get_obs()
+                reward = -200
+                self.accumulated_episode_reward += reward
+                return U.get_state(observation), reward, True, {}
+
+            elapsed_time = rospy.Time.now() - start_ros_time
+            if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
+                break
+            elif elapsed_time > rospy.Duration(2):  # time out
+                break
 
         # 5) Get Observations and pause Simulation
         observation = self.get_obs()
-        if observation[0] < self.min_distance:
-            self.min_distance = observation[0]
+        # if observation[0] < self.min_distance:
+        #     self.min_distance = observation[0]
         self.gazebo.pauseSim()
 
         # 6) Convert Observations into state
-        state = self.get_state(observation)
+        state = U.get_state(observation)
 
-        U.get_obj_orient()
+        # U.get_obj_orient()
 
         # 7) Unpause Simulation check if its done, calculate done_reward
         self.gazebo.unpauseSim()
@@ -382,7 +390,16 @@ class PickbotEnv(gym.Env):
 
         # 8) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
         # reward = self.compute_reward(observation, done_reward, invalid_contact)
-        reward = UMath.compute_reward_orient(observation, done_reward, invalid_contact)
+        # reward = UMath.compute_reward_orient(observation, done_reward, invalid_contact)
+
+        distance_error = observation[6:9] - observation[13:16]
+        orientation_error = quaternion_multiply(observation[9:13], quaternion_conjugate(observation[16:]))
+
+        rewardDist = UMath.rmseFunc(distance_error)
+        rewardOrientation = 2 * np.arccos(abs(orientation_error[0]))
+
+        reward = UMath.computeReward(rewardDist, rewardOrientation) + done_reward
+
         self.accumulated_episode_reward += reward
 
         # 9) Unpause that topics can be received in next step
@@ -504,153 +521,6 @@ class PickbotEnv(gym.Env):
         U.change_object_position(self.object_name, box_pos)
         print("Current target: ", self.object_name)
 
-    def randomly_spawn_object(self):
-        """
-        spawn the object unit_box_0 in a random position in the shelf
-        """
-        try:
-            spawn_box = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
-            box = ModelState()
-            box.model_name = self.object_name
-            box.pose.position.x = np.random.uniform(low=-0.35, high=0.3, size=None)
-            box.pose.position.y = np.random.uniform(low=0.7, high=0.9, size=None)
-            box.pose.position.z = 1.05
-            spawn_box(box)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Set Model State service call failed:  {0}".format(e))
-
-    def spawn_object(self, object_name, model_position, model_sdf=None):
-        """
-        spawn object using gazebo service
-        :param object_name: name of the object
-        :param model_position: position of the spawned object
-        :param model_sdf: description of the object in sdf format
-        :return: -
-        """
-        if model_sdf is None:  # take sdf file from default folder
-            # get model from sdf file
-            rospack = rospkg.RosPack()
-            sdf_fname = rospack.get_path('simulation') + "/meshes/environments/sdf/" + object_name + ".sdf"
-            with open(sdf_fname, "r") as f:
-                model_sdf = f.read()
-
-        try:
-            spawn_model = rospy.ServiceProxy("gazebo/spawn_sdf_model", SpawnModel)
-            spawn_model(object_name, model_sdf, "/", model_position, "world")
-            print("SPAWN %s finished" % object_name)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Spawn Model service call failed:  {0}".format(e))
-
-    def delete_object(self, object_name):
-        """
-        delete object using gazebo service
-        :param object_name: the name of the object
-        :return: -
-        """
-        try:
-            delete_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
-            delete_model(object_name)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Delete Model service call failed:  {0}".format(e))
-
-    def change_object_position(self, object_name, model_position):
-        """
-        change object postion using gazebo service
-        :param object_name: name of the object
-        :param model_position: destination
-        :return: -
-        """
-        try:
-            change_position = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
-            box = ModelState()
-            box.model_name = object_name
-            box.pose.position.x = model_position.position.x
-            box.pose.position.y = model_position.position.y
-            box.pose.position.z = model_position.position.z
-            box.pose.orientation.x = model_position.orientation[1]
-            box.pose.orientation.y = model_position.orientation[2]
-            box.pose.orientation.z = model_position.orientation[3]
-            box.pose.orientation.w = model_position.orientation[0]
-            change_position(box)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Set Model State service call failed:  {0}".format(e))
-
-    def populate_objects(self):
-        """
-        populate objects, called in init
-        :return: -
-        """
-        if not self._random_object:  # only populate the first object
-            U.spawn_object(self.object_list[0], self.object_initial_position)
-        else:
-            rand_x = np.random.uniform(low=-0.35, high=0.35, size=(len(self.object_list),))
-            rand_y = np.random.uniform(low=2.2, high=2.45, size=(len(self.object_list),))
-            for idx, obj in enumerate(self.object_list):
-                box_pos = Pose(position=Point(x=rand_x[idx],
-                                              y=rand_y[idx],
-                                              z=1.05))
-                U.spawn_object(obj, box_pos)
-
-    def get_distance_gripper_to_object(self):
-        """
-        Get the Position of the endeffektor and the object via rosservice call /gazebo/get_model_state and /gazebo/get_link_state
-        Calculate distance between them
-
-        In this case
-
-        Object:     unite_box_0 link
-        Gripper:    vacuum_gripper_link ground_plane
-        """
-        try:
-            model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-            blockName = self.object_name
-            relative_entity_name = "link"
-            object_resp_coordinates = model_coordinates(blockName, relative_entity_name)
-            Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
-                               object_resp_coordinates.pose.position.z))
-
-        except rospy.ServiceException as e:
-            rospy.loginfo("Get Model State service call failed:  {0}".format(e))
-            print("Exception get model state")
-
-        try:
-            model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
-            LinkName = "vacuum_gripper_link"
-            ReferenceFrame = "ground_plane"
-            resp_coordinates_gripper = model_coordinates(LinkName, ReferenceFrame)
-            Gripper = np.array((resp_coordinates_gripper.link_state.pose.position.x,
-                                resp_coordinates_gripper.link_state.pose.position.y,
-                                resp_coordinates_gripper.link_state.pose.position.z))
-
-        except rospy.ServiceException as e:
-            rospy.loginfo("Get Link State service call failed:  {0}".format(e))
-            print("Exception get Gripper position")
-        distance = np.linalg.norm(Object - Gripper)
-
-        return distance, Object
-
-    def turn_on_gripper(self):
-        """
-        turn on the Gripper by calling the service
-        """
-        try:
-            turn_on_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
-            enable = True
-            turn_on_gripper_service(enable)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Turn on Gripper service call failed:  {0}".format(e))
-
-    def turn_off_gripper(self):
-        """
-        sturn off the Gripper by calling the service
-        """
-        try:
-            turn_off_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
-            enable = False
-            turn_off_gripper_service(enable)
-        except rospy.ServiceException as e:
-            rospy.loginfo("Turn off Gripper service call failed:  {0}".format(e))
-
     def get_action_to_position(self, action, last_position):
         """
         Take the last published joint and increment/decrement one joint according to action chosen
@@ -658,8 +528,8 @@ class PickbotEnv(gym.Env):
         :return: list with all joint positions according to chosen action
         """
 
-        distance = U.get_distance_gripper_to_object()
-        self._joint_increment_value = 0.18 * distance[0] + 0.01
+        # distance = U.get_distance_gripper_to_object()
+        # self._joint_increment_value = 0.18 * distance[0] + 0.01
 
         joint_states_position = last_position
         action_position = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -762,105 +632,44 @@ class PickbotEnv(gym.Env):
         Returns the state of the robot needed for Algorithm to learn
         The state will be defined by a List (later converted to numpy array) of the:
 
-        1)          Distance from desired point in meters
-        2-7)        States of the 6 joints in radiants
-        8,9)        Force in contact sensor in Newtons
-        10,11,12)   x, y, z Position of object?
-
-        MISSING
-        10)     RGBD image
-
-
-        self._list_of_observations = ["distance_gripper_to_object",
-                                    "elbow_joint_state",
-                                    "shoulder_lift_joint_state",
-                                    "shoulder_pan_joint_state",
-                                    "wrist_1_joint_state",
-                                    "wrist_2_joint_state",
-                                    "wrist_3_joint_state",
-                                    "contact_1_force",
-                                    "contact_2_force",
-                                    "object_pos_x",
-                                    "object_pos_y",
-                                    "object_pos_z",
-                                    "object_type", -- if use_object_type set to True
-                                    "min_distance_gripper_to_object",
-                                    "orient_diff_gripper_to_object"]
-
+        self._list_of_observations = ["elbow_joint_state",
+                              "shoulder_lift_joint_state",
+                              "shoulder_pan_joint_state",
+                              "wrist_1_joint_state",
+                              "wrist_2_joint_state",
+                              "wrist_3_joint_state",
+                              "vacuum_gripper_pos_x",
+                              "vacuum_gripper_pos_y",
+                              "vacuum_gripper_pos_z",
+                              "vacuum_gripper_ori_w",
+                              "vacuum_gripper_ori_x",
+                              "vacuum_gripper_ori_y",
+                              "vacuum_gripper_ori_z",
+                              "object_pos_x",
+                              "object_pos_y",
+                              "object_pos_z",
+                              "object_ori_w",
+                              "object_ori_x",
+                              "object_ori_y",
+                              "object_ori_z",
+                              ]
 
         :return: observation
         """
 
-        # Get Distance Object to Gripper and Objectposition from Service Call.
-        # Needs to be done a second time cause we need the distance and position after the Step execution
-        distance_gripper_to_object, position_xyz_object = U.get_distance_gripper_to_object()
-        object_pos_x = position_xyz_object[0]
-        object_pos_y = position_xyz_object[1]
-        object_pos_z = position_xyz_object[2]
-
         # Get Joints Data out of Subscriber
-        joint_states = self.joints_state
-        elbow_joint_state = joint_states.position[0]
-        shoulder_lift_joint_state = joint_states.position[1]
-        shoulder_pan_joint_state = joint_states.position[2]
-        wrist_1_joint_state = joint_states.position[3]
-        wrist_2_joint_state = joint_states.position[4]
-        wrist_3_joint_state = joint_states.position[5]
+        joint_states = self.joints_state.position
 
-        # Get Contact Forces out of get_contact_force Functions to be able to take an average over some iterations
-        # otherwise chances are high that not both sensors are showing contact the same time
-        contact_1_force = self.get_contact_force_1()
-        contact_2_force = self.get_contact_force_2()
+        vacuum_gripper_geometry = U.get_link_state("vacuum_gripper_link")
 
-        # orientation differences between gripper and target wrt x axis (roll)
-        target_orient, gripper_orient = U.get_obj_orient()
-        print("yaw of the target {} with wrist_3 {} ".format(target_orient[2], wrist_3_joint_state))
-        orient_diff = np.abs(target_orient[2]) - np.abs(wrist_3_joint_state)
+        target_geometry = U.get_link_state("target")
 
-        # Stack all information into Observations List
-        observation = []
-        for obs_name in self._list_of_observations:
-            if obs_name == "distance_gripper_to_object":
-                observation.append(distance_gripper_to_object)
-            elif obs_name == "elbow_joint_state":
-                observation.append(elbow_joint_state)
-            elif obs_name == "shoulder_lift_joint_state":
-                observation.append(shoulder_lift_joint_state)
-            elif obs_name == "shoulder_pan_joint_state":
-                observation.append(shoulder_pan_joint_state)
-            elif obs_name == "wrist_1_joint_state":
-                observation.append(wrist_1_joint_state)
-            elif obs_name == "wrist_2_joint_state":
-                observation.append(wrist_2_joint_state)
-            elif obs_name == "wrist_3_joint_state":
-                observation.append(wrist_3_joint_state)
-            elif obs_name == "contact_1_force":
-                observation.append(contact_1_force)
-            elif obs_name == "contact_2_force":
-                observation.append(contact_2_force)
-            elif obs_name == "object_pos_x":
-                observation.append(object_pos_x)
-            elif obs_name == "object_pos_y":
-                observation.append(object_pos_y)
-            elif obs_name == "object_pos_z":
-                observation.append(object_pos_z)
-            elif obs_name == "object_type":
-                observation.append(self.object_type)
-            elif obs_name == "min_distance_gripper_to_object":
-                observation.append(self.min_distance)
-            elif obs_name == "orient_diff_gripper_to_object":
-                observation.append(orient_diff)
-            else:
-                raise NameError('Observation Asked does not exist==' + str(obs_name))
+        # Concatenate the information that defines the robot state
+        state = np.r_[np.reshape(joint_states, -1),
+                      np.reshape(vacuum_gripper_geometry, -1),
+                      np.reshape(target_geometry, -1)]
 
-        return observation
-
-    def get_state(self, observation):
-        """
-        convert observation list intp a numpy array
-        """
-        x = np.asarray(observation)
-        return x
+        return state
 
     def get_contact_force_1(self):
         """
@@ -870,7 +679,7 @@ class PickbotEnv(gym.Env):
         """
 
         # get Force out of contact_1_state
-        if self.contact_1_state == []:
+        if not self.contact_1_state:
             contact1_force = 0.0
         else:
             for state in self.contact_1_state:
@@ -901,7 +710,7 @@ class PickbotEnv(gym.Env):
         """
 
         # get Force out of contact_2_state
-        if self.contact_2_state == []:
+        if not self.contact_2_state:
             contact2_force = 0.0
         else:
             for state in self.contact_2_state:
@@ -934,7 +743,7 @@ class PickbotEnv(gym.Env):
         If one of the 2 Messages is True it returns True.
         returns:
             False:  if no contacts or just valid ones -> Box/Shelf, Wrist3/Box, VacuumGripper/Box
-            True:   if any other contact occures wich is invalid
+            True:   if any other contact occurs which is invalid
         """
 
         # read last contact_2_force value out of yaml
@@ -964,22 +773,33 @@ class PickbotEnv(gym.Env):
 
         done = False
         done_reward = 0
-        reward_reached_goal = 500
+        reward_reached_goal = 1000
         reward_crashing = -200
         reward_join_range = -150
 
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
 
-        # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
-        if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
+        # Successfully reached_goal: orientation of the end-effector and target is less than threshold also
+        # distance is less than threshold
+        distance_gripper_to_target = np.linalg.norm(observations[6:9] - observations[13:16])
+        orientation_error = quaternion_multiply(observations[9:13], quaternion_conjugate(observations[16:]))
+        print("Step func check distance {} and orientation err {} ".format(distance_gripper_to_target, orientation_error))
+
+        if distance_gripper_to_target < 0.05 and orientation_error[0] < 0.1:
             done = True
-            print('>>>>>> Success!')
+            print("Success! Distance {} and orientation err {} ".format(distance_gripper_to_target, orientation_error[0]))
             done_reward = reward_reached_goal
-            # save state in csv file
-            U.append_to_csv(self.csv_success_exp, observations)
-            self.successful_attempts += 1
-            print("Successful contact so far: {} attempts".format(self.successful_attempts))
+
+        # Successfully reached goal: Contact with both contact sensors and there is no invalid contact
+        # if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
+        #     done = True
+        #     print('>>>>>> Success!')
+        #     done_reward = reward_reached_goal
+        #     # save state in csv file
+        #     U.append_to_csv(self.csv_success_exp, observations)
+        #     self.successful_attempts += 1
+        #     print("Successful contact so far: {} attempts".format(self.successful_attempts))
 
         # Crashing with itself, shelf, base
         if invalid_collision:
