@@ -181,6 +181,9 @@ class PickbotEnv(gym.Env):
         self.csv_success_exp = logger.get_dir() + '/success_exp' + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + '.csv'
         self.successful_attempts = 0
 
+        # variable to store last observation
+        self.old_obs = self.get_obs()
+
         # object name: name of the target object
         # object type: index of the object name in the object list
         # object list: pool of the available objects, have at least one entry
@@ -293,13 +296,13 @@ class PickbotEnv(gym.Env):
         self._check_all_systems_ready()
 
         # last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
-        last_position = [0, 0, 0, 0, 0, 0]
-        with open('last_position.yml', 'w') as yaml_file:
-            yaml.dump(last_position, yaml_file, default_flow_style=False)
-        with open('contact_1_force.yml', 'w') as yaml_file:
-            yaml.dump(0.0, yaml_file, default_flow_style=False)
-        with open('contact_2_force.yml', 'w') as yaml_file:
-            yaml.dump(0.0, yaml_file, default_flow_style=False)
+        # last_position = [0, 0, 0, 0, 0, 0]
+        # with open('last_position.yml', 'w') as yaml_file:
+        #     yaml.dump(last_position, yaml_file, default_flow_style=False)
+        # with open('contact_1_force.yml', 'w') as yaml_file:
+        #     yaml.dump(0.0, yaml_file, default_flow_style=False)
+        # with open('contact_2_force.yml', 'w') as yaml_file:
+        #     yaml.dump(0.0, yaml_file, default_flow_style=False)
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
@@ -335,17 +338,18 @@ class PickbotEnv(gym.Env):
         print("action: {}".format(action))
 
         # 1) read last_position out of YAML File
-        with open("last_position.yml", 'r') as stream:
-            try:
-                last_position = (yaml.load(stream, Loader=yaml.Loader))
-            except yaml.YAMLError as exc:
-                print(exc)
+        last_position = self.old_obs[:6]
+        # with open("last_position.yml", 'r') as stream:
+        #     try:
+        #         last_position = (yaml.load(stream, Loader=yaml.Loader))
+        #     except yaml.YAMLError as exc:
+        #         print(exc)
         # 2) get the new joint positions according to chosen action
         next_action_position = self.get_action_to_position(action, last_position)
 
         # 3) write last_position into YAML File
-        with open('last_position.yml', 'w') as yaml_file:
-            yaml.dump(next_action_position, yaml_file, default_flow_style=False)
+        # with open('last_position.yml', 'w') as yaml_file:
+        #     yaml.dump(next_action_position, yaml_file, default_flow_style=False)
 
         # 4) unpause, move to position for certain time
         self.gazebo.unpauseSim()
@@ -535,6 +539,7 @@ class PickbotEnv(gym.Env):
         """
         Take the last published joint and increment/decrement one joint according to action chosen
         :param action: Integer that goes from 0 to 11, because we have 12 actions.
+        :param last_position: array of 6 value
         :return: list with all joint positions according to chosen action
         """
 
