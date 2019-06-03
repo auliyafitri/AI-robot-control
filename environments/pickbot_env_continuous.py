@@ -314,8 +314,8 @@ class PickbotEnv(gym.Env):
 
         self.gazebo.change_gravity(0, 0, 0)
         self.controllers_object.turn_off_controllers()
-        self.gazebo.pauseSim()
         self.gazebo.resetSim()
+        self.gazebo.pauseSim()
 
         ##### TEST #########
         # idx = 0
@@ -445,6 +445,7 @@ class PickbotEnv(gym.Env):
             if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
                 break
             elif elapsed_time > rospy.Duration(2): # time out
+                print("TIME OUT, have not reached destination")
                 break
         # time.sleep(self.running_step)
 
@@ -686,7 +687,8 @@ class PickbotEnv(gym.Env):
         :return: observation
         """
 
-        # Get Distance Object to Gripper and Objectposition from Service Call. Needs to be done a second time cause we need the distance and position after the Step execution
+        # Get Distance Object to Gripper and Object position from Service Call.
+        # Needs to be done a second time cause we need the distance and position after the Step execution
         distance_gripper_to_object, position_xyz_object = U.get_distance_gripper_to_object()
         object_pos_x = position_xyz_object[0]
         object_pos_y = position_xyz_object[1]
@@ -706,20 +708,21 @@ class PickbotEnv(gym.Env):
                 print(joint_states.name)
                 print(np.around(joint_states.position, decimals=3))
 
-                self.controllers_object.turn_off_controllers()
-                self.gazebo.pauseSim()
-                self.gazebo.resetSim()
-                U.delete_object("pickbot")
-                U.spawn_urdf_object("pickbot", self.pickbot_initial_position)
-                self.gazebo.unpauseSim()
-                self.controllers_object.turn_off_controllers()
+                # self.controllers_object.turn_off_controllers()
+                # self.gazebo.pauseSim()
+                # self.gazebo.resetSim()
+                # U.delete_object("pickbot")
+                # U.spawn_urdf_object("pickbot", self.pickbot_initial_position)
+                # self.gazebo.unpauseSim()
+                # self.controllers_object.turn_off_controllers()
+                #
+                # print("###############################")
+                # print("#####  Pickbot respawned  #####")
+                # print("###############################")
+                sys.exit("Joint exceeds limit")
 
-                print("###############################")
-                print("#####  Pickbot respawned  #####")
-                print("###############################")
-                # sys.exit("Joint exceeds limit")
-
-        # Get Contact Forces out of get_contact_force Functions to be able to take an average over some iterations otherwise chances are high that not both sensors are showing contact the same time
+        # Get Contact Forces out of get_contact_force Functions to be able to take an average over some iterations
+        # otherwise chances are high that not both sensors are showing contact the same time
         contact_1_force = self.get_contact_force_1()
         contact_2_force = self.get_contact_force_2()
 

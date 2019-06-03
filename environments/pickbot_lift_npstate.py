@@ -264,8 +264,8 @@ class PickbotEnv(gym.Env):
         self.controllers_object.turn_off_controllers()
         # turn off the gripper
         # U.turn_off_gripper()
-        # self.gazebo.pauseSim()
         self.gazebo.resetSim()
+        # self.gazebo.pauseSim()
 
         # turn on the gripper
         # U.turn_on_gripper()
@@ -804,7 +804,7 @@ class PickbotEnv(gym.Env):
         orientation_error = quaternion_multiply(observations[9:13], quaternion_conjugate(observations[16:]))
         print("Step func check distance {} and orientation err {} ".format(distance_gripper_to_target, orientation_error))
 
-        if distance_gripper_to_target < 0.05 and orientation_error[0] < 0.1:
+        if distance_gripper_to_target < 0.05 and np.abs(orientation_error[0]) < 0.1:
             done = True
             print("Success! Distance {} and orientation err {} ".format(distance_gripper_to_target, orientation_error[0]))
             done_reward = reward_reached_goal
