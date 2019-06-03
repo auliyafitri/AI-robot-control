@@ -165,7 +165,7 @@ register(
         'env_object_type': 'door_handle',
         'random_position': False,
         'sim_time_factor': 0.001,
-        'joint_increment_value': 0.1
+        'joint_increment_value': 0.174
     },
     max_episode_steps=500,
 )

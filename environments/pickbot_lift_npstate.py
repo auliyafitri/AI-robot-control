@@ -4,7 +4,7 @@
 import gym
 import rospy
 import numpy as np
-import time
+import sys
 import os
 import yaml
 import math
@@ -259,31 +259,26 @@ class PickbotEnv(gym.Env):
         18) Return State
         """
 
-        self.gazebo.change_gravity(0, 0, 0)
+        # self.gazebo.change_gravity(0, 0, 0)
         self.controllers_object.turn_off_controllers()
         # turn off the gripper
-        U.turn_off_gripper()
-        self.gazebo.pauseSim()
+        # U.turn_off_gripper()
+        # self.gazebo.pauseSim()
         self.gazebo.resetSim()
 
         # turn on the gripper
-        U.turn_on_gripper()
+        # U.turn_on_gripper()
 
         if self._load_init_pos:
             # load sample from previous training result
             sample_ep = random.choice(self.init_samples)
             print("Joints from samples: {}".format(sample_ep[0:6]))
-            # self.pickbot_joint_publisher_object.set_joints()
-            self.pickbot_joint_publisher_object.set_joints(sample_ep[0:6])
+            # self.pickbot_joint_publisher_object.set_joints(sample_ep[0:6])
             self.set_target_object(sample_ep[-6:])
         else:
-            self.pickbot_joint_publisher_object.set_joints([1.5, -1.2, 1.4, -1.87, -1.57, 1.57])
+            # self.pickbot_joint_publisher_object.set_joints()
             vg_geo = U.get_link_state("vacuum_gripper_link")
-            print(vg_geo[3:])
-
             to_geo = U.get_link_state("target")
-            print(to_geo[3:])
-
             orientation_error = quaternion_multiply(vg_geo[3:], quaternion_conjugate(to_geo[3:]))
             print("Orientation error {}".format(orientation_error))
             box_pos = U.get_random_door_handle_pos() if self._random_position else self.object_initial_position
@@ -291,12 +286,13 @@ class PickbotEnv(gym.Env):
         # Code above is hard-coded for door handle, modify later.
         # TO-DO: Modify reset wrt the object type as in the reach env
 
-        self.gazebo.unpauseSim()
+        # self.gazebo.unpauseSim()
         self.controllers_object.turn_on_controllers()
-        self.gazebo.change_gravity(0, 0, -9.81)
+        # self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
 
-        last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
+        # last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
+        last_position = [0, 0, 0, 0, 0, 0]
         with open('last_position.yml', 'w') as yaml_file:
             yaml.dump(last_position, yaml_file, default_flow_style=False)
         with open('contact_1_force.yml', 'w') as yaml_file:
@@ -310,10 +306,10 @@ class PickbotEnv(gym.Env):
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
         self.min_distance = self.max_distance
-        self.gazebo.pauseSim()
+        # self.gazebo.pauseSim()
         state = U.get_state(observation)
         self._update_episode()
-        self.gazebo.unpauseSim()
+        # self.gazebo.unpauseSim()
         return state
 
     def step(self, action):
@@ -362,6 +358,7 @@ class PickbotEnv(gym.Env):
             if invalid_collision:
                 print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
                 observation = self.get_obs()
+                print("joints after reset collision : {} ".format(observation[:6]))
                 reward = -200
                 self.accumulated_episode_reward += reward
                 return U.get_state(observation), reward, True, {}
@@ -399,6 +396,7 @@ class PickbotEnv(gym.Env):
         rewardOrientation = 2 * np.arccos(abs(orientation_error[0]))
 
         reward = UMath.computeReward(rewardDist, rewardOrientation) + done_reward
+        print("Reward this step {}".format(reward))
 
         self.accumulated_episode_reward += reward
 
@@ -625,7 +623,9 @@ class PickbotEnv(gym.Env):
             action_position[4] = joint_states_position[4]
             action_position[5] = joint_states_position[5] - self._joint_increment_value
 
-        return action_position
+        action_position = np.clip(action_position, -2.9, 2.9)
+
+        return action_position.tolist()
 
     def get_obs(self):
         """
@@ -658,14 +658,20 @@ class PickbotEnv(gym.Env):
         """
 
         # Get Joints Data out of Subscriber
-        joint_states = self.joints_state.position
+        joints_state = self.joints_state.position
+
+        for joint in self.joints_state.position:
+            if joint > math.pi or joint < -math.pi:
+                print(self.joints_state.name)
+                print(self.joints_state.position)
+                sys.exit("Joint exceeds limit")
 
         vacuum_gripper_geometry = U.get_link_state("vacuum_gripper_link")
 
         target_geometry = U.get_link_state("target")
 
         # Concatenate the information that defines the robot state
-        state = np.r_[np.reshape(joint_states, -1),
+        state = np.r_[np.reshape(joints_state, -1),
                       np.reshape(vacuum_gripper_geometry, -1),
                       np.reshape(target_geometry, -1)]
 

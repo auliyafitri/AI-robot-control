@@ -104,5 +104,7 @@ def computeReward(rewardDist, rewardOrientation=0, collision=False):
     else:
         collisionReward = 0
 
+    print("Reward distance {} orientation {}".format(distanceReward, orientationReward))
+
     return distanceReward * orientationReward - 1 - collisionReward
 
