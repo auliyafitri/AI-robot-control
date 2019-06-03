@@ -128,6 +128,7 @@
           <surface>
             <contact>
               <ode/>
+              <collide_without_contact>1</collide_without_contact>
             </contact>
             <bounce/>
             <friction>
@@ -170,7 +171,7 @@
             <izz>1</izz>
           </inertia>
         </inertial>
-        <collision name='collision1'>
+        <collision name='collision'>
           <pose frame=''>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
@@ -182,6 +183,7 @@
           <surface>
             <contact>
               <ode/>
+              <collide_without_contact>1</collide_without_contact>
             </contact>
             <bounce/>
             <friction>
@@ -192,7 +194,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='visual1'>
+        <visual name='visual'>
           <pose frame=''>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>

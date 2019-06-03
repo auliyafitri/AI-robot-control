@@ -210,7 +210,7 @@
       <pose frame=''>0 0 0 0 0 0</pose>
     </model>
 
-    <model name='unit_box_0'>
+    <!-- <model name='unit_box_0'>
       <pose frame=''>0 0.919858 1.047203 0 -0 0</pose>
       <link name='target'>
         <inertial>
@@ -227,7 +227,7 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.1 0.1 0.1</size>
+              <size>0.05 0.05 0.05</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -247,12 +247,12 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.1 0.1 0.1</size>
+              <size>0.05 0.05 0.05</size>
             </box>
           </geometry>
           <material>
             <script>
-              <name>Gazebo/Grey</name>
+              <name>Gazebo/Red</name>
               <uri>file://media/materials/scripts/gazebo.material</uri>
             </script>
           </material>
@@ -260,6 +260,27 @@
         <self_collide>0</self_collide>
         <kinematic>0</kinematic>
         <gravity>1</gravity>
+      </link>
+    </model> -->
+
+
+    <model name='unit_box_0'>
+      <pose frame=''>0 0.919858 1.08 0 -0 0</pose>
+      <link name='target'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.02 0.02 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Red</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <gravity>0</gravity>
       </link>
     </model>
 
