@@ -334,6 +334,8 @@ class PickbotEnv(gym.Env):
         10) Return State, Reward, Done
         """
 
+        self.old_obs = self.get_obs()
+
         print("====================================================================")
         print("action: {}".format(action))
 
