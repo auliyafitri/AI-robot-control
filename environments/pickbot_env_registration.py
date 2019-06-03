@@ -167,5 +167,5 @@ register(
         'sim_time_factor': 0.001,
         'joint_increment_value': 0.174
     },
-    max_episode_steps=500,
+    max_episode_steps=1000,
 )
