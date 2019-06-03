@@ -7,7 +7,7 @@ import tf
 import numpy
 import moveit_commander 
 import moveit_msgs.msg 
-import geometry_msgs.msg 
+from sensor_msgs.msg import JointState
 # from robotiq_c_model_control.msg import _CModel_robot_output as outputMsg
 
 ##___GLOBAL VARIABLES___###
@@ -185,7 +185,7 @@ def TiltAboutAxis(pose_target, resolution, tilt_axis, tilt_direction):
 ###___JOINT VALUE MANIPULATION___###
 ## Manipulate by assigning joint values
 def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
-    group.set_max_velocity_scaling_factor(0.1)
+    # group.set_max_velocity_scaling_factor(0.1)
     group_variable_values = group.get_current_joint_values() #create variable that stores joint values
 
     #Assign values to joints
@@ -345,41 +345,54 @@ def manipulator_arm_control():
     # TurnArcAboutAxis('y', 0.22434, -0.79, 10, -1, 'yes', 'y', 1)
 
 
-    print("1. Moving to position 1")
-    assign_pose_target(0.4, 0.5, 0.6, 0.2, 0.0, 0.0, 0.0)
-    print ("Current position 1: {},{},{}".format(group.get_current_pose().pose.position.x,
-                                               group.get_current_pose().pose.position.y,
-                                               group.get_current_pose().pose.position.z))
+    # print("1. Moving to position 1")
+    # assign_pose_target(0.4, 0.5, 0.6, 0.2, 0.0, 0.0, 0.0)
+    #
+    # print("2. Moving to position 2")
+    # assign_pose_target(0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0)
+    #
+    # print("3. Moving to position 3")
+    # assign_pose_target(0.01, 1.0, 0.8, 0.0, 0.0, 0.0, 0.0)
+    #
+    # print("4. Moving to position 4")
+    # assign_pose_target(-0.1, 1.1, 0.21, 0.0, 0.0, 0.0, 0.0)
+    #
+    # print("Assigning joint values")
+    # relative_joint_value(0, 0, 0, 0, 0, math.pi/2)
+    #
+    # print("Planning ended.")
+    global joints_state
 
-    print("2. Moving to position 2")
-    assign_pose_target(0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0)
-    print ("Current position 2: {},{},{}".format(group.get_current_pose().pose.position.x,
-                                               group.get_current_pose().pose.position.y,
-                                               group.get_current_pose().pose.position.z))
+    assign_joint_value(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    init_pos = [       1.5, -1.2, 1.4, -1.87, -1.57, 0]
+    print("1. Moving to init position")
+    assign_joint_value(1.4, -1.2, 1.5, -1.87, -1.57, 0)
+    # rospy.sleep(2)
+    print("Joint_pos: {}".format(numpy.round(joints_state.position, decimals=3)))
 
-    print("3. Moving to position 3")
-    assign_pose_target(0.01, 1.0, 0.8, 0.0, 0.0, 0.0, 0.0)
-    print ("Current position 3: {},{},{}".format(group.get_current_pose().pose.position.x,
-                                               group.get_current_pose().pose.position.y,
-                                               group.get_current_pose().pose.position.z))
+    print("2. Moving to position 1")
+    pos = [           -0.983, -0.699, 0.588,  0.978, -1.414, 0.882]
+    assign_joint_value(0.588, -0.699, -0.983, 0.978, -1.414, 0.882)
+    # rospy.sleep(2)
+    print("Joint_pos: {}".format(numpy.round(joints_state.position, decimals=3)))
 
-    print("4. Moving to position 4")
-    assign_pose_target(-0.1, 1.1, 0.21, 0.0, 0.0, 0.0, 0.0)
-    print ("Current position 4: {},{},{}".format(group.get_current_pose().pose.position.x,
-                                               group.get_current_pose().pose.position.y,
-                                               group.get_current_pose().pose.position.z))
 
-    print("Assigning joint values")
-    relative_joint_value(0, 0, 0, 0, 0, math.pi/2)
-
-    print("Planning ended.")
+    print("3. Moving to position 2")
+    pos = [            0.079, 0.598, 1.112, -0.797, -0.154, 0.79 ]
+    assign_joint_value(1.112, 0.598, 0.079, -0.797, -0.154, 0.79)
+    # rospy.sleep(2)
+    print("Joint_pos: {}".format(numpy.round(joints_state.position, decimals=3)))
 
     rospy.spin()
 
+def joints_state_callback(msg):
+    global joints_state
+    joints_state = msg
 
 ###___MAIN___###
 if __name__ == '__main__':
-
+    rospy.Subscriber("/joint_states", JointState, joints_state_callback)
+    joints_state = JointState()
     try:
          
         manipulator_arm_control()

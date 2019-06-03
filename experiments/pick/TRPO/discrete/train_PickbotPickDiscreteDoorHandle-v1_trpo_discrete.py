@@ -20,11 +20,10 @@ timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
 
 
 num_env = 1
-# env_id = "PickbotReachContinuous-v1"
-env_id = "PickbotReachContinuousDoorHandle-v1"
+env_id = "PickbotPickDiscreteDoorHandle-v1"
 env_type = "classic_control"
 seed = None
-task_name = "reach"
+task_name = "pick"
 
 # Create needed folders for log file and models
 logdir = os.path.dirname(evaluations.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + timestamp + '/'

@@ -20,7 +20,6 @@ timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
 
 
 num_env = 1
-# env_id = "PickbotReachContinuous-v1"
 env_id = "PickbotReachContinuousDoorHandle-v1"
 env_type = "classic_control"
 seed = None
@@ -56,7 +55,7 @@ def main():
     act = trpo_mpi.learn(
         env=env,
         network='mlp',
-        total_timesteps=1000000,
+        total_timesteps=2000000,
         save_path=modelsdir
     )
 
