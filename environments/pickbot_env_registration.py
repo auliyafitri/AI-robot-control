@@ -169,3 +169,15 @@ register(
     },
     max_episode_steps=1000,
 )
+
+register(
+    id='PickbotPickContinuousDoorHandle-v0',
+    entry_point='environments.pickbot_lift_continuous:PickbotEnv',
+    kwargs={
+        'env_object_type': 'door_handle',
+        'random_position': False,
+        'sim_time_factor': 0.001,
+        'joint_increment_value': 1.0
+    },
+    max_episode_steps=1000,
+)

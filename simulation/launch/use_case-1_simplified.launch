@@ -16,8 +16,8 @@
     </include>
 
     <!-- Spawn a robot into Gazebo -->
-    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find simulation)/urdf/pickbot_research.urdf -urdf -x 0.0 -y 0.0 -z 0.0 -roll 0 -pitch 0 -yaw 0 -model pickbot" />
-    <param name="robot_description" textfile="$(find simulation)/urdf/pickbot_research.urdf"/>
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find simulation)/urdf/pickbot.urdf -urdf -x 0.0 -y 0.0 -z 0.0 -roll 0 -pitch 0 -yaw 0 -model pickbot" />
+    <param name="robot_description" textfile="$(find simulation)/urdf/pickbot.urdf"/>
     <include file="$(find simulation)/launch/pickbot_control.launch"/>
 
     <!-- Launch the repulisher gz topci to ros topic -->
