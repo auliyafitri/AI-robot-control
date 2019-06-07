@@ -338,7 +338,7 @@ class PickbotEnv(gym.Env):
         self.old_obs = self.get_obs()
 
         print("====================================================================")
-        print("action: {}".format(action))
+        # print("action: {}".format(action))
 
         # 1) read last_position out of YAML File
         last_position = self.old_obs[:6]
@@ -348,7 +348,12 @@ class PickbotEnv(gym.Env):
         #     except yaml.YAMLError as exc:
         #         print(exc)
         # 2) get the new joint positions according to chosen action
-        next_action_position = self.get_action_to_position(action, last_position)
+        if self._joint_increment_value is None:
+            next_action_position = action
+        else:
+            next_action_position = self.get_action_to_position(np.clip(action, -self._joint_increment_value, self._joint_increment_value),
+                                                           last_position)
+        print("next action position: {}".format(np.around(next_action_position, decimals=3)))
 
         # 3) write last_position into YAML File
         # with open('last_position.yml', 'w') as yaml_file:
@@ -390,7 +395,8 @@ class PickbotEnv(gym.Env):
 
         # 5) Get Observations and pause Simulation
         observation = self.get_obs()
-        print("Observation in the step func {}".format(np.around(observation[:6], decimals=3)))
+        print("Observation in the step: {}".format(np.around(observation[:6], decimals=3)))
+        print("Joints      in the step: {}".format(np.around(self.joints_state.position, decimals=3)))
         # if observation[0] < self.min_distance:
         #     self.min_distance = observation[0]
         self.gazebo.pauseSim()
