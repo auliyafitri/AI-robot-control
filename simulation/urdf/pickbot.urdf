@@ -73,7 +73,7 @@
         <origin xyz="0.0 0.0 0.1273" rpy="0.0 0.0 0.0"/>
         <parent link="base_link"/>
         <child  link="shoulder_link"/>
-        <limit effort="330" lower="-3.14159265" upper="3.14159265" velocity="2.16"/>
+        <limit effort="330" lower="-3.0" upper="3.0" velocity="2.16"/>
 <!--        <safety_controller k_velocity="10" k_position="10" soft_lower_limit="-3.1" soft_upper_limit="3.1" />-->
         <axis xyz="0 0 1"/>
         <dynamics damping="20.0" friction="20.0"/>
@@ -113,7 +113,7 @@
         <origin xyz="0.0 0.220941 0.0" rpy="0.0 1.570796325 0.0"/>
         <parent link="shoulder_link"/>
         <child  link="upper_arm_link"/>
-        <limit effort="330" lower="-3.14159265" upper="3.14159265" velocity="2.16"/>
+        <limit effort="330" lower="-3.0" upper="3.0" velocity="2.16"/>
 <!--        <safety_controller k_velocity="10" k_position="10" soft_lower_limit="-3.1" soft_upper_limit="3.1" />-->
         <axis xyz="0 1 0"/>
         <dynamics damping="20.0" friction="0.0"/>
@@ -155,7 +155,7 @@
         <origin xyz="0.0 -0.1719 0.612" rpy="0.0 0.0 0.0"/>
         <parent link="upper_arm_link"/>
         <child  link="forearm_link"/>
-        <limit effort="150" lower="-3.14159265" upper="3.14159265" velocity="3.15"/>
+        <limit effort="150" lower="-3.0" upper="3.0" velocity="3.15"/>
 <!--        <safety_controller k_velocity="10" k_position="10" soft_lower_limit="-3.1" soft_upper_limit="3.1" />-->
         <axis xyz="0 1 0"/>
         <dynamics damping="20.0" friction="0.0"/>
@@ -196,7 +196,7 @@
         <origin xyz="0.0 0.0 0.5723" rpy="0.0 1.570796325 0.0"/>
         <parent link="forearm_link"/>
         <child  link="wrist_1_link"/>
-        <limit effort="54" lower="-3.14159265" upper="3.14159265" velocity="3.2"/>
+        <limit effort="54" lower="-3.0" upper="3.0" velocity="3.2"/>
 <!--        <safety_controller k_velocity="10" k_position="10" soft_lower_limit="-3.1" soft_upper_limit="3.1" />-->
         <axis xyz="0 1 0"/>
         <dynamics damping="1.0" friction="0.0"/>
@@ -237,7 +237,7 @@
         <origin xyz="0.0 0.1149 0.0" rpy="0.0 0.0 0.0"/>
         <parent link="wrist_1_link"/>
         <child  link="wrist_2_link"/>
-        <limit effort="54" lower="-3.14159265" upper="3.14159265" velocity="3.2"/>
+        <limit effort="54" lower="-3.0" upper="3.0" velocity="3.2"/>
 <!--        <safety_controller k_velocity="10" k_position="10" soft_lower_limit="-3.1" soft_upper_limit="3.1" />-->
         <axis xyz="0 0 1"/>
         <dynamics damping="1.0" friction="0.0"/>
@@ -278,7 +278,7 @@
         <origin xyz="0.0 0.0 0.1157" rpy="0.0 0.0 0.0"/>
         <parent link="wrist_2_link"/>
         <child  link="wrist_3_link"/>
-        <limit effort="54" lower="-3.14159265" upper="3.14159265" velocity="3.2"/>
+        <limit effort="54" lower="-3.0" upper="3.0" velocity="3.2"/>
 <!--        <safety_controller k_velocity="10" k_position="10" soft_lower_limit="-3.1" soft_upper_limit="3.1" />-->
         <axis xyz="0 1 0"/>
         <dynamics damping="0.5" friction="0.0"/>
