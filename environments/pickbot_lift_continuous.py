@@ -8,6 +8,7 @@ import sys
 import os
 import yaml
 import math
+import time
 import random
 import datetime
 import rospkg
@@ -263,13 +264,15 @@ class PickbotEnv(gym.Env):
         18) Return State
         """
 
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Reset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        # self.gazebo.change_gravity(0, 0, 0)
+        # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Reset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+        self.gazebo.change_gravity(0, 0, 0)
         self.controllers_object.turn_off_controllers()
         # turn off the gripper
         # U.turn_off_gripper()
         self.gazebo.resetSim()
-        # self.gazebo.pauseSim()
+        self.gazebo.pauseSim()
+        self.gazebo.resetSim()
+        time.sleep(0.1)
 
         # turn on the gripper
         # U.turn_on_gripper()
@@ -281,7 +284,7 @@ class PickbotEnv(gym.Env):
             # self.pickbot_joint_publisher_object.set_joints(sample_ep[0:6])
             self.set_target_object(sample_ep[-6:])
         else:
-            # self.pickbot_joint_publisher_object.set_joints()
+            self.pickbot_joint_publisher_object.set_joints()
             vg_geo = U.get_link_state("vacuum_gripper_link")
             to_geo = U.get_link_state("target")
             orientation_error = quaternion_multiply(vg_geo[3:], quaternion_conjugate(to_geo[3:]))
@@ -291,9 +294,9 @@ class PickbotEnv(gym.Env):
         # Code above is hard-coded for door handle, modify later.
         # TO-DO: Modify reset wrt the object type as in the reach env
 
-        # self.gazebo.unpauseSim()
+        self.gazebo.unpauseSim()
         self.controllers_object.turn_on_controllers()
-        # self.gazebo.change_gravity(0, 0, -9.81)
+        self.gazebo.change_gravity(0, 0, -9.81)
         self._check_all_systems_ready()
 
         # last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
@@ -311,10 +314,10 @@ class PickbotEnv(gym.Env):
         # get maximum distance to the object to calculate reward
         # self.max_distance, _ = U.get_distance_gripper_to_object()
         # self.min_distance = self.max_distance
-        # self.gazebo.pauseSim()
+        self.gazebo.pauseSim()
         state = U.get_state(observation)
         self._update_episode()
-        # self.gazebo.unpauseSim()
+        self.gazebo.unpauseSim()
         return state
 
     def step(self, action):

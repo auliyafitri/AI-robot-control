@@ -17,7 +17,7 @@ from environments.joint_array_publisher import JointArrayPub
 from std_msgs.msg import String
 
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
-
+last_timestamp = '2019-06-11_10h58min'
 
 num_env = 1
 env_id = "PickbotPickContinuousDoorHandle-v0"
@@ -28,6 +28,7 @@ task_name = "pick"
 # Create needed folders for log file and models
 logdir = os.path.dirname(evaluations.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + timestamp + '/'
 modelsdir = os.path.dirname(models.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + timestamp + '/'
+load_path = os.path.dirname(models.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + last_timestamp + '/'
 
 # Generate tensorboard file
 format_strs = ['stdout', 'log', 'csv', 'tensorboard']
@@ -56,7 +57,8 @@ def main():
         env=env,
         network='mlp',
         total_timesteps=1000000,
-        save_path=modelsdir
+        save_path=modelsdir,
+        load_path=load_path + "policy_best"
     )
 
     print("Saving model to " + modelsdir)
