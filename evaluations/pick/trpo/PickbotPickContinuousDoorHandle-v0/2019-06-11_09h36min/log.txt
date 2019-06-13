@@ -1,0 +1,78 @@
+Logging to /home/robotics/catkin_ws/src/AI-robot-control/evaluations/pick/trpo/PickbotPickContinuousDoorHandle-v0/2019-06-11_09h36min
+load_state method is deprecated, please use load_variables instead
+********** Iteration 0 ************
+Expected: 0.022 Actual: 0.022
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.482524     |
+| eplenmean       | 2.42         |
+| eprewmean       | -5.0745745   |
+| eprewsem        | 2.1889277    |
+| epsofar         | 481          |
+| epthisiter      | 481          |
+| ev_tdlam_before | 0.0866       |
+| meankl          | 0.0009955624 |
+| optimgain       | 0.021699116  |
+| surrgain        | 0.021699116  |
+| timelapsed      | 539          |
+| timestepsofar   | 1021         |
+----------------------------------
+********** Iteration 1 ************
+Expected: 0.023 Actual: 0.022
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.468146     |
+| eplenmean       | 1.85         |
+| eprewmean       | -4.5272913   |
+| eprewsem        | 1.5024991    |
+| epsofar         | 985          |
+| epthisiter      | 504          |
+| ev_tdlam_before | 0.0944       |
+| meankl          | 0.0010212159 |
+| optimgain       | 0.022450663  |
+| surrgain        | 0.022450663  |
+| timelapsed      | 1.09e+03     |
+| timestepsofar   | 2048         |
+----------------------------------
+********** Iteration 2 ************
+Expected: 0.023 Actual: 0.023
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.451821     |
+| eplenmean       | 1.95         |
+| eprewmean       | -4.689626    |
+| eprewsem        | 1.506123     |
+| epsofar         | 1497         |
+| epthisiter      | 512          |
+| ev_tdlam_before | 0.108        |
+| meankl          | 0.0010458259 |
+| optimgain       | 0.022919843  |
+| surrgain        | 0.022919843  |
+| timelapsed      | 1.63e+03     |
+| timestepsofar   | 3072         |
+----------------------------------
+********** Iteration 3 ************
+Expected: 0.023 Actual: 0.023
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.431975     |
+| eplenmean       | 1.62         |
+| eprewmean       | -4.311175    |
+| eprewsem        | 1.1820283    |
+| epsofar         | 2049         |
+| epthisiter      | 552          |
+| ev_tdlam_before | 0.0756       |
+| meankl          | 0.0010826441 |
+| optimgain       | 0.023392122  |
+| surrgain        | 0.023392122  |
+| timelapsed      | 2.18e+03     |
+| timestepsofar   | 4096         |
+----------------------------------
+********** Iteration 4 ************

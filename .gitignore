@@ -20,6 +20,15 @@ last_position.yml
 .tox
 .cache
 
-# local model and evaluation
-evaluations/
-models/
+# local model and evaluation, with exception
+!evaluations/
+evaluations/*
+!evaluations/pick/
+evaluations/pick/trpo/*
+!evaluations/pick/trpo/PickbotPickContinuousDoorHandle-v0
+
+!models/
+models/*
+!models/pick
+models/pick/trpo/*
+!models/pick/trpo/PickbotPickContinuousDoorHandle-v0
