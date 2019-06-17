@@ -181,3 +181,16 @@ register(
     },
     max_episode_steps=1000,
 )
+
+register(
+    id='PickbotReach5jsContinuousDoorHandle-v1',
+    entry_point='environments.pickbot_reach_5js_continuous:PickbotEnv',
+    kwargs={
+        'env_object_type': 'door_handle',
+        'random_position': True,
+        'sim_time_factor': 0.001,
+        'joint_increment_value': 1.0,
+        'added_target_height': 0.05
+    },
+    max_episode_steps=1000,
+)

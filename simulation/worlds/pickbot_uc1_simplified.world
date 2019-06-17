@@ -364,8 +364,8 @@
 
 
   <model name='door_handle'>
-  <pose frame=''>-0.13 0.848 1.06 0.002567 0.102 1.563</pose>
-    <link name='target'>
+  <pose frame=''>-0.13 0.848 1.1 0.002567 0.102 1.563</pose>
+    <link name='the_object'>
       <inertial>
         <mass>1</mass>
         <inertia>
@@ -460,6 +460,26 @@
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
   </model>
+
+  <model name='red_dot'>
+     <pose frame=''>-0.13 0.848 1.15 0.002567 0.102 1.563</pose>
+     <link name='target'>
+       <visual name='visual'>
+         <geometry>
+           <box>
+             <size>0.02 0.02 0.02</size>
+           </box>
+         </geometry>
+         <material>
+           <script>
+             <name>Gazebo/Red</name>
+             <uri>file://media/materials/scripts/gazebo.material</uri>
+           </script>
+         </material>
+       </visual>
+       <gravity>0</gravity>
+     </link>
+   </model>
 
     <gui fullscreen='0'>
       <camera name='user_camera'>
