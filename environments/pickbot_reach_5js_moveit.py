@@ -727,6 +727,7 @@ class PickbotEnv(gym.Env):
             print(">>>>>>>>>>>> NO MOTION PLAN!!! <<<<<<<<<<<<<<<")
             done = True
             done_reward = reward_no_motion_plan
+            invalid_collision = True
 
         # Successfully reached_goal: orientation of the end-effector and target is less than threshold also
         # distance is less than threshold
@@ -751,10 +752,10 @@ class PickbotEnv(gym.Env):
         #     print("Successful contact so far: {} attempts".format(self.successful_attempts))
 
         # Crashing with itself, shelf, base
-        if invalid_collision:
-            done = True
-            print('>>>>>>>>>>>>>>>>>>>> crashing')
-            # done_reward = reward_crashing
+        # if invalid_collision:
+        #     done = True
+        #     print('>>>>>>>>>>>>>>>>>>>> crashing')
+        #    done_reward = reward_crashing
 
         joint_exceeds_limits = False
         for joint_pos in self.joints_state.position:
