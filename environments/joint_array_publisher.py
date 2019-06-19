@@ -80,7 +80,7 @@ class JointArrayPub(object):
         # reset_req.joint_names =[ 'elbow_joint', 'shoulder_lift_joint','shoulder_pan_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
         # reset_req.joint_positions = array
         # res = self.reset_joints(reset_req)
-        self.pub_joints_to_moveit(self.init_pos)
+        self.pub_joints_to_moveit(array)
 
 
         

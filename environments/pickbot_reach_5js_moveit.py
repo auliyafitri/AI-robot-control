@@ -23,6 +23,7 @@ import environments.util_math as UMath
 from environments.gazebo_connection import GazeboConnection
 from environments.controllers_connection import ControllersConnection
 from environments.joint_publisher import JointPub
+from environments.joint_array_publisher import JointArrayPub
 from baselines import logger
 
 
@@ -42,6 +43,7 @@ from gazebo_msgs.msg import ModelState
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 from openai_ros.msg import RLExperimentInfo
+from moveit_msgs.msg import MoveGroupActionFeedback
 
 from simulation.msg import VacuumGripperState
 from simulation.srv import VacuumGripperControl
@@ -82,6 +84,13 @@ class PickbotEnv(gym.Env):
         self.contact_1_force = Vector3()
         self.contact_2_force = Vector3()
         self.gripper_state = VacuumGripperState()
+        
+        # MoveIt! ======
+        self.movement_complete = Bool()
+        self.movement_complete.data = False
+        self.moveit_action_feedback = MoveGroupActionFeedback()
+        self.feedback_list = []
+        # ==============
 
         self._list_of_observations = ["elbow_joint_state",
                                       "shoulder_lift_joint_state",
@@ -117,6 +126,7 @@ class PickbotEnv(gym.Env):
         self.gazebo = GazeboConnection(sim_time_factor=sim_time_factor)
         self.controllers_object = ControllersConnection()
         self.pickbot_joint_publisher_object = JointPub()
+        self.publisher_to_moveit_object = JointArrayPub()
 
         # Define Subscribers as Sensordata
         """
@@ -128,11 +138,19 @@ class PickbotEnv(gym.Env):
         6) /camera_rgb/image_raw   
         7) /camera_depth/depth/image_raw
         """
-        rospy.Subscriber("/pickbot/joint_states", JointState, self.joints_state_callback)
+
+        # PID Controller
+        # rospy.Subscriber("/pickbot/joint_states", JointState, self.joints_state_callback)
+
+        # MoveIt! Controller
+        rospy.Subscriber("/joint_states", JointState, self.joints_state_callback)
+        rospy.Subscriber("/pickbot/movement_complete", Bool, self.movement_complete_callback)
+        rospy.Subscriber("/move_group/feedback", MoveGroupActionFeedback, self.move_group_action_feedback_callback, queue_size=4)
+        
         rospy.Subscriber("/gripper_contactsensor_1_state", ContactsState, self.contact_1_callback)
         rospy.Subscriber("/gripper_contactsensor_2_state", ContactsState, self.contact_2_callback)
         rospy.Subscriber("/gz_collisions", Bool, self.collision_callback)
-        rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
+        # rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
         # rospy.Subscriber("/camera_rgb/image_raw", Image, self.camera_rgb_callback)
         # rospy.Subscriber("/camera_depth/depth/image_raw", Image, self.camera_depth_callback)
 
@@ -238,161 +256,118 @@ class PickbotEnv(gym.Env):
     def gripper_state_callback(self, msg):
         self.gripper_state = msg
 
+    def movement_complete_callback(self, msg):
+        self.movement_complete = msg
+
+    def move_group_action_feedback_callback(self, msg):
+        self.moveit_action_feedback = msg
+
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
     def reset(self):
         """
-        Reset The Robot to its initial Position and restart the Controllers
-
-        1) Change Gravity to 0 -> That arm doesnt fall
-        2) Turn Controllers off
-        3) Pause Simulation
-        4) Delete previous target object if randomly chosen object is set to True
-        4) Reset Simulation
-        5) Set Model Pose to desired one
-        6) Unpause Simulation
-        7) Turn on Controllers
-        8) Restore Gravity
-        9) Get Observations and return current State
-        10) Check all Systems work
-        11) Spawn new target
-        12) Pause Simulation
-        13) Write initial Position into Yaml File
-        14) Create YAML Files for contact forces in order to get the average over 2 contacts
-        15) Create YAML Files for collision to make sure to see a collision due to high noise in topic
-        16) Unpause Simulation cause in next Step System must be running otherwise no data is seen by Subscribers
-        17) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
-        18) Return State
+        Reset The Robot to its initial Position and restart the Controllers 
+        1) Publish the initial joint_positions to MoveIt
+        2) Busy waiting until the movement is completed by MoveIt
+        3) set target_object to random position
+        4) Check all Systems work
+        5) Create YAML Files for contact forces in order to get the average over 2 contacts
+        6) Create YAML Files for collision to make shure to see a collision due to high noise in topic
+        7) Get Observations and return current State
+        8) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
+        9) Return State
         """
 
-        # print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Reset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        self.gazebo.change_gravity(0, 0, 0)
-        self.controllers_object.turn_off_controllers()
-        # turn off the gripper
-        # U.turn_off_gripper()
-        self.gazebo.resetSim()
-        self.gazebo.pauseSim()
-        self.gazebo.resetSim()
-        time.sleep(0.1)
+        init_joint_pos = [0, -1.57, 1.57, 0, 0, 0]
+        self.publisher_to_moveit_object.set_joints(init_joint_pos)
 
-        # turn on the gripper
-        # U.turn_on_gripper()
-
-        if self._load_init_pos:
-            # # load sample from previous training result
-            # sample_ep = random.choice(self.init_samples)
-            # print("Joints from samples: {}".format(sample_ep[0:6]))
-            # # self.pickbot_joint_publisher_object.set_joints(sample_ep[0:6])
-            # self.set_target_object(sample_ep[-6:])
+        while not self.movement_complete.data:
             pass
-        else:
-            self.pickbot_joint_publisher_object.set_joints([0, -1.57, 1.57, 0, 0, 0])
-            # vg_geo = U.get_link_state("vacuum_gripper_link")
-            # to_geo = U.get_link_state("target")
-            # orientation_error = quaternion_multiply(vg_geo[3:], quaternion_conjugate(to_geo[3:]))
-            # print("Orientation error {}".format(orientation_error))
-            self.set_target_object(random_object=self._random_object, random_position=self._random_position)
-            # box_pos = U.get_random_door_handle_pos() if self._random_position else self.object_initial_position
-            # U.change_object_position(self.object_name, box_pos)
-        # Code above is hard-coded for door handle, modify later.
-        # TO-DO: Modify reset wrt the object type as in the reach env
+        # print(">>>>>>>>>>>>>>>>>>> RESET: Waiting complete")
 
-        self.gazebo.unpauseSim()
-        self.controllers_object.turn_on_controllers()
-        self.gazebo.change_gravity(0, 0, -9.81)
+        start_ros_time = rospy.Time.now()
+        while True:
+            elapsed_time = rospy.Time.now() - start_ros_time
+            if np.isclose(init_joint_pos, self.joints_state.position, rtol=0.0, atol=0.01).all():
+                break
+            elif elapsed_time > rospy.Duration(2): # time out
+                break
+
+        self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         self._check_all_systems_ready()
 
-        # last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
-        # last_position = [0, 0, 0, 0, 0, 0]
-        # with open('last_position.yml', 'w') as yaml_file:
-        #     yaml.dump(last_position, yaml_file, default_flow_style=False)
-        # with open('contact_1_force.yml', 'w') as yaml_file:
-        #     yaml.dump(0.0, yaml_file, default_flow_style=False)
-        # with open('contact_2_force.yml', 'w') as yaml_file:
-        #     yaml.dump(0.0, yaml_file, default_flow_style=False)
+        with open('contact_1_force.yml', 'w') as yaml_file:
+            yaml.dump(0.0, yaml_file, default_flow_style=False)
+        with open('contact_2_force.yml', 'w') as yaml_file:
+            yaml.dump(0.0, yaml_file, default_flow_style=False)
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
-        # print("current joints {}".format(observation[:6]))
-        # get maximum distance to the object to calculate reward
-        # self.max_distance, _ = U.get_distance_gripper_to_object()
-        # self.min_distance = self.max_distance
-        self.gazebo.pauseSim()
+        # self.object_position = observation[9:12]
+
         state = U.get_state(observation)
         self._update_episode()
-        self.gazebo.unpauseSim()
         return state
-
+    
     def step(self, action):
         """
         Given the action selected by the learning algorithm,
         we perform the corresponding movement of the robot
         return: the state of the robot, the corresponding reward for the step and if its done(terminal State)
 
-        1) read last published joint from YAML
-        2) define ne joints acording to chosen action
-        3) Write joint position into YAML to save last published joints for next step
-        4) Unpause, Move to that pos for defined time, Pause
-        5) Get Observations and pause Simulation
-        6) Convert Observations into State
-        7) Unpause Simulation check if its done, calculate done_reward and pause Simulation again
-        8) Calculate reward based on Observatin and done_reward
-        9) Unpause that topics can be received in next step
-        10) Return State, Reward, Done
+        1) Read last joint positions by getting the observation before acting
+        2) Get the new joint positions according to chosen action (actions here are the joint increments)
+        3) Publish the joint_positions to MoveIt, meanwhile busy waiting, until the movement is complete
+        4) Get new observation after performing the action
+        5) Convert Observations into States
+        6) Check if the task is done or crashing happens, calculate done_reward and pause Simulation again
+        7) Calculate reward based on Observatin and done_reward
+        8) Return State, Reward, Done
         """
 
-        self.old_obs = self.get_obs()
-
         print("====================================================================")
-        # print("action: {}".format(action))
 
-        # 1) read last_position out of YAML File
+        self.movement_complete.data = False
+
+        # 1) Read last joint positions by getting the observation before acting
+        self.old_obs = self.get_obs()
         last_position = self.old_obs[:6]
-        # with open("last_position.yml", 'r') as stream:
-        #     try:
-        #         last_position = (yaml.load(stream, Loader=yaml.Loader))
-        #     except yaml.YAMLError as exc:
-        #         print(exc)
-        # 2) get the new joint positions according to chosen action
+        
+        # 2) Get the new joint positions according to chosen action (actions here are the joint increments)
         if self._joint_increment_value is None:
             next_action_position = np.append(action, last_position[-1])
         else:
-            next_action_position = self.get_action_to_position(np.clip(action, -self._joint_increment_value, self._joint_increment_value),
-                                                           last_position)
+            next_action_position = self.get_action_to_position(action, last_position)
         print("next action position: {}".format(np.around(next_action_position, decimals=3)))
 
-        # 3) write last_position into YAML File
-        # with open('last_position.yml', 'w') as yaml_file:
-        #     yaml.dump(next_action_position, yaml_file, default_flow_style=False)
-
-        # 4) unpause, move to position for certain time
-        self.gazebo.unpauseSim()
-        self.pickbot_joint_publisher_object.move_joints(next_action_position)
-        # time.sleep(self.running_step)
+        # 3) Move to position and wait for moveit to complete the execution
+        self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
+        while not self.movement_complete.data:
+            pass
 
         # Busy waiting until all the joints reach the next_action_position (first the third joints are reversed)
         start_ros_time = rospy.Time.now()
         while True:
             # Check collision:
-            invalid_collision = self.get_collisions()
-            if invalid_collision:
-                print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
-                observation = self.get_obs()
-                print("joints after reset collision : {} ".format(observation[:6]))
+            # invalid_collision = self.get_collisions()
+            # if invalid_collision:
+            #     print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
+            #     observation = self.get_obs()
+            #     print("joints after reset collision : {} ".format(observation[:6]))
 
-                # calculate reward immediately
-                distance_error = observation[6:9] - observation[13:16]
-                orientation_error = quaternion_multiply(observation[9:13], quaternion_conjugate(observation[16:]))
+            #     # calculate reward immediately
+            #     distance_error = observation[6:9] - observation[13:16]
+            #     orientation_error = quaternion_multiply(observation[9:13], quaternion_conjugate(observation[16:]))
 
-                rewardDist = UMath.rmseFunc(distance_error)
-                # rewardOrientation = 2 * np.arccos(abs(orientation_error[0]))
+            #     rewardDist = UMath.rmseFunc(distance_error)
+            #     # rewardOrientation = 2 * np.arccos(abs(orientation_error[0]))
 
-                reward = UMath.computeReward(rewardDist, invalid_collision)
-                print("Reward this step after colliding {}".format(reward))
-                self.accumulated_episode_reward += reward
-                return U.get_state(observation), reward, True, {}
+            #     reward = UMath.computeReward(rewardDist, invalid_collision)
+            #     print("Reward this step after colliding {}".format(reward))
+            #     self.accumulated_episode_reward += reward
+            #     return U.get_state(observation), reward, True, {}
 
             elapsed_time = rospy.Time.now() - start_ros_time
             if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
@@ -401,44 +376,30 @@ class PickbotEnv(gym.Env):
                 print("TIME OUT, joints haven't reach positions")
                 break
 
-        # 5) Get Observations and pause Simulation
+        # 4) Get new observation
         observation = self.get_obs()
-        print("Observation in the step: {}".format(np.around(observation[:6], decimals=3)))
-        print("Joints      in the step: {}".format(np.around(self.joints_state.position, decimals=3)))
-        # if observation[0] < self.min_distance:
-        #     self.min_distance = observation[0]
-        self.gazebo.pauseSim()
+        
 
-        # 6) Convert Observations into state
+        # 5) Convert Observations into state
         state = U.get_state(observation)
 
-        # U.get_obj_orient()
+        # 6) Check if its done, calculate done_reward
+        done, done_reward, invalid_contact = self.is_done(observation)
 
-        # 7) Unpause Simulation check if its done, calculate done_reward
-        self.gazebo.unpauseSim()
-        done, done_reward, invalid_collision = self.is_done(observation, last_position)
-        self.gazebo.pauseSim()
-
-        # 8) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
-        # reward = self.compute_reward(observation, done_reward, invalid_contact)
-        # reward = UMath.compute_reward_orient(observation, done_reward, invalid_contact)
-
+        # 7) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
         distance_error = observation[6:9] - observation[13:16]
         orientation_error = quaternion_multiply(observation[9:13], quaternion_conjugate(observation[16:]))
 
         rewardDist = UMath.rmseFunc(distance_error)
         rewardOrientation = 2 * np.arccos(abs(orientation_error[0]))
 
-        reward = UMath.computeReward(rewardDist, rewardOrientation, invalid_collision) + done_reward
+        reward = UMath.computeReward(rewardDist, rewardOrientation, invalid_contact) + done_reward
         print("Reward this step {}".format(reward))
 
         self.accumulated_episode_reward += reward
-
-        # 9) Unpause that topics can be received in next step
-        self.gazebo.unpauseSim()
-
         self.episode_steps += 1
-        # 10) Return State, Reward, Done
+
+        # 8) Return State, Reward, Done
         return state, reward, done, {}
 
     def _check_all_systems_ready(self):
@@ -468,7 +429,8 @@ class PickbotEnv(gym.Env):
         joint_states_msg = None
         while joint_states_msg is None and not rospy.is_shutdown():
             try:
-                joint_states_msg = rospy.wait_for_message("/pickbot/joint_states", JointState, timeout=0.1)
+                # joint_states_msg = rospy.wait_for_message("/pickbot/joint_states", JointState, timeout=0.1)
+                joint_states_msg = rospy.wait_for_message("/joint_states", JointState, timeout=0.1)
                 self.joints_state = joint_states_msg
                 rospy.logdebug("Current joint_states READY")
             except Exception as e:
@@ -739,7 +701,7 @@ class PickbotEnv(gym.Env):
         else:
             return False
 
-    def is_done(self, observations, last_position):
+    def is_done(self, observations):
         """Checks if episode is done based on observations given.
 
         Done when:
@@ -752,9 +714,19 @@ class PickbotEnv(gym.Env):
         done_reward = 0
         reward_reached_goal = 1000
         reward_crashing = -2000
+        reward_no_motion_plan = 0
+        reward_joint_range = 0
 
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
+
+        if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or  \
+                self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
+                self.moveit_action_feedback.status.text == "Motion plan was found but it seems to be invalid (possibly due to postprocessing).Not executing.":
+
+            print(">>>>>>>>>>>> NO MOTION PLAN!!! <<<<<<<<<<<<<<<")
+            done = True
+            done_reward = reward_no_motion_plan
 
         # Successfully reached_goal: orientation of the end-effector and target is less than threshold also
         # distance is less than threshold
@@ -784,10 +756,29 @@ class PickbotEnv(gym.Env):
             print('>>>>>>>>>>>>>>>>>>>> crashing')
             # done_reward = reward_crashing
 
-        return done, done_reward, invalid_collision
+        joint_exceeds_limits = False
+        for joint_pos in self.joints_state.position:
+            joint_correction = []
+            if joint_pos < -math.pi or joint_pos > math.pi:
+                joint_exceeds_limits = True
+                done = True
+                done_reward = reward_joint_range
+                print('>>>>>>>>>>>>>>>>>>>> joint exceeds limit <<<<<<<<<<<<<<<<<<<<<<<')
+                joint_correction.append(-joint_pos)
+            else:
+                joint_correction.append(0.0)
 
-    def load_position(self):
-        pass
+        if joint_exceeds_limits:
+            print("is_done: Joints: {}".format(np.round(self.joints_state.position, decimals=3)))
+            self.publisher_to_moveit_object.pub_joints_to_moveit([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+            while not self.movement_complete.data:
+                pass
+            self.publisher_to_moveit_object.pub_relative_joints_to_moveit(joint_correction)
+            while not self.movement_complete.data:
+                pass
+            print('>>>>>>>>>>>>>>>> joint corrected <<<<<<<<<<<<<<<<<')
+
+        return done, done_reward, invalid_collision
 
     def _update_episode(self):
         """

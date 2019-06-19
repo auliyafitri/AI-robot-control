@@ -17,10 +17,11 @@ from environments.joint_array_publisher import JointArrayPub
 from std_msgs.msg import String
 
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
-# last_timestamp = '2019-06-12_16h10min'
+last_timestamp = '2019-06-18_08h14min'
 
 num_env = 1
-env_id = "PickbotReach5jsContinuousDoorHandle-v1"
+# env_id = "PickbotReach5jsContinuousDoorHandle-v1"
+env_id = "MoveIt_Reach5jsContinuousDoorHandle-v1"
 env_type = "classic_control"
 seed = None
 task_name = "reach"
@@ -28,7 +29,7 @@ task_name = "reach"
 # Create needed folders for log file and models
 logdir = os.path.dirname(evaluations.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + timestamp + '/'
 modelsdir = os.path.dirname(models.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + timestamp + '/'
-# load_path = os.path.dirname(models.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + last_timestamp + '/'
+load_path = os.path.dirname(models.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + last_timestamp + '/'
 
 # Generate tensorboard file
 format_strs = ['stdout', 'log', 'csv', 'tensorboard']

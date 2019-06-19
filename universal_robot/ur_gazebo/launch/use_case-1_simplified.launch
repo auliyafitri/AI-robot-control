@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="limited" default="true"  doc="If true, limits joint range [-PI, PI] on all joints." />
+  <arg name="paused" default="false" doc="Starts gazebo in paused mode" />
+  <arg name="gui" default="true" doc="Starts gazebo gui" />
+  <arg name="robot" default="machines"/>
+  <arg name="debug" default="false"/>
+  <arg name="headless" default="false"/>
+
+  <!-- startup simulated world -->
+  <include file="$(find ur_gazebo)/worlds/empty_world.launch">
+    <arg name="world_name" value="$(find simulation)/worlds/pickbot_uc1_simplified.world"/>
+    <arg name="debug" value="$(arg debug)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="headless" value="$(arg headless)"/>
+  </include>
+
+  <!-- send robot urdf to param server -->
+  <include file="$(find ur_description)/launch/ur10_upload.launch">
+    <arg name="limited" value="$(arg limited)"/>
+  </include>
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot" respawn="false" output="screen" />
+
+  <include file="$(find ur_gazebo)/launch/controller_utils.launch"/>
+
+  <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur10.yaml" command="load"/>
+  <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn arm_controller" respawn="false" output="screen"/>
+
+  <!-- Launch the republisher gz topic to ros topic -->
+  <node pkg="simulation" name="gz_topic_republisher" type="gz_subscriber.py" output="screen"/>
+
+  <!-- Startup ur5_moveit_planning_execution.launch with args: sim:=true and limited:=true -->
+  <include file="$(find ur10_moveit_config)/launch/ur10_moveit_planning_execution.launch">
+      <arg name="sim" value="true"/>
+      <arg name="limited" value="true"/>
+  </include>
+
+</launch>
