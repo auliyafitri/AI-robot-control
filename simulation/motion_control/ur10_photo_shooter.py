@@ -510,7 +510,7 @@ def photo_shooter():
                                                group.get_current_pose().pose.position.z))
 
     print("2. Moving to position 2")
-    assign_pose_target(0.0, 0.5, 1.84, 0.0, 0.0, 0.0, 0.0)
+    assign_pose_target(0.0, 0.82, 1.84, 0.0, 0.0, 0.0, 0.0)
     print ("Current position 2: {},{},{}".format(group.get_current_pose().pose.position.x,
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
@@ -525,7 +525,7 @@ def photo_shooter():
         if moving:
             new_image = False
             print("Moving to position: ")
-            assign_pose_target(-0.1, position_y, 0.6, 0.0, 0.0, 0.0, 0.0)
+            assign_pose_target(-0.1, position_y, 1.74, 0.0, 0.0, 0.0, 0.0)
             print ("Current position: {},{},{}".format(group.get_current_pose().pose.position.x,
                                             group.get_current_pose().pose.position.y,
                                             group.get_current_pose().pose.position.z))
@@ -542,7 +542,7 @@ def photo_shooter():
         if moving:
             new_image = False
             print("Moving to position: ")
-            assign_pose_target(position_x, 0.8, 0.6, 0.0, 0.0, 0.0, 0.0)
+            assign_pose_target(position_x, 0.8, 1.74, 0.0, 0.0, 0.0, 0.0)
             print ("Current position: {},{},{}".format(group.get_current_pose().pose.position.x,
                                             group.get_current_pose().pose.position.y,
                                             group.get_current_pose().pose.position.z))
