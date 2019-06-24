@@ -42,10 +42,12 @@ rospy.init_node('move_group_python_interface_tutorial', anonymous=True) #initial
 robot = moveit_commander.RobotCommander() #define the robot
 scene = moveit_commander.PlanningSceneInterface() #define the scene
 group = moveit_commander.MoveGroupCommander("manipulator") #define the planning group (from the moveit packet 'manipulator' planning group)
-display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory) #publisher that publishes a plan to the topic: '/move_group/display_planned_path'
+display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory, queue_size=10) #publisher that publishes a plan to the topic: '/move_group/display_planned_path'
 # gripper_publisher = rospy.Publisher('CModelRobotOutput', outputMsg.CModel_robot_output)
 tf_listener = tf.TransformListener()
 tf_broadcaster = tf.TransformBroadcaster()
+# group.set_end_effector_link("vacuum_gripper_link")
+group.set_end_effector_link("gripper_contactsensor_link_1")
 
 
 
@@ -488,14 +490,27 @@ def callback_depth(ros_img):
 
  
 def photo_shooter():
+
+    print("Moving to real robot position")
+    # assign_pose_target(-0.52, 0.1166, 0.22434, 0.0, 0.707, -0.707, 0.0)
+    assign_joint_value(1.5, -1.2, 1.4, -1.87, -1.57, 0)
+    print ("Current position 1: {},{},{}".format(group.get_current_pose().pose.position.x,
+                                               group.get_current_pose().pose.position.y,
+                                               group.get_current_pose().pose.position.z))
+    # -0.215268462831,0.823047229224,1.64087635599    ee_link
+    # -0.0980773344623,0.936432150844,1.42101275111   vacuum_gripper_link
+    # -0.117190292953,0.937696817126,1.42097040156    gripper_contactsensor_link_1
+    # TODO: due the missing vacuum_gripper_joint is not known by moveit, vacuum_gripper_link cannot be used as end_effector
+
     print("1. Moving to starting position")
-    assign_pose_target(0.4, 0.5, 0.6, 0.2, 0.0, 0.0, 0.0)
+    # assign_pose_target(0.0, 0.9, 1.6, 0.0, 0.0, 0.0, 0.0)
+    assign_pose_target(-0.21, 0.82, 1.74, 0.0, 0.0, 0.0, 0.0)
     print ("Current position 1: {},{},{}".format(group.get_current_pose().pose.position.x,
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
 
     print("2. Moving to position 2")
-    assign_pose_target(0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0)
+    assign_pose_target(0.0, 0.5, 1.84, 0.0, 0.0, 0.0, 0.0)
     print ("Current position 2: {},{},{}".format(group.get_current_pose().pose.position.x,
                                                group.get_current_pose().pose.position.y,
                                                group.get_current_pose().pose.position.z))
@@ -555,6 +570,12 @@ if __name__ == '__main__':
     #     manipulator_arm_control()
     #     moveit_commander.roscpp_shutdown() #shut down the moveit_commander
     # except rospy.ROSInterruptException: pass
+
+    # old = group.get_end_effector_link()
+    # print(old)
+    # group.set_end_effector_link("vacuum_gripper_link")
+    new = group.get_end_effector_link()
+    print(new)
 
     photo_shooter()
     # print ("Current position: {},{},{}".format(group.get_current_pose().pose.position.x,
