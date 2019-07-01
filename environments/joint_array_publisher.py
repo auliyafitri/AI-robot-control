@@ -13,8 +13,8 @@ import numpy as np
 
 class JointArrayPub(object):
     def __init__(self):
-        self.joint_pub = rospy.Publisher('/pickbot/target_joint_positions', JointState, queue_size=10)
-        self.relative_joint_pub = rospy.Publisher('/pickbot/relative_joint_positions', JointState, queue_size=10)
+        self.joint_pub = rospy.Publisher('/pickbot/target_joint_positions', JointState, queue_size=1)
+        self.relative_joint_pub = rospy.Publisher('/pickbot/relative_joint_positions', JointState, queue_size=1)
         self.init_pos = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
 
     def set_init_pose(self):
@@ -80,7 +80,7 @@ class JointArrayPub(object):
         # reset_req.joint_names =[ 'elbow_joint', 'shoulder_lift_joint','shoulder_pan_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
         # reset_req.joint_positions = array
         # res = self.reset_joints(reset_req)
-        self.pub_joints_to_moveit(self.init_pos)
+        self.pub_joints_to_moveit(array)
 
 
         

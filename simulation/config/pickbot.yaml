@@ -8,7 +8,8 @@ pickbot:
   # Creates the /joint_states topic necessary in ROS
   joint_state_controller:
     type: joint_state_controller/JointStateController
-    publish_rate: 1000
+    # publish_rate: 1000
+    publish_rate: 25
 
   # Effort Controllers ---------------------------------------
   joint1_position_controller:

@@ -30,7 +30,7 @@ class JointPub(object):
         self.publishers_array.append(self._joint6_pub)
         self.init_pos = [1.5,-1.2,1.4,-1.87,-1.57,0] #[0, 0, 0, 0, 0, 0]
 
-        self.reset_joints =  rospy.ServiceProxy('/gazebo/set_model_configuration', SetModelConfiguration)
+        self.reset_joints = rospy.ServiceProxy('/gazebo/set_model_configuration', SetModelConfiguration)
 
     def set_init_pose(self):
         """

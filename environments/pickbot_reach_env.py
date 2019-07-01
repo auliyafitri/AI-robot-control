@@ -47,7 +47,7 @@ from simulation.srv import VacuumGripperControl
 # DEFINE ENVIRONMENT CLASS
 class PickbotEnv(gym.Env):
 
-    def __init__(self, joint_increment=None, sim_time_factor=0.005, random_object=False, random_position=False,
+    def __init__(self, joint_increment=0.1, sim_time_factor=0.005, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
@@ -301,8 +301,10 @@ class PickbotEnv(gym.Env):
         8) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
         9) Return State
         """
+        print("###########  RESET #################")
         # print("Joint (reset): {}".format(np.around(self.joints_state.position, decimals=3)))
         init_joint_pos = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
+        # init_joint_pos = [1.626, -0.855, 1.58, -2.761, -1.606, 0.233]
         self.publisher_to_moveit_object.set_joints(init_joint_pos)
 
         # print(">>>>>>>>>>>>>>>>>>> RESET: waiting for the movement to complete")
@@ -327,6 +329,7 @@ class PickbotEnv(gym.Env):
             if np.isclose(init_joint_pos, self.joints_state.position, rtol=0.0, atol=0.01).all():
                 break
             elif elapsed_time > rospy.Duration(2): # time out
+                print("Movement TIME OUT")
                 break
 
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
@@ -414,7 +417,7 @@ class PickbotEnv(gym.Env):
         new_observation = self.get_obs()
         if new_observation[0] < self.min_distace:
             self.min_distace = new_observation[0]
-        # print("observ: {}".format( np.around(new_observation[1:7], decimals=3)))
+        print("observ: {}".format( np.around(new_observation[1:7], decimals=3)))
 
         # 5) Convert Observations into state
         state = U.get_state(new_observation)
@@ -546,16 +549,10 @@ class PickbotEnv(gym.Env):
             self.object_name = rand_object["name"]
             self.object_type_str = rand_object["type"]
             self.object_type = self.object_list.index(rand_object)
-            init_pos = rand_object["init_pos"]
-            self.object_initial_position = Pose(position=Point(x=init_pos[0], y=init_pos[1], z=init_pos[2]),
-                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4], init_pos[5]))
         else:
             self.object_name = self.object_list[0]["name"]
             self.object_type_str = self.object_list[0]["type"]
             self.object_type = 0
-            init_pos = self.object_list[0]["init_pos"]
-            self.object_initial_position = Pose(position=Point(x=init_pos[0], y=init_pos[1], z=init_pos[2]),
-                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4], init_pos[5]))
 
         if random_position:
             if self.object_type_str == "door_handle":
@@ -802,14 +799,18 @@ class PickbotEnv(gym.Env):
 
         ####################################################################################
         # Plan1: Reach a point in 3D space (usually right above the target object)         #
-        # Reward only dependent on distance. Nu punishment for crashing or joint_limits    #
+        # Reward only dependent on distance. No punishment for crashing or joint_limits    #
         ####################################################################################
         done = False
         done_reward = 0
-        reward_reached_goal = 100
+        reward_reached_goal = 0
         reward_crashing = 0
         reward_no_motion_plan = 0
         reward_joint_range = 0
+
+        ####################################################################################
+        # End of Plan1 reward                                                              #
+        ####################################################################################
 
 
         # Check if there are invalid collisions
@@ -823,6 +824,7 @@ class PickbotEnv(gym.Env):
             print(">>>>>>>>>>>> NO MOTION PLAN!!! <<<<<<<<<<<<<<<")
             done = True
             done_reward = reward_no_motion_plan
+            invalid_collision = True  # No Motion plan means the action will cause collision in MoveIt.
 
         # Successfully reached goal: Contact with at least one contact sensor and there is no invalid contact
         if observations[7] != 0 and observations[8] != 0 and not invalid_collision:

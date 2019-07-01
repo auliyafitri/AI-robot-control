@@ -61,7 +61,7 @@ register(
         'random_object': False,
         'random_position': True,
     },
-    max_episode_steps=300,
+    max_episode_steps=1024,
 )
 
 # MoveIt Env
@@ -106,8 +106,6 @@ register(
         'random_object': False,
         'random_position': True,
         'env_object_type': 'door_handle',
-        'joint_increment': None,
-        'sim_time_factor': 0.001,
     },
     max_episode_steps=300,
 )
@@ -136,36 +134,4 @@ register(
         'env_object_type': 'door_handle',
     },
     max_episode_steps=300,
-)
-
-# Combox
-register(
-    id='PickbotReachDiscreteCombox-v0',
-    entry_point='environments.pickbot_env_npstate:PickbotEnv',
-    kwargs={
-        'env_object_type': 'combox',
-    },
-    max_episode_steps=300,
-)
-
-register(
-    id='PickbotReachContinuousCombox-v0',
-    entry_point='environments.pickbot_env_continuous:PickbotEnv',
-    kwargs={
-        'env_object_type': 'combox',
-    },
-    max_episode_steps=300,
-)
-
-# Pick
-register(
-    id='PickbotPickDiscreteDoorHandle-v1',
-    entry_point='environments.pickbot_lift_npstate:PickbotEnv',
-    kwargs={
-        'env_object_type': 'door_handle',
-        'random_position': False,
-        'sim_time_factor': 0.001,
-        'joint_increment_value': 0.174
-    },
-    max_episode_steps=500,
 )

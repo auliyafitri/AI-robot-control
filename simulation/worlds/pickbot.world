@@ -262,9 +262,7 @@
         <gravity>1</gravity>
       </link>
     </model>
-
-   
-
+    
     <gui fullscreen='0'>
       <camera name='user_camera'>
         <pose frame=''>4.99035 -4.88266 2.31748 0 0.275643 2.35619</pose>
