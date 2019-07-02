@@ -71,6 +71,20 @@ def joint_callback(data):
     pub.publish(complete_msg)
 
 
+def pose_callback(data):
+    pos = data.position
+    pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
+    complete_msg = Bool()
+    complete_msg.data = False
+    check_publishers_connection(pub)
+    pub.publish(complete_msg)
+
+    assign_pose_target(pos.x, pos.y, pos.z, 'nil', 'nil', 'nil', 'nil')
+
+    complete_msg.data = True
+    pub.publish(complete_msg)
+
+
 def relative_joint_callback(data):
     pos = data.position
     pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
@@ -254,7 +268,7 @@ def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
 
 
 def assign_pose_target(pos_x, pos_y, pos_z, orient_x, orient_y, orient_z, orient_w):
-    group.set_max_velocity_scaling_factor(0.1)
+    # group.set_max_velocity_scaling_factor(0.1)
     pose_target = group.get_current_pose() # create a pose variable. The parameters can be seen from "$ rosmsg show Pose"
 
     #Assign values
@@ -406,5 +420,6 @@ if __name__ == '__main__':
 
     rospy.Subscriber('/pickbot/target_joint_positions/', JointState, joint_callback)
     rospy.Subscriber('/pickbot/relative_joint_positions', JointState, relative_joint_callback)
+    rospy.Sublisher('/pickbot/target_pose', Pose, pose_callback)
     print("listening to joint states now")
     rospy.spin()
