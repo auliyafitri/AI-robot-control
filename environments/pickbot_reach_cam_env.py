@@ -128,6 +128,16 @@ class PickbotReachCamEnv(gym.Env):
         Reward Range: -infitity to infinity 
         """
 
+        self._list_of_status = ["distance_gripper_to_object",
+                                      "contact_1_force",
+                                      "contact_2_force",
+                                      "object_pos_x",
+                                      "object_pos_y",
+                                      "object_pos_z",
+                                      "min_distance_gripper_to_object"]
+        if self._use_object_type:
+            self._list_of_status.append("object_type")
+
         self.observation_space = spaces.Box(low=0, high=255, shape=(self._height, self._width, 4), dtype=np.uint8)
         self.reward_range = (-np.inf, np.inf)
 
@@ -211,7 +221,6 @@ class PickbotReachCamEnv(gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-
     def reset(self):
         """
         Reset The Robot to its initial Position and restart the Controllers 
@@ -229,24 +238,12 @@ class PickbotReachCamEnv(gym.Env):
         init_joint_pos = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
         self.publisher_to_moveit_object.set_joints(init_joint_pos)
 
-        # print(">>>>>>>>>>>>>>>>>>> RESET: waiting for the movement to complete")
-        # rospy.wait_for_message("/pickbot/movement_complete", Bool)
+        # Busy waiting for moveit to complete the movement
         while not self.movement_complete.data:
             pass
         # print(">>>>>>>>>>>>>>>>>>> RESET: Waiting complete")
-
         start_ros_time = rospy.Time.now()
         while True:
-            # Check collision:
-            # invalid_collision = self.get_collisions()
-            # if invalid_collision:
-            #     print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
-            #     observation = self.get_obs()
-            #     reward = UMath.compute_reward(observation, -200, True)
-            #     observation = self.get_obs()
-            #     print("Test Joint: {}".format(np.around(observation[1:7], decimals=3)))
-            #     return U.get_state(observation), reward, True, {}
-
             elapsed_time = rospy.Time.now() - start_ros_time
             if np.isclose(init_joint_pos, self.joints_state.position, rtol=0.0, atol=0.01).all():
                 break
@@ -522,7 +519,7 @@ class PickbotReachCamEnv(gym.Env):
 
         return x.tolist()
 
-    def get_obs(self):
+    def get_status(self):
         """
         Returns the state of the robot needed for Algorithm to learn
         The state will be defined by a List (later converted to numpy array) of the:
@@ -546,12 +543,6 @@ class PickbotReachCamEnv(gym.Env):
 
         # Get Joints Data out of Subscriber
         joint_states = self.joints_state
-        elbow_joint_state = joint_states.position[0]
-        shoulder_lift_joint_state = joint_states.position[1]
-        shoulder_pan_joint_state = joint_states.position[2]
-        wrist_1_joint_state = joint_states.position[3]
-        wrist_2_joint_state = joint_states.position[4]
-        wrist_3_joint_state = joint_states.position[5]
 
         for joint in joint_states.position:
             if joint > 2 * math.pi or joint < -2 * math.pi:
@@ -565,21 +556,9 @@ class PickbotReachCamEnv(gym.Env):
 
         # Stack all information into Observations List
         observation = []
-        for obs_name in self._list_of_observations:
+        for obs_name in self._list_of_status:
             if obs_name == "distance_gripper_to_object":
                 observation.append(distance_gripper_to_object)
-            elif obs_name == "elbow_joint_state":
-                observation.append(elbow_joint_state)
-            elif obs_name == "shoulder_lift_joint_state":
-                observation.append(shoulder_lift_joint_state)
-            elif obs_name == "shoulder_pan_joint_state":
-                observation.append(shoulder_pan_joint_state)
-            elif obs_name == "wrist_1_joint_state":
-                observation.append(wrist_1_joint_state)
-            elif obs_name == "wrist_2_joint_state":
-                observation.append(wrist_2_joint_state)
-            elif obs_name == "wrist_3_joint_state":
-                observation.append(wrist_3_joint_state)
             elif obs_name == "contact_1_force":
                 observation.append(contact_1_force)
             elif obs_name == "contact_2_force":
