@@ -47,11 +47,10 @@ from simulation.srv import VacuumGripperControl
 # DEFINE ENVIRONMENT CLASS
 class PickbotReachCamEnv(gym.Env):
 
-    def __init__(self, joint_increment=None, sim_time_factor=0.005, random_object=False, random_position=False,
+    def __init__(self, sim_time_factor=0.005, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes'):
         """
         initializing all the relevant variables and connections
-        :param joint_increment: increment of the joints
         :param running_step: gazebo simulation time factor
         :param random_object: spawn random object in the simulation
         :param random_position: change object position in each reset
@@ -62,7 +61,6 @@ class PickbotReachCamEnv(gym.Env):
         """
 
         # Assign Parameters
-        self._joint_increment = joint_increment  # joint_increment in rad
         self._random_object = random_object
         self._random_position = random_position
         self._use_object_type = use_object_type
@@ -75,6 +73,9 @@ class PickbotReachCamEnv(gym.Env):
         self.collisions = Bool()
         self.camera_rgb_state = Image()
         self.camera_depth_state = Image()
+
+        self._height = 480
+        self._width = 640
         self.realsense_rgb = Image()
         self.realsense_depth = Image()
 
@@ -85,23 +86,6 @@ class PickbotReachCamEnv(gym.Env):
         self.movement_complete.data = False
         self.moveit_action_feedback = MoveGroupActionFeedback()
         self.feedback_list = []
-
-        self._list_of_observations = ["distance_gripper_to_object",
-                                      "elbow_joint_state",
-                                      "shoulder_lift_joint_state",
-                                      "shoulder_pan_joint_state",
-                                      "wrist_1_joint_state",
-                                      "wrist_2_joint_state",
-                                      "wrist_3_joint_state",
-                                      "contact_1_force",
-                                      "contact_2_force",
-                                      "object_pos_x",
-                                      "object_pos_y",
-                                      "object_pos_z",
-                                      "min_distance_gripper_to_object"]
-
-        if self._use_object_type:
-            self._list_of_observations.append("object_type")
 
         # Establishes connection with simulator
         """
@@ -143,76 +127,8 @@ class PickbotReachCamEnv(gym.Env):
 
         Reward Range: -infitity to infinity 
         """
-        # Directly use joint_positions as action
-        if self._joint_increment is None:
-            low_action = np.array([
-                -(math.pi - 0.05),
-                -(math.pi - 0.05),
-                -(math.pi - 0.05),
-                -(math.pi - 0.05),
-                -(math.pi - 0.05),
-                -(math.pi - 0.05)])
 
-            high_action = np.array([
-                math.pi - 0.05,
-                math.pi - 0.05,
-                math.pi - 0.05,
-                math.pi - 0.05,
-                math.pi - 0.05,
-                math.pi - 0.05])
-        else: # Use joint_increments as action
-            low_action = np.array([
-                -self._joint_increment,
-                -self._joint_increment,
-                -self._joint_increment,
-                -self._joint_increment,
-                -self._joint_increment,
-                -self._joint_increment])
-
-            high_action = np.array([
-                self._joint_increment,
-                self._joint_increment,
-                self._joint_increment,
-                self._joint_increment,
-                self._joint_increment,
-                self._joint_increment])
-        self.action_space = spaces.Box(low_action, high_action)
-
-        high = np.array([
-            999,
-            math.pi,
-            math.pi,
-            math.pi,
-            math.pi,
-            math.pi,
-            math.pi,
-            np.finfo(np.float32).max,
-            np.finfo(np.float32).max,
-            1,
-            1.4,
-            1.5,
-            999])
-
-        low = np.array([
-            0,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            -math.pi,
-            0,
-            0,
-            -1,
-            0,
-            0,
-            0])
-
-        if self._use_object_type:
-            high = np.append(high, 9)
-            low = np.append(low, 0)
-            
-        self.observation_space = spaces.Box(low, high)
+        self.observation_space = spaces.Box(low=0, high=255, shape=(self._height, self._width, 4), dtype=np.uint8)
         self.reward_range = (-np.inf, np.inf)
 
         self._seed()
@@ -617,23 +533,7 @@ class PickbotReachCamEnv(gym.Env):
         10,11,12)   x, y, z Position of object?
 
         MISSING
-        10)     RGBD image 
-        
-        
-        self._list_of_observations = ["distance_gripper_to_object",
-                                    "elbow_joint_state",
-                                    "shoulder_lift_joint_state",
-                                    "shoulder_pan_joint_state",
-                                    "wrist_1_joint_state",
-                                    "wrist_2_joint_state",
-                                    "wrist_3_joint_state",
-                                    "contact_1_force",
-                                    "contact_2_force",
-                                    "object_pos_x",
-                                    "object_pos_y",
-                                    "object_pos_z",
-                                    "object_type", -- if use_object_type set to True
-                                    "min_distance_gripper_to_object"]
+        10)     RGBD image
 
         :return: observation
         """
