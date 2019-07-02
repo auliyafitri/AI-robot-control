@@ -4,6 +4,7 @@ import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Header
 from sensor_msgs.msg import JointState
+from geometry_msgs.msg import Pose, Point
 from gazebo_msgs.srv import SetModelConfiguration
 from gazebo_msgs.srv import SetModelConfigurationRequest
 
@@ -14,6 +15,7 @@ import numpy as np
 class JointArrayPub(object):
     def __init__(self):
         self.joint_pub = rospy.Publisher('/pickbot/target_joint_positions', JointState, queue_size=10)
+        self.geomsg_pub = rospy.Publisher('/pickbot/target_pose', Pose, queue_size=10)
         self.relative_joint_pub = rospy.Publisher('/pickbot/relative_joint_positions', JointState, queue_size=10)
         self.init_pos = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
 
@@ -58,6 +60,12 @@ class JointArrayPub(object):
         jointState.effort = []
         self.joint_pub.publish(jointState)
         # print("I've published: {}".format(jointState.position))
+
+    def pub_pose_to_moveit(self, position):
+        self.check_publishers_connection()
+        geomsg = Pose(position=Point(x=position[0], y=position[1], z=position[2]))
+        self.geomsg_pub.publish(geomsg)
+
 
     def pub_relative_joints_to_moveit(self, joints_array):
         self.check_publishers_connection()
