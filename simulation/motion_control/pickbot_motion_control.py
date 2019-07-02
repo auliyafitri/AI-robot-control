@@ -48,11 +48,13 @@ display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path
 # gripper_publisher = rospy.Publisher('CModelRobotOutput', outputMsg.CModel_robot_output)
 tf_listener = tf.TransformListener()
 tf_broadcaster = tf.TransformBroadcaster()
+group.set_end_effector_link("gripper_contactsensor_link_1") #TODO: change it to vacuum_gripper_link
 
 
 def joint_position_sub():
     rospy.Subscriber('/pickbot/target_joint_positions', JointState, joint_callback)
     rospy.Subscriber('/pickbot/relative_joint_positions', JointState, relative_joint_callback)
+
 
 def joint_callback(data):
     pos = data.position
@@ -68,6 +70,7 @@ def joint_callback(data):
     complete_msg.data = True
     pub.publish(complete_msg)
 
+
 def relative_joint_callback(data):
     pos = data.position
     pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
@@ -81,6 +84,7 @@ def relative_joint_callback(data):
     # check_publishers_connection(pub)
     complete_msg.data = True
     pub.publish(complete_msg)
+
 
 def check_publishers_connection(pub):
     """
@@ -96,23 +100,6 @@ def check_publishers_connection(pub):
             # This is to avoid error when world is rested, time when backwards.
             pass
     rospy.logdebug("joint_pub Publisher Connected")
-
-
-def randomly_spawn_object():
-    """
-    spawn the object unit_box_0 in a random position in the shelf
-    """
-    try:
-        spawn_box = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
-        box = ModelState()
-        box.model_name = "unit_box_0"
-        box.pose.position.x = np.random.uniform(low=-0.35, high=0.3, size=None)
-        box.pose.position.y = np.random.uniform(low=0.7, high=0.9, size=None)
-        box.pose.position.z = 1.05
-        spawn_box(box)
-    except rospy.ServiceException as e:
-        rospy.loginfo("Set Model State service call failed:  {0}".format(e))
-
 
 
 ###___REGRASP FUNCTION___###
@@ -213,7 +200,8 @@ def TurnArcAboutAxis(axis, CenterOfCircle_1, CenterOfCircle_2, angle_degree, dir
         waypoints.append(copy.deepcopy(pose_target))
         theta+=math.pi/resolution # increment counter, defines the number of waypoints 
     del waypoints[:2]
-    plan_execute_waypoints(waypoints) 
+    plan_execute_waypoints(waypoints)
+
             
 def TiltAboutAxis(pose_target, resolution, tilt_axis, tilt_direction):
     quaternion = (
@@ -243,8 +231,6 @@ def TiltAboutAxis(pose_target, resolution, tilt_axis, tilt_direction):
     return pose_target
 
 
-###___JOINT VALUE MANIPULATION___###
-## Manipulate by assigning joint values
 def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
     # group.set_max_velocity_scaling_factor(0.1)
     group_variable_values = group.get_current_joint_values() #create variable that stores joint values
@@ -266,11 +252,10 @@ def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
     group.stop()
     # rospy.sleep(0.1)
 
-###___POSE TARGET MANIPULATION___###
-## Manipulate by assigning pose target
+
 def assign_pose_target(pos_x, pos_y, pos_z, orient_x, orient_y, orient_z, orient_w):
     group.set_max_velocity_scaling_factor(0.1)
-    pose_target = group.get_current_pose() #create a pose variable. The parameters can be seen from "$ rosmsg show Pose"
+    pose_target = group.get_current_pose() # create a pose variable. The parameters can be seen from "$ rosmsg show Pose"
 
     #Assign values
     if pos_x is 'nil':
@@ -302,14 +287,13 @@ def assign_pose_target(pos_x, pos_y, pos_z, orient_x, orient_y, orient_z, orient
     else:     
         pose_target.pose.orientation.w = orient_w
     
-    group.set_pose_target(pose_target) #set pose_target as the goal pose of 'manipulator' group 
+    group.set_pose_target(pose_target) #set pose_target as the goal pose of 'manipulator' group
+    # plan2 = group.plan()
+    group.go(pose_target, wait=True)
+    group.stop()
+    # rospy.sleep(2)
 
-    plan2 = group.plan() #call plan function to plan the path
-    group.go(wait=True) #execute plan on real/simulation robot
-    rospy.sleep(2) #sleep 5 seconds
 
-###___RELATIVE JOINT VALUE MANIPULATION___###
-## Manipulate by assigning relative joint values w.r.t. current joint values of robot
 def relative_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
     group.set_max_velocity_scaling_factor(0.1)
     group_variable_values = group.get_current_joint_values() #create variable that stores joint values
@@ -328,8 +312,7 @@ def relative_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
     group.go(wait=True) #execute plan on real/simulation (gazebo) robot 
     # rospy.sleep(2) #sleep 2 seconds
 
-###___RELATIVE POSE TARGET MANIPULATION___###
-## Manipulate by moving gripper linearly with respect to world frame
+
 def relative_pose_target(axis_world, distance):
     group.set_max_velocity_scaling_factor(0.1)
     pose_target = group.get_current_pose() #create a pose variable. The parameters can be seen from "$ rosmsg show Pose"
@@ -355,106 +338,21 @@ def plan_execute_waypoints(waypoints):
 ###___STATUS ROBOT___###
 def manipulator_status():
     #You can get a list with all the groups of the robot like this:
-    print "Robot Groups:"
-    print robot.get_group_names()
+    print("Robot Groups:")
+    print(robot.get_group_names())
 
     #You can get the current values of the joints like this:
-    print "Current Joint Values:"
-    print group.get_current_joint_values()
+    print("Current Joint Values:")
+    print(group.get_current_joint_values())
 
     #You can also get the current Pose of the end effector of the robot like this:
-    print "Current Pose:"
-    print group.get_current_pose()
+    print("Current Pose:")
+    print(group.get_current_pose())
 
     #Finally you can check the general status of the robot like this:
-    print "Robot State:"
-    print robot.get_current_state()
+    print("Robot State:")
+    print(robot.get_current_state())
 
-###___Initiate node; subscribe to topic; call callback function___###
-def manipulator_arm_control():
-
-###___LIST OF FUNCTIONS___###
-##      assign_pose_target(pos_x, pos_y, pos_z, orient_x, orient_y, orient_z, orient_w)
-##      assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5)
-##      relative_pose_target(axis_world, distance)
-##      relative_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5)
-##      TurnArcAboutAxis(axis, CenterOfCircle_1, CenterOfCircle_2, angle_degree, direction, tilt, tilt_axis, tilt_direction)
-##      regrasp(theta, length, phi_target, axis, direction, tilt_axis, tilt_direction)
-
-
-###___TEMP___###    
-    
-   
-
-###___MOTION PLAN TO SET ROBOT TO REAL ENVIRONMNET for GAZEBO___###
-#    relative_joint_value(0, -math.pi/2, 0, 0, 0, 0)
-#    relative_joint_value(0, 0, -3*math.pi/4, 0, 0, 0)
-#    relative_joint_value(0, 0, 0, -3*math.pi/4, 0, 0)
-#    relative_joint_value(0, 0, 0, 0, -math.pi/2, 0)
-    # assign_pose_target(-0.52, 0.1166, 0.22434, 0.0, 0.707, -0.707, 0.0) ## REAL ROBOT ENVIRONMENT    
-
-
-###___REGRASP DEMO___###    
-    # assign_pose_target(-0.52, 0.1166, 0.22434, 0.0, 0.707, -0.707, 0.0)
-    # TurnArcAboutAxis('y', 0.22434, -0.79, 60, -1, 'yes', 'y', 1)
-    # regrasp(60.0, 50.0, 20.0, 'y', -1, 'y', 1)
-
-###___TURNARC DEMO___### 
-    # assign_pose_target(-0.52, 0.1166, 0.22434, 0.0, 0.707, -0.707, 0.0) ## REAL ROBOT ENVIRONMENT
-    # TurnArcAboutAxis('y', 0.22434, -0.79, 40, -1, 'yes', 'y', 1)
-    # TurnArcAboutAxis('y', 0.22434, -0.79, 40, 1, 'yes', 'y', -1)
-    # TurnArcAboutAxis('y', 0.22434, -0.79, 70, -1, 'yes', 'y', 1)
-    # TurnArcAboutAxis('y', 0.22434, -0.79, 70, 1, 'yes', 'y', -1)
-    # TurnArcAboutAxis('y', 0.22434, -0.79, 10, 1, 'yes', 'y', -1)   
-    # TurnArcAboutAxis('y', 0.22434, -0.79, 10, -1, 'yes', 'y', 1)
-
-
-    print("1. Moving to position 1")
-    assign_pose_target(0.4, 0.5, 0.6, 0.2, 0.0, 0.0, 0.0)
-    print ("Current position 1: {},{},{}".format(group.get_current_pose().pose.position.x,
-                                               group.get_current_pose().pose.position.y,
-                                               group.get_current_pose().pose.position.z))
-
-    print("--------Taking a picture")
-    photoShooter = PhotoShooter()
-    photoShooter.main()
-
-
-    print("2. Moving to position 2")
-    assign_pose_target(0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0)
-    print ("Current position 2: {},{},{}".format(group.get_current_pose().pose.position.x,
-                                               group.get_current_pose().pose.position.y,
-                                               group.get_current_pose().pose.position.z))
-    print("--------Taking a picture")
-    photoShooter.main()
-
-
-
-    print("3. Moving to position 3")
-    assign_pose_target(0.01, 1.0, 0.8, 0.0, 0.0, 0.0, 0.0)
-    print ("Current position 3: {},{},{}".format(group.get_current_pose().pose.position.x,
-                                               group.get_current_pose().pose.position.y,
-                                               group.get_current_pose().pose.position.z))
-
-    print("--------Taking a picture")
-    photoShooter.main()
-
-
-    print("Randomly spawning object now")
-    randomly_spawn_object()
-
-    print("4. Moving to position 4")
-    assign_pose_target(-0.1, 0.9, 0.21, 0.0, 0.0, 0.0, 0.0)
-    print ("Current position 4: {},{},{}".format(group.get_current_pose().pose.position.x,
-                                               group.get_current_pose().pose.position.y,
-                                               group.get_current_pose().pose.position.z))
-
-    print("Assigning joint values")
-    relative_joint_value(0, 0, 0, 0, 0, math.pi/2)
-
-    print("Planning ended.")
-
-    rospy.spin()
 
 def get_distance_gripper_to_object():
     """
@@ -501,10 +399,10 @@ def get_distance_gripper_to_object():
 
     return distance, Object
 
-###___MAIN___###
+
 if __name__ == '__main__':
 
-    group.set_end_effector_link('vacuum_gripper_link')
+    # group.set_end_effector_link('vacuum_gripper_link')
 
     rospy.Subscriber('/pickbot/target_joint_positions/', JointState, joint_callback)
     rospy.Subscriber('/pickbot/relative_joint_positions', JointState, relative_joint_callback)

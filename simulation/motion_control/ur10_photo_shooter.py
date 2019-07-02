@@ -500,7 +500,9 @@ def photo_shooter():
     # -0.215268462831,0.823047229224,1.64087635599    ee_link
     # -0.0980773344623,0.936432150844,1.42101275111   vacuum_gripper_link
     # -0.117190292953,0.937696817126,1.42097040156    gripper_contactsensor_link_1
+
     # TODO: due the missing vacuum_gripper_joint is not known by moveit, vacuum_gripper_link cannot be used as end_effector
+    # Maybe add a pseudo link (fixed joint) exactly at vacuum_gripper_link's position 
 
     print("1. Moving to starting position")
     # assign_pose_target(0.0, 0.9, 1.6, 0.0, 0.0, 0.0, 0.0)
