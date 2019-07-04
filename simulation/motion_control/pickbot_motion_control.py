@@ -420,6 +420,6 @@ if __name__ == '__main__':
 
     rospy.Subscriber('/pickbot/target_joint_positions/', JointState, joint_callback)
     rospy.Subscriber('/pickbot/relative_joint_positions', JointState, relative_joint_callback)
-    rospy.Sublisher('/pickbot/target_pose', Pose, pose_callback)
+    rospy.Subscriber('/pickbot/target_pose', Pose, pose_callback)
     print("listening to joint states now")
     rospy.spin()
