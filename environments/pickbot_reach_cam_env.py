@@ -4,8 +4,7 @@
 import gym
 import rospy
 import numpy as np
-import cv2
-from cv_bridge import CvBridge, CvBridgeError
+# import cv2
 import time
 import random
 import sys
@@ -26,6 +25,9 @@ from environments.controllers_connection import ControllersConnection
 from environments.joint_publisher import JointPub
 from environments.joint_array_publisher import JointArrayPub
 from baselines import logger
+
+from cv_bridge import CvBridge, CvBridgeError
+from scipy.misc import imsave
 
 # MESSAGES/SERVICES
 from std_msgs.msg import String
@@ -50,7 +52,7 @@ from simulation.srv import VacuumGripperControl
 class PickbotReachCamEnv(gym.Env):
 
     def __init__(self, sim_time_factor=0.005, random_object=False, random_position=False,
-                 use_object_type=False, populate_object=False, env_object_type='free_shapes'):
+                 use_object_type=False, populate_object=False, env_object_type='free_shapes', is_discrete=False):
         """
         initializing all the relevant variables and connections
         :param running_step: gazebo simulation time factor
@@ -61,6 +63,8 @@ class PickbotReachCamEnv(gym.Env):
         :param env_object_type: object type for environment, free_shapes for boxes while others are related to use_case
             'door_handle', 'combox', ...
         """
+
+        self._is_discrete = is_discrete
 
         # Assign Parameters
         self._random_object = random_object
@@ -130,6 +134,18 @@ class PickbotReachCamEnv(gym.Env):
         Reward Range: -infitity to infinity 
         """
 
+        if self._is_discrete:
+            self.action_space = spaces.Discrete(7)
+        else:
+            action_dim = 3
+            self._action_bound = 1
+            action_high = np.array([self._action_bound] * action_dim)
+            self.action_space = spaces.Box(-action_high, action_high, dtype=np.float32)
+        self.observation_space = spaces.Box(low=0,
+                                            high=255,
+                                            shape=(self._height, self._width, 4),
+                                            dtype=np.uint8)
+
         self._list_of_status = ["distance_gripper_to_object",
                                       "contact_1_force",
                                       "contact_2_force",
@@ -140,7 +156,6 @@ class PickbotReachCamEnv(gym.Env):
         if self._use_object_type:
             self._list_of_status.append("object_type")
 
-        self.observation_space = spaces.Box(low=0, high=255, shape=(self._height, self._width, 4), dtype=np.uint8)
         self.reward_range = (-np.inf, np.inf)
 
         self._seed()
@@ -262,6 +277,7 @@ class PickbotReachCamEnv(gym.Env):
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
+        print(">>>>>>> Observation size: {}".format(observation.shape))
         self.object_position = observation[9:12]
 
         # print("Joint (after): {}".format(np.around(observation[1:7], decimals=3)))
@@ -531,12 +547,17 @@ class PickbotReachCamEnv(gym.Env):
         # 1)
         ros_rgb = self.realsense_rgb
         ros_depth = self.realsense_depth
+        print("ros_rgb type: {}, ros_depth type: {}".format(type(ros_rgb), type(ros_depth)))
 
         # 2)
         rgb = CvBridge().imgmsg_to_cv2(ros_rgb, desired_encoding="passthrough")
         depth = CvBridge().imgmsg_to_cv2(ros_depth, desired_encoding="passthrough")
-        print("rgb size: {}, type: {}".format(rgb.shape, type(rgb)))
-        print("depth size: {}, type: {}".format(depth.shape, type(depth)))
+        # imsave('depth.png', depth)
+        depth = depth.reshape((depth.shape[0], depth.shape[1], 1))
+        # print("rgb size: {}, type: {}".format(rgb.shape, type(rgb)))
+        # print("depth size: {}, type: {}".format(depth.shape, type(depth)))
+        # imsave('rgb.png', rgb)
+
 
         # 3) Image Normalization
 
