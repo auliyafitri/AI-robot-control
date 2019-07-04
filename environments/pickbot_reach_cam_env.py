@@ -4,6 +4,8 @@
 import gym
 import rospy
 import numpy as np
+import cv2
+from cv_bridge import CvBridge, CvBridgeError
 import time
 import random
 import sys
@@ -519,6 +521,30 @@ class PickbotReachCamEnv(gym.Env):
 
         return x.tolist()
 
+    def get_obs(self):
+        """
+        1) Get the rgb image and the depth image of the current step,
+        2_ Convert them to numpy array
+        3) Normalize rgb values from [0, 255] to [0, 1]
+        :return: observation (opencv image)
+        """
+        # 1)
+        ros_rgb = self.realsense_rgb
+        ros_depth = self.realsense_depth
+
+        # 2)
+        rgb = CvBridge().imgmsg_to_cv2(ros_rgb, desired_encoding="passthrough")
+        depth = CvBridge().imgmsg_to_cv2(ros_depth, desired_encoding="passthrough")
+        print("rgb size: {}, type: {}".format(rgb.shape, type(rgb)))
+        print("depth size: {}, type: {}".format(depth.shape, type(depth)))
+
+        # 3) Image Normalization
+
+        # 4) Concatenate rgb and depth image and get a 4-channel observation
+        observation = np.append(rgb, depth, axis=2)
+
+        return observation
+
     def get_status(self):
         """
         Returns the state of the robot needed for Algorithm to learn
@@ -555,28 +581,28 @@ class PickbotReachCamEnv(gym.Env):
         contact_2_force = self.get_contact_force_2()
 
         # Stack all information into Observations List
-        observation = []
+        sim_status = []
         for obs_name in self._list_of_status:
             if obs_name == "distance_gripper_to_object":
-                observation.append(distance_gripper_to_object)
+                sim_status.append(distance_gripper_to_object)
             elif obs_name == "contact_1_force":
-                observation.append(contact_1_force)
+                sim_status.append(contact_1_force)
             elif obs_name == "contact_2_force":
-                observation.append(contact_2_force)
+                sim_status.append(contact_2_force)
             elif obs_name == "object_pos_x":
-                observation.append(object_pos_x)
+                sim_status.append(object_pos_x)
             elif obs_name == "object_pos_y":
-                observation.append(object_pos_y)
+                sim_status.append(object_pos_y)
             elif obs_name == "object_pos_z":
-                observation.append(object_pos_z)
+                sim_status.append(object_pos_z)
             elif obs_name == "object_type":
-                observation.append(self.object_type)
+                sim_status.append(self.object_type)
             elif obs_name == "min_distance_gripper_to_object":
-                observation.append(self.min_distace)
+                sim_status.append(self.min_distace)
             else:
                 raise NameError('Observation Asked does not exist==' + str(obs_name))
 
-        return observation
+        return sim_status
 
     def get_contact_force_1(self):
         """
