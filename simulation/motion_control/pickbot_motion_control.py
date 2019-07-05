@@ -95,9 +95,9 @@ def relative_pose_callbak(data):
 
     if pos.x != 0:
         relative_pose_target(axis_world='x', distance=pos.x)
-    elif pos.y != 0:
+    if pos.y != 0:
         relative_pose_target(axis_world='y', distance=pos.y)
-    elif pos.z != 0:
+    if pos.z != 0:
         relative_pose_target(axis_world='z', distance=pos.z)
 
     complete_msg.data = True
