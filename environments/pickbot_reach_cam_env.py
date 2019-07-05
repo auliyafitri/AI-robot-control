@@ -277,17 +277,15 @@ class PickbotReachCamEnv(gym.Env):
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
-        print(">>>>>>> Observation size: {}".format(observation.shape))
-        self.object_position = observation[9:12]
-
-        # print("Joint (after): {}".format(np.around(observation[1:7], decimals=3)))
+        sim_status = self.get_status()
+        self.object_position = sim_status[3:6]
 
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
         self.min_distace = self.max_distance
-        state = U.get_state(observation)
         self._update_episode()
-        return state
+        # print(">>>>>>>>>> observation: {}".format(np.array(observation).shape))
+        return np.array(observation)
 
     def step(self, action):
         """
@@ -547,7 +545,7 @@ class PickbotReachCamEnv(gym.Env):
         # 1)
         ros_rgb = self.realsense_rgb
         ros_depth = self.realsense_depth
-        print("ros_rgb type: {}, ros_depth type: {}".format(type(ros_rgb), type(ros_depth)))
+        # print("ros_rgb type: {}, ros_depth type: {}".format(type(ros_rgb), type(ros_depth)))
 
         # 2)
         rgb = CvBridge().imgmsg_to_cv2(ros_rgb, desired_encoding="passthrough")
