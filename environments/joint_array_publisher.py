@@ -16,6 +16,7 @@ class JointArrayPub(object):
     def __init__(self):
         self.joint_pub = rospy.Publisher('/pickbot/target_joint_positions', JointState, queue_size=10)
         self.geomsg_pub = rospy.Publisher('/pickbot/target_pose', Pose, queue_size=10)
+        self.relative_geomsg_pub = rospy.Publisher('/pickbot/relative_target_pose', Pose, queue_size=10)
         self.relative_joint_pub = rospy.Publisher('/pickbot/relative_joint_positions', JointState, queue_size=10)
         self.init_pos = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
 
@@ -45,8 +46,6 @@ class JointArrayPub(object):
                 pass
         rospy.logdebug("joint_pub Publisher Connected")
 
-
-
     def pub_joints_to_moveit(self, joints_array):
         self.check_publishers_connection()
         
@@ -66,6 +65,10 @@ class JointArrayPub(object):
         geomsg = Pose(position=Point(x=position[0], y=position[1], z=position[2]))
         self.geomsg_pub.publish(geomsg)
 
+    def pub_relative_pose_to_moveit(self, position):
+        self.check_publishers_connection()
+        geomsg = Pose(position=Point(x=position[0], y=position[1], z=position[2]))
+        self.relative_geomsg_pub.publish(geomsg)
 
     def pub_relative_joints_to_moveit(self, joints_array):
         self.check_publishers_connection()
@@ -91,7 +94,6 @@ class JointArrayPub(object):
         self.pub_joints_to_moveit(self.init_pos)
 
 
-        
 if __name__=="__main__":
     rospy.init_node('joint_array_publisher_node')
     joint_publisher = JointArrayPub()
