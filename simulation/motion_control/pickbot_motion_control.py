@@ -85,6 +85,25 @@ def pose_callback(data):
     pub.publish(complete_msg)
 
 
+def relative_pose_callbak(data):
+    pos = data.position
+    pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
+    complete_msg = Bool()
+    complete_msg.data = False
+    check_publishers_connection(pub)
+    pub.publish(complete_msg)
+
+    if pos.x != 0:
+        relative_pose_target(axis_world='x', distance=pos.x)
+    elif pos.y != 0:
+        relative_pose_target(axis_world='y', distance=pos.y)
+    elif pos.z != 0:
+        relative_pose_target(axis_world='z', distance=pos.z)
+
+    complete_msg.data = True
+    pub.publish(complete_msg)
+
+
 def relative_joint_callback(data):
     pos = data.position
     pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
@@ -338,9 +357,10 @@ def relative_pose_target(axis_world, distance):
         pose_target.pose.position.z += distance
     group.set_pose_target(pose_target) #set pose_target as the goal pose of 'manipulator' group 
 
-    plan2 = group.plan() #call plan function to plan the path
-    group.go(wait=True) #execute plan on real/simulation robot
-    rospy.sleep(2) #sleep 5 seconds
+    # plan2 = group.plan()
+    group.go(pose_target, wait=True)
+    group.stop()
+    # rospy.sleep(2)
 
 
 def plan_execute_waypoints(waypoints):
@@ -421,5 +441,6 @@ if __name__ == '__main__':
     rospy.Subscriber('/pickbot/target_joint_positions/', JointState, joint_callback)
     rospy.Subscriber('/pickbot/relative_joint_positions', JointState, relative_joint_callback)
     rospy.Subscriber('/pickbot/target_pose', Pose, pose_callback)
+    rospy.Subscriber('/pickbot/relative_target_pose', Pose, relative_pose_callbak)
     print("listening to joint states now")
     rospy.spin()
