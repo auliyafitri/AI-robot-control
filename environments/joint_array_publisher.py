@@ -65,9 +65,23 @@ class JointArrayPub(object):
         geomsg = Pose(position=Point(x=position[0], y=position[1], z=position[2]))
         self.geomsg_pub.publish(geomsg)
 
-    def pub_relative_pose_to_moveit(self, position):
+    def pub_relative_pose_to_moveit(self, distance, is_discrete, axis=None):
+        """
+        :param distance: could be float(Discrete action space) or list of float(Continuous action space)
+        :param is_discrete: True: only move along one axis, False: move along x,y,z axis simultaneously
+        :param axis: which axis to move along. Only needed for Discrete action space
+        :return:
+        """
         self.check_publishers_connection()
-        geomsg = Pose(position=Point(x=position[0], y=position[1], z=position[2]))
+        if is_discrete:
+            if axis == 'x':
+                geomsg = Pose(position=Point(x=distance, y=0, z=0))
+            elif axis == 'y':
+                geomsg = Pose(position=Point(x=0, y=distance, z=0))
+            elif axis == 'z'
+                geomsg = Pose(position=Point(x=0, y=0, z=distance))
+        else:
+            geomsg = Pose(position=Point(x=distance[0], y=distance[1], z=distance[2]))
         self.relative_geomsg_pub.publish(geomsg)
 
     def pub_relative_joints_to_moveit(self, joints_array):
