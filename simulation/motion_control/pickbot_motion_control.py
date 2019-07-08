@@ -341,8 +341,9 @@ def relative_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
 
     group.set_joint_value_target(group_variable_values) #set target joint values for 'manipulator' group
  
-    plan1 = group.plan() #call plan function to plan the path (visualize on rviz)
-    group.go(wait=True) #execute plan on real/simulation (gazebo) robot 
+    # plan1 = group.plan()
+    group.go(group_variable_values, wait=True)
+    group.stop()
     # rospy.sleep(2) #sleep 2 seconds
 
 
