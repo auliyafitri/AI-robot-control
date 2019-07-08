@@ -736,7 +736,7 @@ class PickbotReachCamEnv(gym.Env):
         else:
             return False
 
-    def is_done(self, observations):
+    def is_done(self, status):
         """Checks if episode is done based on observations given.
         
         Done when:
@@ -779,16 +779,16 @@ class PickbotReachCamEnv(gym.Env):
             done_reward = reward_no_motion_plan
 
         # Successfully reached goal: Contact with at least one contact sensor and there is no invalid contact
-        if observations[7] != 0 and observations[8] != 0 and not invalid_collision:
+        if status["contact_1_force"] != 0 and status["contact_2_force"] != 0 and not invalid_collision:
             done = True
             print('>>>>>>>>>>>>> get two contacts <<<<<<<<<<<<<<<<<<')
             done_reward = reward_reached_goal
             # save state in csv file
-            U.append_to_csv(self.csv_success_exp, observations)
+            U.append_to_csv(self.csv_success_exp, status)
             self.success_2_contacts += 1
             print("Successful 2 contacts so far: {} attempts".format(self.success_2_contacts))
 
-        if observations[7] != 0 or observations[8] != 0 and not invalid_collision:
+        if status["contact_1_force"] != 0 or status["contact_2_force"] != 0 and not invalid_collision:
             done = True
             print('>>>>>>>>>>>>> get one contacts <<<<<<<<<<<<<<<<<<')
             self.success_1_contact += 1
@@ -806,6 +806,9 @@ class PickbotReachCamEnv(gym.Env):
             print('>>>>>>>>>>>>>>>>>>>> crashing <<<<<<<<<<<<<<<<<<<<<<<')
             done_reward = reward_crashing
 
+        ##################################################################################
+        # Joint Safety                                                                   #
+        ##################################################################################
         joint_exceeds_limits = False
         for joint_pos in self.joints_state.position:
             joint_correction = []
@@ -827,6 +830,9 @@ class PickbotReachCamEnv(gym.Env):
             while not self.movement_complete.data:
                 pass
             print('>>>>>>>>>>>>>>>> joint corrected <<<<<<<<<<<<<<<<<')
+        ##################################################################################
+        # Joint Safety                                                                   #
+        ##################################################################################
 
         return done, done_reward, invalid_collision
 
