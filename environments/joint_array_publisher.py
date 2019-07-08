@@ -78,7 +78,7 @@ class JointArrayPub(object):
                 geomsg = Pose(position=Point(x=distance, y=0, z=0))
             elif axis == 'y':
                 geomsg = Pose(position=Point(x=0, y=distance, z=0))
-            elif axis == 'z'
+            elif axis == 'z':
                 geomsg = Pose(position=Point(x=0, y=0, z=distance))
         else:
             geomsg = Pose(position=Point(x=distance[0], y=distance[1], z=distance[2]))
