@@ -63,10 +63,15 @@ class PickbotReachCamEnv(gym.Env):
         :param env_object_type: object type for environment, free_shapes for boxes while others are related to use_case
             'door_handle', 'combox', ...
         """
-
+        # Parameters for action
         self._is_discrete = is_discrete
+        self._xy_increment = 0.01
+        self._z_increment = 0.002
+        self._wrist_3_joint_increment = math.pi / 100
+        self._use_z_axis = False
+        self._action_bound = 1
 
-        # Assign Parameters
+        # Parameters for target-object
         self._random_object = random_object
         self._random_position = random_position
         self._use_object_type = use_object_type
@@ -133,18 +138,32 @@ class PickbotReachCamEnv(gym.Env):
 
         Reward Range: -infitity to infinity 
         """
+        if self._use_z_axis:
+            if self._is_discrete:
+                # +-x, +-y, +-z, +-angle
+                self.action_space = spaces.Discrete(8)
+            else:
+                action_dim = 4
+                action_high = np.array([self._action_bound] * action_dim)
+                self.action_space = spaces.Box(-action_high, action_high, dtype=np.float32)
 
-        if self._is_discrete:
-            self.action_space = spaces.Discrete(7)
-        else:
-            action_dim = 3
-            self._action_bound = 1
-            action_high = np.array([self._action_bound] * action_dim)
-            self.action_space = spaces.Box(-action_high, action_high, dtype=np.float32)
-        self.observation_space = spaces.Box(low=0,
-                                            high=255,
-                                            shape=(self._height, self._width, 4),
-                                            dtype=np.uint8)
+            self.observation_space = spaces.Box(low=0,
+                                                high=255,
+                                                shape=(self._height, self._width, 4),
+                                                dtype=np.uint8)
+        else:   # not use the movement along z-axis as action. dz will always be -self._z_increment
+            if self._is_discrete:
+                # +-x, +-y, +-z, +-angle
+                self.action_space = spaces.Discrete(6)
+            else:
+                action_dim = 3
+                action_high = np.array([self._action_bound] * action_dim)
+                self.action_space = spaces.Box(-action_high, action_high, dtype=np.float32)
+
+            self.observation_space = spaces.Box(low=0,
+                                                high=255,
+                                                shape=(self._height, self._width, 4),
+                                                dtype=np.uint8)
 
         self._list_of_status = ["distance_gripper_to_object",
                                       "contact_1_force",
@@ -306,57 +325,76 @@ class PickbotReachCamEnv(gym.Env):
         # print("action: {}".format(action))
 
         self.movement_complete.data = False
+        old_status = self.get_status()
+        gripper_pos = U.get_gripper_position()
 
-        # 1) Read last joint positions by getting the observation before acting
-        old_observation = self.get_obs()
+        if not self._use_z_axis:
+            if self._is_discrete:
+                dx = [-self._xy_increment, self._xy_increment, 0, 0, 0, 0][action]
+                dy = [0, 0, -self._xy_increment, self._xy_increment, 0, 0][action]
+                dz = -self._z_increment
+                da = [0, 0, 0, 0, -self._wrist_3_joint_increment, self._wrist_3_joint_increment][action]
 
-        # 2) Get the new joint positions according to chosen action (actions here are the joint increments)
-        if self._joint_increment is None:
-            next_action_position = action
+                realAction = [dx, dy, dz, da]
+            else:
+                dx = action[0] * self._xy_increment
+                dy = action[1] * self._xy_increment
+                dz = -self._z_increment
+                da = action[2] * self._wrist_3_joint_increment
+
+                realAction = [dx, dy, dz, da]
         else:
-            next_action_position = self.get_action_to_position(action, old_observation[1:7])
+            if self._is_discrete:
+                dx = [-self._xy_increment, self._xy_increment, 0, 0, 0, 0, 0, 0][action]
+                dy = [0, 0, -self._xy_increment, self._xy_increment, 0, 0, 0, 0][action]
+                dz = [0, 0, 0, 0, -self._z_increment, self._z_increment,   0, 0][action]
+                da = [0, 0, 0, 0, 0, 0 -self._wrist_3_joint_increment, self._wrist_3_joint_increment][action]
+
+                realAction = [dx, dy, dz, da]
+            else:
+                dx = action[0] * self._xy_increment
+                dy = action[1] * self._xy_increment
+                dz = action[2] * self._z_increment
+                da = action[3] * self._wrist_3_joint_increment
+
+                realAction = [dx, dy, dz, da]
+
+        next_pos = gripper_pos + realAction[0:3]
+        next_wrist_3_angle = self.joints_state[-1] + realAction[-1]
+        next_action_position = next_pos.append(next_wrist_3_angle)
 
         # 3) Move to position and wait for moveit to complete the execution
-        self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
-        # rospy.wait_for_message("/pickbot/movement_complete", Bool)
+        self.publisher_to_moveit_object.pub_pose_to_moveit(next_pos)
+        while not self.movement_complete.data:
+            pass
+        self.movement_complete.data = False
+
+        self.publisher_to_moveit_object.pub_relative_joints_to_moveit([0, 0, 0, 0, 0, realAction[-1]])
         while not self.movement_complete.data:
             pass
 
         start_ros_time = rospy.Time.now()
         while True:
-            # Check collision:
-            # invalid_collision = self.get_collisions()
-            # if invalid_collision:
-            #     print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
-            #     observation = self.get_obs()
-            #     reward = UMath.compute_reward(observation, -200, True)
-            #     observation = self.get_obs()
-            #     print("Test Joint: {}".format(np.around(observation[1:7], decimals=3)))
-            #     return U.get_state(observation), reward, True, {}
-
+            current_position = U.get_gripper_position()
+            current_position.append(self.joints_state[-1])
             elapsed_time = rospy.Time.now() - start_ros_time
-            if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
+            if np.isclose(next_action_position, current_position, rtol=0.0, atol=0.01).all():
                 break
-            elif elapsed_time > rospy.Duration(2): # time out
+            elif elapsed_time > rospy.Duration(2):
+                # time out
                 break
-        # time.sleep(s
 
-        """
-        #execute action as long as the current position is close to the target position and there is no invalid collision and time spend in the while loop is below 1.2 seconds to avoid beeing stuck touching the object and not beeing able to go to the desired position     
-        time1=time.time()
-        while np.linalg.norm(np.asarray(self.joints_state.position)-np.asarray(next_action_position))>0.1 and self.get_collisions()==False and time.time()-time1<0.1:         
-            rospy.loginfo("Not yet reached target position and no collision")
-        """
-        # 4) Get new observation and update min_distance after performing the action
+        # 4) Get new status and update min_distance after performing the action
         new_observation = self.get_obs()
-        if new_observation[0] < self.min_distace:
-            self.min_distace = new_observation[0]
-        # print("observ: {}".format( np.around(new_observation[1:7], decimals=3)))
+        new_status = self.get_status()
+        if new_status[0] < self.min_distace:
+            self.min_distace = new_status[0]
 
         # 5) Convert Observations into state
         state = U.get_state(new_observation)
 
         # 6) Check if its done, calculate done_reward
+        #TODO: modify is done function
         done, done_reward, invalid_contact = self.is_done(new_observation)
 
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
