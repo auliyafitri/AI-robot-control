@@ -165,13 +165,12 @@ class PickbotReachCamEnv(gym.Env):
                                                 shape=(self._height, self._width, 4),
                                                 dtype=np.uint8)
 
-        self._list_of_status = ["distance_gripper_to_object",
-                                      "contact_1_force",
-                                      "contact_2_force",
-                                      "object_pos_x",
-                                      "object_pos_y",
-                                      "object_pos_z",
-                                      "min_distance_gripper_to_object"]
+        self._list_of_status = {"distance_gripper_to_object": -1,
+                                "contact_1_force": -1,
+                                "contact_2_force": -1,
+                                "gripper_pos": -1,
+                                "object_pos": -1,
+                                "min_distance_gripper_to_object": -1}
         if self._use_object_type:
             self._list_of_status.append("object_type")
 
@@ -296,8 +295,8 @@ class PickbotReachCamEnv(gym.Env):
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
-        sim_status = self.get_status()
-        self.object_position = sim_status[3:6]
+        self.get_status()
+        self.object_position = self._list_of_status["object_pos"]
 
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
@@ -395,7 +394,7 @@ class PickbotReachCamEnv(gym.Env):
 
         # 6) Check if its done, calculate done_reward
         #TODO: modify is done function
-        done, done_reward, invalid_contact = self.is_done(new_observation)
+        done, done_reward, invalid_contact = self.is_done(new_status)
 
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
@@ -618,11 +617,9 @@ class PickbotReachCamEnv(gym.Env):
         :return: observation
         """
 
-        # Get Distance Object to Gripper and Objectposition from Service Call. Needs to be done a second time cause we need the distance and position after the Step execution
+        # Get Distance Object to Gripper and Objectposition from Service Call. Needs to be done a second time cause
+        # we need the distance and position after the Step execution
         distance_gripper_to_object, position_xyz_object = U.get_distance_gripper_to_object()
-        object_pos_x = position_xyz_object[0]
-        object_pos_y = position_xyz_object[1]
-        object_pos_z = position_xyz_object[2]
 
         # Get Joints Data out of Subscriber
         joint_states = self.joints_state
@@ -633,33 +630,20 @@ class PickbotReachCamEnv(gym.Env):
                 print(np.around(joint_states.position, decimals=3))
                 sys.exit("Joint exceeds limit")
 
-        # Get Contact Forces out of get_contact_force Functions to be able to take an average over some iterations otherwise chances are high that not both sensors are showing contact the same time
+        # Get Contact Forces out of get_contact_force Functions to be able to take an average over some iterations
+        # otherwise chances are high that not both sensors are showing contact the same time
         contact_1_force = self.get_contact_force_1()
         contact_2_force = self.get_contact_force_2()
 
         # Stack all information into Observations List
-        sim_status = []
-        for obs_name in self._list_of_status:
-            if obs_name == "distance_gripper_to_object":
-                sim_status.append(distance_gripper_to_object)
-            elif obs_name == "contact_1_force":
-                sim_status.append(contact_1_force)
-            elif obs_name == "contact_2_force":
-                sim_status.append(contact_2_force)
-            elif obs_name == "object_pos_x":
-                sim_status.append(object_pos_x)
-            elif obs_name == "object_pos_y":
-                sim_status.append(object_pos_y)
-            elif obs_name == "object_pos_z":
-                sim_status.append(object_pos_z)
-            elif obs_name == "object_type":
-                sim_status.append(self.object_type)
-            elif obs_name == "min_distance_gripper_to_object":
-                sim_status.append(self.min_distace)
-            else:
-                raise NameError('Observation Asked does not exist==' + str(obs_name))
+        self._list_of_status["distance_gripper_to_object"] = distance_gripper_to_object
+        self._list_of_status["contact_1_force"] = contact_1_force
+        self._list_of_status["contact_2_force"] = contact_2_force
+        self._list_of_status["gripper_pos"] = U.get_gripper_position()
+        self._list_of_status["object_pos"] = position_xyz_object
+        self._list_of_status["min_distance_gripper_to_object"] = self.min_distace
 
-        return sim_status
+        return self._list_of_status
 
     def get_contact_force_1(self):
         """
