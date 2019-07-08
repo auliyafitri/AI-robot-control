@@ -51,7 +51,7 @@ from simulation.srv import VacuumGripperControl
 # DEFINE ENVIRONMENT CLASS
 class PickbotReachCamEnv(gym.Env):
 
-    def __init__(self, sim_time_factor=0.005, random_object=False, random_position=False,
+    def __init__(self, sim_time_factor=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes', is_discrete=False):
         """
         initializing all the relevant variables and connections
@@ -169,7 +169,9 @@ class PickbotReachCamEnv(gym.Env):
                                 "contact_1_force": -1,
                                 "contact_2_force": -1,
                                 "gripper_pos": -1,
+                                "gripper_ori": -1,
                                 "object_pos": -1,
+                                "object_ori": -1,
                                 "min_distance_gripper_to_object": -1}
         if self._use_object_type:
             self._list_of_status.append("object_type")
@@ -396,7 +398,8 @@ class PickbotReachCamEnv(gym.Env):
         done, done_reward, invalid_contact = self.is_done(new_status)
 
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
-        reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
+        # reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
+        reward = UMath.computeReward(status=new_status, collision=True)
 
         ### TEST ###
         if done:
@@ -619,6 +622,9 @@ class PickbotReachCamEnv(gym.Env):
         # Get Distance Object to Gripper and Objectposition from Service Call. Needs to be done a second time cause
         # we need the distance and position after the Step execution
         distance_gripper_to_object, position_xyz_object = U.get_distance_gripper_to_object()
+        vacuum_gripper_pose = U.get_link_state("vacuum_gripper_link")
+        target_pose = U.get_link_state("target")
+
 
         # Get Joints Data out of Subscriber
         joint_states = self.joints_state
@@ -638,8 +644,10 @@ class PickbotReachCamEnv(gym.Env):
         self._list_of_status["distance_gripper_to_object"] = distance_gripper_to_object
         self._list_of_status["contact_1_force"] = contact_1_force
         self._list_of_status["contact_2_force"] = contact_2_force
-        self._list_of_status["gripper_pos"] = U.get_gripper_position()
-        self._list_of_status["object_pos"] = position_xyz_object
+        self._list_of_status["gripper_pos"] = vacuum_gripper_pose[0:3]
+        self._list_of_status["gripper_ori"] = vacuum_gripper_pose[3:]
+        self._list_of_status["object_pos"] = target_pose[0:3]
+        self._list_of_status["object_ori"] = target_pose[3:]
         self._list_of_status["min_distance_gripper_to_object"] = self.min_distance
 
         return self._list_of_status

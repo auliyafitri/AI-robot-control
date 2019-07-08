@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from transformations import quaternion_from_euler, euler_from_quaternion, quaternion_multiply, quaternion_conjugate
 
 
 def compute_reward(observation, done_reward, invalid_contact):
@@ -106,13 +107,17 @@ def rmseFunc(eePoints):
     return rmse
 
 
-def computeReward(rewardDist, rewardOrientation=0, collision=False):
+def computeReward(status, collision=False):
     alpha = 5
     beta = 1.5
     gamma = 1
     delta = 3
     eta = 0.03
     done = 0.02
+
+    rewardDist = np.sqrt(1/3) * status["distance_gripper_to_object"]
+    orientation_error = quaternion_multiply(status["gripper_ori"], quaternion_conjugate(status["object_ori"]))
+    rewardOrientation = 2 * np.arccos(abs(orientation_error[0]))
 
     distanceReward = (math.exp(-alpha * rewardDist) - math.exp(-alpha)) \
      / (1 - math.exp(-alpha)) + 10 * (math.exp(-alpha/done * rewardDist) - math.exp(-alpha/done)) \
