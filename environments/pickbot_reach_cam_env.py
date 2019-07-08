@@ -216,7 +216,7 @@ class PickbotReachCamEnv(gym.Env):
 
         # get maximum distance to the object to calculate reward, renewed in the reset function
         self.max_distance, _ = U.get_distance_gripper_to_object()
-        self.min_distace = 999
+        self.min_distance = 999
 
     # Callback Functions for Subscribers to make topic values available each time the class is initialized 
     def joints_state_callback(self, msg):
@@ -300,7 +300,7 @@ class PickbotReachCamEnv(gym.Env):
 
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
-        self.min_distace = self.max_distance
+        self.min_distance = self.max_distance
         self._update_episode()
         # print(">>>>>>>>>> observation: {}".format(np.array(observation).shape))
         return np.array(observation)
@@ -359,8 +359,8 @@ class PickbotReachCamEnv(gym.Env):
                 realAction = [dx, dy, dz, da]
 
         next_pos = gripper_pos + realAction[0:3]
-        next_wrist_3_angle = self.joints_state[-1] + realAction[-1]
-        next_action_position = next_pos.append(next_wrist_3_angle)
+        next_wrist_3_angle = self.joints_state.position[-1] + realAction[-1]
+        next_action_position = np.append(next_pos, next_wrist_3_angle)
 
         # 3) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_pose_to_moveit(next_pos)
@@ -375,7 +375,7 @@ class PickbotReachCamEnv(gym.Env):
         start_ros_time = rospy.Time.now()
         while True:
             current_position = U.get_gripper_position()
-            current_position.append(self.joints_state[-1])
+            current_position = np.append(current_position, self.joints_state.position[-1])
             elapsed_time = rospy.Time.now() - start_ros_time
             if np.isclose(next_action_position, current_position, rtol=0.0, atol=0.01).all():
                 break
@@ -386,14 +386,13 @@ class PickbotReachCamEnv(gym.Env):
         # 4) Get new status and update min_distance after performing the action
         new_observation = self.get_obs()
         new_status = self.get_status()
-        if new_status[0] < self.min_distace:
-            self.min_distace = new_status[0]
+        if new_status["distance_gripper_to_object"] < self.min_distance:
+            self.min_distance = new_status["distance_gripper_to_object"]
 
         # 5) Convert Observations into state
         state = U.get_state(new_observation)
 
         # 6) Check if its done, calculate done_reward
-        #TODO: modify is done function
         done, done_reward, invalid_contact = self.is_done(new_status)
 
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
@@ -641,7 +640,7 @@ class PickbotReachCamEnv(gym.Env):
         self._list_of_status["contact_2_force"] = contact_2_force
         self._list_of_status["gripper_pos"] = U.get_gripper_position()
         self._list_of_status["object_pos"] = position_xyz_object
-        self._list_of_status["min_distance_gripper_to_object"] = self.min_distace
+        self._list_of_status["min_distance_gripper_to_object"] = self.min_distance
 
         return self._list_of_status
 
