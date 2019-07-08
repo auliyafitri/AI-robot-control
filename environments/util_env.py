@@ -156,6 +156,22 @@ def get_target_position():
     
     return Object
 
+def get_gripper_position():
+    try:
+        model_coordinates = rospy.ServiceProxy('/gazebo/get_link_state', GetLinkState)
+        LinkName = "vacuum_gripper_link"
+        ReferenceFrame = "ground_plane"
+        resp_coordinates_gripper = model_coordinates(LinkName, ReferenceFrame)
+        Gripper = np.array((resp_coordinates_gripper.link_state.pose.position.x,
+                            resp_coordinates_gripper.link_state.pose.position.y,
+                            resp_coordinates_gripper.link_state.pose.position.z))
+
+    except rospy.ServiceException as e:
+        rospy.loginfo("Get Link State service call failed:  {0}".format(e))
+        print("Exception get Gripper position")
+
+    return Gripper
+
 
 def get_distance_gripper_to_object(height=None):
     """
