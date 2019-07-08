@@ -216,12 +216,12 @@
         <inertial>
           <mass>1</mass>
           <inertia>
-            <ixx>0.166667</ixx>
+            <ixx>0.00166667</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.166667</iyy>
+            <iyy>0.00166667</iyy>
             <iyz>0</iyz>
-            <izz>0.166667</izz>
+            <izz>0.00166667</izz>
           </inertia>
         </inertial>
         <collision name='collision'>
@@ -267,6 +267,17 @@
     <model name='unit_box_0'>
       <pose frame=''>0 0.919858 1.08 0 -0 0</pose>
       <link name='target'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.00166667</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.00166667</iyy>
+            <iyz>0</iyz>
+            <izz>0.00166667</izz>
+          </inertia>
+        </inertial>
         <visual name='visual'>
           <geometry>
             <box>
