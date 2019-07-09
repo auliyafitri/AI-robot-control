@@ -433,8 +433,8 @@ class PickbotReachCamEnv(gym.Env):
         self.check_contact_1()
         self.check_contact_2()
         self.check_collision()
-        # self.check_rgb_camera()
-        # self.check_rgbd_camera()
+        self.check_rgb_camera()
+        self.check_rgbd_camera()
         # self.check_gripper_state()
         rospy.logdebug("ALL SYSTEMS READY")
 
@@ -487,7 +487,7 @@ class PickbotReachCamEnv(gym.Env):
         camera_rgb_states_msg = None
         while camera_rgb_states_msg is None and not rospy.is_shutdown():
             try:
-                camera_rgb_states_msg = rospy.wait_for_message("/camera_rgb/image_raw", Image, timeout=0.1)
+                camera_rgb_states_msg = rospy.wait_for_message("/intel_realsense_camera/rgb/image_raw", Image, timeout=0.1)
                 self.camera_rgb_state = camera_rgb_states_msg
                 rospy.logdebug("rgb_image READY")
             except Exception as e:
@@ -497,7 +497,7 @@ class PickbotReachCamEnv(gym.Env):
         camera_depth_states_msg = None
         while camera_depth_states_msg is None and not rospy.is_shutdown():
             try:
-                camera_depth_states_msg = rospy.wait_for_message("/camera_depth/depth/image_raw", Image, timeout=0.1)
+                camera_depth_states_msg = rospy.wait_for_message("/intel_realsense_camera/depth/image_raw", Image, timeout=0.1)
                 self.camera_depth_state = camera_depth_states_msg
                 rospy.logdebug("rgbd_image READY")
             except Exception as e:
@@ -592,6 +592,8 @@ class PickbotReachCamEnv(gym.Env):
         rgb = CvBridge().imgmsg_to_cv2(ros_rgb, desired_encoding="passthrough")
         depth = CvBridge().imgmsg_to_cv2(ros_depth, desired_encoding="passthrough")
         # imsave('depth.png', depth)
+        print("depth pixel {}, type: {}".format(depth[200][200], type(depth[200][200])))
+        print("rgb pixel {}, type: {}".format(rgb[200][200][0], type(rgb[200][200][0])))
         depth = depth.reshape((depth.shape[0], depth.shape[1], 1))
         # print("rgb size: {}, type: {}".format(rgb.shape, type(rgb)))
         # print("depth size: {}, type: {}".format(depth.shape, type(depth)))
