@@ -138,6 +138,9 @@ class PickbotReachCamEnv(gym.Env):
 
         Reward Range: -infitity to infinity 
         """
+        ################################################
+        # Action space                                 #
+        ################################################
         if self._use_z_axis:
             if self._is_discrete:
                 # +-x, +-y, +-z, +-angle
@@ -147,10 +150,6 @@ class PickbotReachCamEnv(gym.Env):
                 action_high = np.array([self._action_bound] * action_dim)
                 self.action_space = spaces.Box(-action_high, action_high, dtype=np.float32)
 
-            self.observation_space = spaces.Box(low=0,
-                                                high=255,
-                                                shape=(self._height, self._width, 4),
-                                                dtype=np.uint8)
         else:   # not use the movement along z-axis as action. dz will always be -self._z_increment
             if self._is_discrete:
                 # +-x, +-y, +-z, +-angle
@@ -159,11 +158,14 @@ class PickbotReachCamEnv(gym.Env):
                 action_dim = 3
                 action_high = np.array([self._action_bound] * action_dim)
                 self.action_space = spaces.Box(-action_high, action_high, dtype=np.float32)
+        ################################################
+        # Action space                                 #
+        ################################################
 
-            self.observation_space = spaces.Box(low=0,
-                                                high=255,
-                                                shape=(self._height, self._width, 4),
-                                                dtype=np.uint8)
+        self.observation_space = spaces.Box(low=0,
+                                            high=255,
+                                            shape=(self._height, self._width, 4),
+                                            dtype=np.float32)
 
         self._list_of_status = {"distance_gripper_to_object": -1,
                                 "contact_1_force": -1,
