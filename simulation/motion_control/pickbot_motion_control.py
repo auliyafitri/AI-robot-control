@@ -43,12 +43,13 @@ moveit_commander.roscpp_initialize(sys.argv) #initialize the moveit commander
 rospy.init_node('move_group_python_interface', anonymous=True) #initialize the node 
 robot = moveit_commander.RobotCommander() #define the robot
 scene = moveit_commander.PlanningSceneInterface() #define the scene
-group = moveit_commander.MoveGroupCommander("manipulator") #define the planning group (from the moveit packet 'manipulator' planning group)
+group = moveit_commander.MoveGroupCommander("manipulator")
 display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory) #publisher that publishes a plan to the topic: '/move_group/display_planned_path'
 # gripper_publisher = rospy.Publisher('CModelRobotOutput', outputMsg.CModel_robot_output)
 tf_listener = tf.TransformListener()
 tf_broadcaster = tf.TransformBroadcaster()
-group.set_end_effector_link("gripper_contactsensor_link_1") #TODO: change it to vacuum_gripper_link
+# group.set_end_effector_link("gripper_contactsensor_link_1")
+group.set_end_effector_link("dummy_vacuum_gripper_link")
 
 
 def joint_position_sub():
@@ -276,6 +277,7 @@ def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
     group_variable_values[3] = joint_3
     group_variable_values[4] = joint_4
     group_variable_values[5] = joint_5
+    # group_variable_values[6] = 0.0
 
     group.set_joint_value_target(group_variable_values) #set target joint values for 'manipulator' group
 
@@ -328,7 +330,7 @@ def assign_pose_target(pos_x, pos_y, pos_z, orient_x, orient_y, orient_z, orient
 
 
 def relative_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
-    group.set_max_velocity_scaling_factor(0.1)
+    # group.set_max_velocity_scaling_factor(0.1)
     group_variable_values = group.get_current_joint_values() #create variable that stores joint values
 
     #Assign values to joints
@@ -348,7 +350,7 @@ def relative_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
 
 
 def relative_pose_target(axis_world, distance):
-    group.set_max_velocity_scaling_factor(0.1)
+    # group.set_max_velocity_scaling_factor(0.1)
     pose_target = group.get_current_pose() #create a pose variable. The parameters can be seen from "$ rosmsg show Pose"
     if axis_world is 'x':
         pose_target.pose.position.x += distance

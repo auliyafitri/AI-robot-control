@@ -225,6 +225,7 @@ class PickbotReachCamEnv(gym.Env):
     # Callback Functions for Subscribers to make topic values available each time the class is initialized 
     def joints_state_callback(self, msg):
         self.joints_state = msg
+        self.joints_state.position = self.joints_state.position[0:6]
 
     def contact_1_callback(self, msg):
         self.contact_1_state = msg.states

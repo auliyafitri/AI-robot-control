@@ -466,7 +466,7 @@
       </visual>
     </link>
     <joint name="${prefix}dummy_vacuum_gripper_joint" type="fixed">
-      <origin xyz="0 0.297 0.0" rpy="1.570797 0 0"/>
+      <origin xyz="0 0.2965 0.0" rpy="1.570797 0 0"/>
       <parent link="${prefix}wrist_3_link"/>
       <child link="${prefix}dummy_vacuum_gripper_link"/>
     </joint>
