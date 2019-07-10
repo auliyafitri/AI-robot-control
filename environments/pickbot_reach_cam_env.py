@@ -363,9 +363,12 @@ class PickbotReachCamEnv(gym.Env):
 
                 realAction = [dx, dy, dz, da]
 
+        print("########################################")
+        print("Old Gripper position: {}".format(np.round(gripper_pos, decimals=3)))
         next_pos = gripper_pos + realAction[0:3]
         next_wrist_3_angle = self.joints_state.position[-1] + realAction[-1]
         next_action_position = np.append(next_pos, next_wrist_3_angle)
+        print("Next_position: {}".format(next_action_position))
 
         # 3) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_pose_to_moveit(next_pos)
@@ -391,6 +394,10 @@ class PickbotReachCamEnv(gym.Env):
         # 4) Get new status and update min_distance after performing the action
         new_observation = self.get_obs()
         new_status = self.get_status()
+
+        print("New Gripper position: {}".format(np.round(new_status["gripper_pos"], decimals=3)))
+        print("########################################")
+
         if new_status["distance_gripper_to_object"] < self.min_distance:
             self.min_distance = new_status["distance_gripper_to_object"]
 
@@ -593,8 +600,8 @@ class PickbotReachCamEnv(gym.Env):
         rgb = CvBridge().imgmsg_to_cv2(ros_rgb, desired_encoding="passthrough")
         depth = CvBridge().imgmsg_to_cv2(ros_depth, desired_encoding="passthrough")
         # imsave('depth.png', depth)
-        print("depth pixel {}, type: {}".format(depth[200][200], type(depth[200][200])))
-        print("rgb pixel {}, type: {}".format(rgb[200][200][0], type(rgb[200][200][0])))
+        # print("depth pixel {}, type: {}".format(depth[200][200], type(depth[200][200])))
+        # print("rgb pixel {}, type: {}".format(rgb[200][200][0], type(rgb[200][200][0])))
         depth = depth.reshape((depth.shape[0], depth.shape[1], 1))
         # print("rgb size: {}, type: {}".format(rgb.shape, type(rgb)))
         # print("depth size: {}, type: {}".format(depth.shape, type(depth)))
