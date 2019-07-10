@@ -3,7 +3,7 @@
 This folder contains python script for controling the movement of the robot (in Gazebo) using *MoveIt*. Since *MoveIt*'s python API is in 2.7, the script is also written in Python 2.7.
 
 ### Standard procedure
-##### 1. Start Gazebo simulation in Terminal 1:
+#### 1. Start Gazebo simulation in Terminal 1:
 ```sh
 roslaunch ur_gazebo pickbot.launch
 ```
@@ -14,11 +14,11 @@ instead of `fixed`, so that Gazebo is able to identify where the `vacuum_gripper
 
 
 
-##### 2. Wait until Terminal 1 to print out *"You can start planning now!"*. Then open a new terminal (Terminal 2) and start one of the script in this folder:
+#### 2. Wait until Terminal 1 to print out *"You can start planning now!"*. Then open a new terminal (Terminal 2) and start one of the script in this folder:
 - **pickbot_motion_control.py**
   - listens to ROS messages of target positions from the environment script and perform the actions accordingly.It will publish a ROS message to tell when the action is finished by MoveIt.
 
-- **ur10_motion_test.py**
+- **ur10_keyboard_motion.py**
   - A script to move the UR10 with keyboard input
   - You need to install `tkinter` for python2 first. 
     ```sh
