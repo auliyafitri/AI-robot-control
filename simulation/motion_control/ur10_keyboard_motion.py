@@ -449,7 +449,7 @@ def key(event):
 
     elif len(event.char) == 1:
         # charcters like []/.,><#$ also Return and ctrl/key
-        print( 'Punctuation Key %r (%r)' % (event.keysym, event.char) )
+        print('Punctuation Key %r (%r)' % (event.keysym, event.char))
     else:
         # f1 to f12, shift keys, caps lock, Home, End, Delete ...
         print( 'Special Key %r' % event.keysym)
@@ -480,9 +480,10 @@ if __name__ == '__main__':
     gripperControl = GripperControl()
 
     root = tk.Tk()
-    print( "Press <arrow key> to move in x-y-plane." )
-    print( "Press Z or X to move along z-axis." )
-    print( "Press A or S to rotate wrist_3_joint (Escape key to exit):" )
+    print("Press <arrow key> to move in x-y-plane.")
+    print("Press Z or X to move along z-axis.")
+    print("Press A or S to rotate wrist_3_joint (Escape key to exit):")
+    print("Press G to turn on Gripper and press H to turn off Gripper")
     root.bind_all('<Key>', key)
     # root.withdraw() # don't show the tk window
     root.mainloop()

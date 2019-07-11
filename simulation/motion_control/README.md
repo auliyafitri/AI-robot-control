@@ -26,7 +26,8 @@ instead of `fixed`, so that Gazebo is able to identify where the `vacuum_gripper
     ```
   - Press the **arrow key** to move in x-y-plane
   - Press Z or X to move along z-axis.
-  - Press A or S to rotate `wrist_3_joint` 
+  - Press A or S to rotate `wrist_3_joint`
+  - Press G to turn on Gripper and press H to turn off Gripper 
   - Escape key to exit
 
 
