@@ -319,7 +319,7 @@ def get_distance_gripper_to_object():
         Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
                             object_resp_coordinates.pose.position.z))
 
-        print("Object: {}".format(Object))
+        # print("Object: {}".format(Object))
 
     except rospy.ServiceException as e:
         rospy.loginfo("Get Model State service call failed:  {0}".format(e))
@@ -334,9 +334,9 @@ def get_distance_gripper_to_object():
                             resp_coordinates_gripper.link_state.pose.position.y,
                             resp_coordinates_gripper.link_state.pose.position.z))
         
-        print("Gripper position: {},{},{}".format(resp_coordinates_gripper.link_state.pose.position.x,
-                                                resp_coordinates_gripper.link_state.pose.position.y,
-                                                resp_coordinates_gripper.link_state.pose.position.z))
+        # print("Gripper position: {},{},{}".format(resp_coordinates_gripper.link_state.pose.position.x,
+        #                                         resp_coordinates_gripper.link_state.pose.position.y,
+        #                                         resp_coordinates_gripper.link_state.pose.position.z))
 
     except rospy.ServiceException as e:
         rospy.loginfo("Get Link State service call failed:  {0}".format(e))
@@ -373,9 +373,13 @@ def key(event):
         print( 'Punctuation Key %r (%r)' % (event.keysym, event.char) )
     else:
         # f1 to f12, shift keys, caps lock, Home, End, Delete ...
-        print( 'Special Key %r' % event.keysym )
+        print( 'Special Key %r' % event.keysym)
         if event.keysym == 'Left':
             relative_pose_target('x', -xy_increment)
+            # distance, obj_pos, gripper_pos = get_distance_gripper_to_object
+            # print("distance: {}".format(distance))
+            # print("Object: {}".format(np.round(obj_pos, decimals=3)))
+            # print("Gripper: {}".format(np.round(gripper_pos, decimals=3)))
         if event.keysym == 'Right':
             relative_pose_target('x', xy_increment)
         if event.keysym == 'Up':
@@ -383,10 +387,16 @@ def key(event):
         if event.keysym == 'Down':
             relative_pose_target('y', -xy_increment)
 
+    distance, obj_pos, gripper_pos = get_distance_gripper_to_object()
+    print("distance: {}".format(distance))
+    print("Object: {}".format(np.round(obj_pos, decimals=3)))
+    print("Gripper: {}".format(np.round(gripper_pos, decimals=3)))
+
 
 if __name__ == '__main__':
     # Moving the robot to starting position
-    assign_joint_value(1.5, -1.2, 1.4, -1.87, -1.57, 0)
+    # assign_joint_value(1.5, -1.2, 1.4, -1.87, -1.57, 0)
+    assign_joint_value(1.5, -1.2, 1.4, -1.77, -1.57, 0)
 
     root = tk.Tk()
     print( "Press <arrow key> to move in x-y-plane." )
