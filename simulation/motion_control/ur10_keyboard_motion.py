@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # python2.7
-import os
-import cv2
+
 import sys
-import time
 import math
 import rospy
 import copy
@@ -14,10 +12,6 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 import Tkinter as tk
 # from robotiq_c_model_control.msg import _CModel_robot_output as outputMsg
-
-from cv_bridge import CvBridge, CvBridgeError
-from scipy.misc import imsave
-
 
 
 # MESSAGES/SERVICES
@@ -36,8 +30,6 @@ from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 from openai_ros.msg import RLExperimentInfo
 
-##___GLOBAL VARIABLES___###
-
 
 ##___INITIALIZATION___###
 moveit_commander.roscpp_initialize(sys.argv) #initialize the moveit commander
@@ -51,90 +43,6 @@ tf_listener = tf.TransformListener()
 tf_broadcaster = tf.TransformBroadcaster()
 # group.set_end_effector_link("gripper_contactsensor_link_1")
 group.set_end_effector_link("dummy_vacuum_gripper_link")
-
-
-def joint_position_sub():
-    rospy.Subscriber('/pickbot/target_joint_positions', JointState, joint_callback)
-    rospy.Subscriber('/pickbot/relative_joint_positions', JointState, relative_joint_callback)
-
-
-def joint_callback(data):
-    pos = data.position
-    pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
-    complete_msg = Bool()
-    complete_msg.data = False
-    check_publishers_connection(pub)
-    pub.publish(complete_msg)
-
-    assign_joint_value(pos[2], pos[1], pos[0], pos[3], pos[4], pos[5])
-
-    # check_publishers_connection(pub)
-    complete_msg.data = True
-    pub.publish(complete_msg)
-
-
-def pose_callback(data):
-    pos = data.position
-    pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
-    complete_msg = Bool()
-    complete_msg.data = False
-    check_publishers_connection(pub)
-    pub.publish(complete_msg)
-
-    assign_pose_target(pos.x, pos.y, pos.z, 'nil', 'nil', 'nil', 'nil')
-
-    complete_msg.data = True
-    pub.publish(complete_msg)
-
-
-def relative_pose_callbak(data):
-    pos = data.position
-    pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
-    complete_msg = Bool()
-    complete_msg.data = False
-    check_publishers_connection(pub)
-    pub.publish(complete_msg)
-
-    if pos.x != 0:
-        relative_pose_target(axis_world='x', distance=pos.x)
-    if pos.y != 0:
-        relative_pose_target(axis_world='y', distance=pos.y)
-    if pos.z != 0:
-        relative_pose_target(axis_world='z', distance=pos.z)
-
-    complete_msg.data = True
-    pub.publish(complete_msg)
-
-
-def relative_joint_callback(data):
-    pos = data.position
-    pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
-    complete_msg = Bool()
-    complete_msg.data = False
-    check_publishers_connection(pub)
-    pub.publish(complete_msg)
-
-    relative_joint_value(pos[2], pos[1], pos[0], pos[3], pos[4], pos[5])
-
-    # check_publishers_connection(pub)
-    complete_msg.data = True
-    pub.publish(complete_msg)
-
-
-def check_publishers_connection(pub):
-    """
-    Checks that all the publishers are working
-    :return:
-    """
-    rate = rospy.Rate(100)  # 10hz
-    while (pub.get_num_connections() == 0):
-        rospy.logdebug("No subscribers to _joint1_pub yet so we wait and try again")
-        try:
-            rate.sleep()
-        except rospy.ROSInterruptException:
-            # This is to avoid error when world is rested, time when backwards.
-            pass
-    rospy.logdebug("joint_pub Publisher Connected")
 
 
 ###___REGRASP FUNCTION___###
@@ -435,7 +343,7 @@ def get_distance_gripper_to_object():
         print("Exception get Gripper position")
     distance = np.linalg.norm(Object - Gripper)
 
-    return distance, Object
+    return distance, Object, Gripper
 
 
 def key(event):
