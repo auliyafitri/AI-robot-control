@@ -603,21 +603,17 @@ class PickbotReachCamEnv(gym.Env):
         # imsave('depth.png', depth)
         # print("depth pixel mean: {}, type: {}".format(np.nanmean(depth), type(depth[200][200])))
         # print("grayscale pixel mean: {}, type: {}".format(np.mean(grayscale), type(grayscale[200][200])))
-        grayscale = grayscale.reshape(grayscale.shape[0], grayscale.shape[1], 1)
-        depth = depth.reshape((depth.shape[0], depth.shape[1], 1))
+
         # print("grayscale size: {}, type: {}".format(grayscale.shape, type(grayscale)))
         # print("depth size: {}, type: {}".format(depth.shape, type(depth)))
 
-
-
         # 3) Image Normalization
-        # rgb = rgb.astype(float)
-        # for i in range(480):
-        #     for j in range(640):
-        #         rgb[0, i, j] = rgb[0, i, j] /
-
+        grayscale = grayscale.astype(np.float32)
+        grayscale = grayscale / 255.0
 
         # 4) Concatenate rgb and depth image and get a 4-channel observation
+        grayscale = grayscale.reshape(grayscale.shape[0], grayscale.shape[1], 1)
+        depth = depth.reshape((depth.shape[0], depth.shape[1], 1))
         observation = np.append(grayscale, depth, axis=2)
 
         return observation
