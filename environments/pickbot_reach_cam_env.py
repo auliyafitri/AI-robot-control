@@ -164,7 +164,7 @@ class PickbotReachCamEnv(gym.Env):
 
         self.observation_space = spaces.Box(low=0,
                                             high=255,
-                                            shape=(self._height, self._width, 4),
+                                            shape=(self._height, self._width, 2),
                                             dtype=np.float32)
 
         self._list_of_status = {"distance_gripper_to_object": -1,
@@ -587,9 +587,9 @@ class PickbotReachCamEnv(gym.Env):
     def get_obs(self):
         """
         1) Get the rgb image and the depth image of the current step,
-        2_ Convert them to numpy array
-        3) Normalize rgb values from [0, 255] to [0, 1]
-        :return: observation (opencv image)
+        2_ Convert them to numpy array, and convert rgb to grayscale image
+        3) Normalize grayscale pixel values from [0, 255] to [0, 1]
+        :return: observation (numpy.array, shape (480, 640, 2)), with every pixel value in [0, 1]
         """
         # 1)
         ros_rgb = self.realsense_rgb
@@ -597,21 +597,28 @@ class PickbotReachCamEnv(gym.Env):
         # print("ros_rgb type: {}, ros_depth type: {}".format(type(ros_rgb), type(ros_depth)))
 
         # 2)
-        rgb = CvBridge().imgmsg_to_cv2(ros_rgb, desired_encoding="passthrough")
+        grayscale = CvBridge().imgmsg_to_cv2(ros_rgb, desired_encoding="mono8")
         depth = CvBridge().imgmsg_to_cv2(ros_depth, desired_encoding="passthrough")
+        # imsave('grayscale.png', grayscale)
         # imsave('depth.png', depth)
-        # print("depth pixel {}, type: {}".format(depth[200][200], type(depth[200][200])))
-        # print("rgb pixel {}, type: {}".format(rgb[200][200][0], type(rgb[200][200][0])))
+        # print("depth pixel mean: {}, type: {}".format(np.nanmean(depth), type(depth[200][200])))
+        # print("grayscale pixel mean: {}, type: {}".format(np.mean(grayscale), type(grayscale[200][200])))
+        grayscale = grayscale.reshape(grayscale.shape[0], grayscale.shape[1], 1)
         depth = depth.reshape((depth.shape[0], depth.shape[1], 1))
-        # print("rgb size: {}, type: {}".format(rgb.shape, type(rgb)))
+        # print("grayscale size: {}, type: {}".format(grayscale.shape, type(grayscale)))
         # print("depth size: {}, type: {}".format(depth.shape, type(depth)))
-        # imsave('rgb.png', rgb)
+
 
 
         # 3) Image Normalization
+        # rgb = rgb.astype(float)
+        # for i in range(480):
+        #     for j in range(640):
+        #         rgb[0, i, j] = rgb[0, i, j] /
+
 
         # 4) Concatenate rgb and depth image and get a 4-channel observation
-        observation = np.append(rgb, depth, axis=2)
+        observation = np.append(grayscale, depth, axis=2)
 
         return observation
 
