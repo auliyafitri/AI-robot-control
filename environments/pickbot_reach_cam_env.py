@@ -66,7 +66,7 @@ class PickbotReachCamEnv(gym.Env):
         # Parameters for action
         self._is_discrete = is_discrete
         self._xy_increment = 0.01
-        self._z_increment = 0.002
+        self._z_increment = 0.01
         self._wrist_3_joint_increment = math.pi / 100
         self._use_z_axis = False
         self._action_bound = 1
@@ -804,6 +804,10 @@ class PickbotReachCamEnv(gym.Env):
         if self.is_gripper_attached():
             done = True
             done_reward = reward_reached_goal
+
+        # TODO: this only works for the Box
+        if self._list_of_status["gripper_pos"][-1] <= 1.097:
+            done = True
 
         # print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
         if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or  \
