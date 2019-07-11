@@ -28,7 +28,9 @@ seed = None
 task_name = "reach"
 # last_timestamp = "2019-06-11_12h28min"
 # last_timestamp = "2019-06-18_09h26min"
-last_timestamp = "2019-06-18_21h00min"
+# last_timestamp = "2019-06-18_21h00min"
+# last_timestamp = "2019-07-01_10h09min"
+last_timestamp = "2019-07-02_11h21min"
 
 # Create needed folders for log file and models
 logdir = os.path.dirname(evaluations.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + timestamp + '/'
