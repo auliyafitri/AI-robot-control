@@ -30,6 +30,8 @@ from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Point
 from openai_ros.msg import RLExperimentInfo
 
+from simulation.msg import VacuumGripperState
+from simulation.srv import VacuumGripperControl
 
 ##___INITIALIZATION___###
 moveit_commander.roscpp_initialize(sys.argv) #initialize the moveit commander
@@ -345,6 +347,64 @@ def get_distance_gripper_to_object():
 
     return distance, Object, Gripper
 
+########################################################
+# Gripper Control                                      #
+########################################################
+
+
+class GripperControl:
+
+    def __init__(self):
+        self.gripper_state = VacuumGripperState()
+        rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
+        self.check_gripper_state()
+
+    def gripper_state_callback(self, msg):
+        self.gripper_state = msg
+
+    def check_gripper_state(self):
+        gripper_state_msg = None
+        while gripper_state_msg is None and not rospy.is_shutdown():
+            try:
+                gripper_state_msg = rospy.wait_for_message("/pickbot/gripper/state", VacuumGripperState, timeout=0.1)
+                self.gripper_state = gripper_state_msg
+                rospy.logdebug("gripper_state READY")
+            except Exception as e:
+                rospy.logdebug("EXCEPTION: gripper_state not ready yet, retrying==>" + str(e))
+
+    def turn_on_gripper(self):
+        """
+        turn on the Gripper by calling the service
+        """
+        try:
+            turn_on_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
+            enable = True
+            turn_on_gripper_service(enable)
+        except rospy.ServiceException as e:
+            rospy.loginfo("Turn on Gripper service call failed:  {0}".format(e))
+
+    def turn_off_gripper(self):
+        """
+        turn off the Gripper by calling the service
+        """
+        try:
+            turn_off_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
+            enable = False
+            turn_off_gripper_service(enable)
+        except rospy.ServiceException as e:
+            rospy.loginfo("Turn off Gripper service call failed:  {0}".format(e))
+
+    def is_gripper_attached(self):
+        gripper_state = None
+        while gripper_state is None and not rospy.is_shutdown():
+            try:
+                gripper_state = rospy.wait_for_message("/pickbot/gripper/state", VacuumGripperState, timeout=0.1)
+            except Exception as e:
+                rospy.logdebug("Current gripper_state not ready yet, retrying==>" + str(e))
+        return gripper_state.attached
+########################################################
+# Gripper Control                                      #
+########################################################
 
 def key(event):
 
@@ -358,6 +418,12 @@ def key(event):
         # Decrease the increment when getting near the object
         xy_increment = 0.02
         z_increment = 0.002
+        wrist3_increment = math.pi / 10
+
+    if gripperControl.is_gripper_attached():
+        # increase the increment when the object is attached to the gripper
+        xy_increment = 0.05
+        z_increment = 0.05
         wrist3_increment = math.pi / 10
 
     """shows key or tk code for the key"""
@@ -375,6 +441,11 @@ def key(event):
             relative_joint_value(0, 0, 0, 0, 0, -wrist3_increment)
         if event.char == 's':
             relative_joint_value(0, 0, 0, 0, 0, wrist3_increment)
+
+        if event.char == 'g':
+            gripperControl.turn_on_gripper()
+        if event.char == 'h':
+            gripperControl.turn_off_gripper()
 
     elif len(event.char) == 1:
         # charcters like []/.,><#$ also Return and ctrl/key
@@ -405,6 +476,8 @@ if __name__ == '__main__':
     # Moving the robot to starting position
     # assign_joint_value(1.5, -1.2, 1.4, -1.87, -1.57, 0)
     assign_joint_value(1.5, -1.2, 1.4, -1.77, -1.57, 0)
+
+    gripperControl = GripperControl()
 
     root = tk.Tk()
     print( "Press <arrow key> to move in x-y-plane." )
