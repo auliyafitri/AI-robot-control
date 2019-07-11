@@ -210,7 +210,7 @@
       <pose frame=''>0 0 0 0 0 0</pose>
     </model>
 
-    <!-- <model name='unit_box_0'>
+    <model name='unit_box_0'>
       <pose frame=''>0 0.919858 1.047203 0 -0 0</pose>
       <link name='target'>
         <inertial>
@@ -261,10 +261,10 @@
         <kinematic>0</kinematic>
         <gravity>1</gravity>
       </link>
-    </model> -->
+    </model>
 
 
-    <model name='unit_box_0'>
+    <!-- <model name='unit_box_0'>
       <pose frame=''>0 0.919858 1.08 0 -0 0</pose>
       <link name='target'>
         <inertial>
@@ -293,7 +293,7 @@
         </visual>
         <gravity>0</gravity>
       </link>
-    </model>
+    </model> -->
 
    
 
