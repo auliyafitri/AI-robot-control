@@ -129,6 +129,7 @@ class PickbotReachCamEnv(gym.Env):
         rospy.Subscriber("/move_group/feedback", MoveGroupActionFeedback, self.move_group_action_feedback_callback, queue_size=4)
         rospy.Subscriber('/intel_realsense_camera/rgb/image_raw', Image, self.realsense_rgb_callback)
         rospy.Subscriber('/intel_realsense_camera/depth/image_raw', Image, self.realsense_depth_callback)
+        rospy.Subscriber("/pickbot/gripper/state", VacuumGripperState, self.gripper_state_callback)
 
         # Define Action and state Space and Reward Range
         """
@@ -275,7 +276,7 @@ class PickbotReachCamEnv(gym.Env):
         9) Return State
         """
         # print("Joint (reset): {}".format(np.around(self.joints_state.position, decimals=3)))
-        init_joint_pos = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
+        init_joint_pos = [1.5, -1.2, 1.4, -1.77, -1.57, 0]
         self.publisher_to_moveit_object.set_joints(init_joint_pos)
 
         # Busy waiting for moveit to complete the movement
@@ -401,6 +402,19 @@ class PickbotReachCamEnv(gym.Env):
         if new_status["distance_gripper_to_object"] < self.min_distance:
             self.min_distance = new_status["distance_gripper_to_object"]
 
+        # Turn on gripper and try to gripp
+        if new_status["gripper_pos"][-1] <= 1.1:
+            self.movement_complete.data = False
+
+            self.turn_on_gripper()
+            gripping_pos = np.append(new_status["gripper_pos"][0:2], (1.047+0.05)) # this data is only for the cube
+            self.publisher_to_moveit_object.pub_pose_to_moveit(gripping_pos) # grip
+            while not self.movement_complete.data:
+                pass
+            if self.is_gripper_attached():
+                # pick up
+                self.publisher_to_moveit_object.pub_relative_pose_to_moveit(0.5, is_discrete=True, axis='z')
+
         # 5) Convert Observations into state
         state = U.get_state(new_observation)
 
@@ -411,15 +425,11 @@ class PickbotReachCamEnv(gym.Env):
         # reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
         reward = UMath.computeReward(status=new_status, collision=True)
 
-        ### TEST ###
-        if done:
-            joint_pos = self.joints_state.position
-            print("Joint in step (done): {}".format(np.around(joint_pos, decimals=3)))
-        ### END of TEST ###
-
         self.accumulated_episode_reward += reward
 
         self.episode_steps += 1
+
+        self.turn_off_gripper()
 
         return state, reward, done, {}
 
@@ -443,7 +453,7 @@ class PickbotReachCamEnv(gym.Env):
         self.check_collision()
         self.check_rgb_camera()
         self.check_rgbd_camera()
-        # self.check_gripper_state()
+        self.check_gripper_state()
         rospy.logdebug("ALL SYSTEMS READY")
 
     def check_joint_states(self):
@@ -791,6 +801,10 @@ class PickbotReachCamEnv(gym.Env):
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
 
+        if self.is_gripper_attached():
+            done = True
+            done_reward = reward_reached_goal
+
         # print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
         if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or  \
                 self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
@@ -857,6 +871,37 @@ class PickbotReachCamEnv(gym.Env):
         ##################################################################################
 
         return done, done_reward, invalid_collision
+
+    def turn_on_gripper(self):
+        """
+        turn on the Gripper by calling the service
+        """
+        try:
+            turn_on_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
+            enable = True
+            turn_on_gripper_service(enable)
+        except rospy.ServiceException as e:
+            rospy.loginfo("Turn on Gripper service call failed:  {0}".format(e))
+
+    def turn_off_gripper(self):
+        """
+        turn off the Gripper by calling the service
+        """
+        try:
+            turn_off_gripper_service = rospy.ServiceProxy('/pickbot/gripper/control', VacuumGripperControl)
+            enable = False
+            turn_off_gripper_service(enable)
+        except rospy.ServiceException as e:
+            rospy.loginfo("Turn off Gripper service call failed:  {0}".format(e))
+
+    def is_gripper_attached(self):
+        gripper_state = None
+        while gripper_state is None and not rospy.is_shutdown():
+            try:
+                gripper_state = rospy.wait_for_message("/pickbot/gripper/state", VacuumGripperState, timeout=0.1)
+            except Exception as e:
+                rospy.logdebug("Current gripper_state not ready yet, retrying==>" + str(e))
+        return gripper_state.attached
 
     def _update_episode(self):
         """
