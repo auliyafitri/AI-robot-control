@@ -37,7 +37,7 @@ rospy.init_node('move_group_python_interface', anonymous=True) #initialize the n
 robot = moveit_commander.RobotCommander() #define the robot
 scene = moveit_commander.PlanningSceneInterface() #define the scene
 group = moveit_commander.MoveGroupCommander("manipulator")
-display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory) #publisher that publishes a plan to the topic: '/move_group/display_planned_path'
+display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory, queue_size=10) #publisher that publishes a plan to the topic: '/move_group/display_planned_path'
 # gripper_publisher = rospy.Publisher('CModelRobotOutput', outputMsg.CModel_robot_output)
 tf_listener = tf.TransformListener()
 tf_broadcaster = tf.TransformBroadcaster()
@@ -347,10 +347,18 @@ def get_distance_gripper_to_object():
 
 
 def key(event):
-    # Increment for the robot
-    xy_increment = 0.05
-    z_increment = 0.02
-    wrist3_increment = math.pi / 10
+
+    distance, _, _ = get_distance_gripper_to_object()
+    if distance >= 0.1:
+        # Increment for the robot
+        xy_increment = 0.05
+        z_increment = 0.02
+        wrist3_increment = math.pi / 10
+    else:
+        # Decrease the increment when getting near the object
+        xy_increment = 0.02
+        z_increment = 0.002
+        wrist3_increment = math.pi / 10
 
     """shows key or tk code for the key"""
     if event.keysym == 'Escape':
