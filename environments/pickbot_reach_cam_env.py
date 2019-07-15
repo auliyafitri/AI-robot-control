@@ -825,7 +825,7 @@ class PickbotReachCamEnv(gym.Env):
             print('>>>>>>>>>>>>> get two contacts <<<<<<<<<<<<<<<<<<')
             done_reward = reward_reached_goal
             # save state in csv file
-            U.append_to_csv(self.csv_success_exp, status)
+            U.dict_to_csv(self.csv_success_exp, status)
             self.success_2_contacts += 1
             print("Successful 2 contacts so far: {} attempts".format(self.success_2_contacts))
 

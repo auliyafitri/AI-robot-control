@@ -244,6 +244,11 @@ def append_to_csv(csv_filename, anarray):
     writer.writerow(anarray)
     outfile.close()
 
+def dict_to_csv(csv_filename, dictionary):
+    f = open(csv_filename, 'wb')
+    w = csv.DictWriter(f, dictionary.keys())
+    w.writerow(dictionary)
+    f.close()
 
 def load_samples_from_prev_task(filename):  # currently for door handle only
     output = np.genfromtxt(filename, delimiter=',')
