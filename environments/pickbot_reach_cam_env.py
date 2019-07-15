@@ -365,7 +365,7 @@ class PickbotReachCamEnv(gym.Env):
                 realAction = [dx, dy, dz, da]
 
         print("########################################")
-        print("Old Gripper position: {}".format(np.round(gripper_pos, decimals=3)))
+        print("Old Gripper position: {}".format(np.round(np.append(gripper_pos, self.joints_state.position[-1]), decimals=4)))
         next_pos = gripper_pos + realAction[0:3]
         next_wrist_3_angle = self.joints_state.position[-1] + realAction[-1]
         next_action_position = np.append(next_pos, next_wrist_3_angle)
@@ -389,14 +389,15 @@ class PickbotReachCamEnv(gym.Env):
             if np.isclose(next_action_position, current_position, rtol=0.0, atol=0.01).all():
                 break
             elif elapsed_time > rospy.Duration(2):
-                # time out
+                print(">>> Time Out!")
                 break
 
         # 4) Get new status and update min_distance after performing the action
         new_observation = self.get_obs()
         new_status = self.get_status()
 
-        print("New Gripper position: {}".format(np.round(new_status["gripper_pos"], decimals=3)))
+        new_gripper_position = np.append(new_status["gripper_pos"], self.joints_state.position[-1])
+        print("New Gripper position: {}".format(np.round(new_gripper_position, decimals=4)))
         print("########################################")
 
         if new_status["distance_gripper_to_object"] < self.min_distance:
