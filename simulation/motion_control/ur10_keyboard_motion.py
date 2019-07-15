@@ -3,6 +3,7 @@
 
 import sys
 import math
+import time
 import rospy
 import copy
 import tf
@@ -467,6 +468,16 @@ def key(event):
             relative_pose_target('y', -xy_increment)
 
     distance, obj_pos, gripper_pos = get_distance_gripper_to_object()
+    if gripper_pos[-1] < 1.2:
+        gripperControl.turn_on_gripper()
+        print("Z < 1.2, going dow and try to grasp the object.")
+        assign_pose_target('nil', 'nil', 1.047+0.05, 'nil', 'nil', 'nil', 'nil')
+        time.sleep(1)
+        if gripperControl.is_gripper_attached():
+            # assign_pose_target('nil', 'nil', 1.3, 'nil', 'nil', 'nil', 'nil')
+            relative_pose_target('z', 0.3)
+        distance, obj_pos, gripper_pos = get_distance_gripper_to_object()
+
     print("distance: {}".format(distance))
     print("Object: {}".format(np.round(obj_pos, decimals=3)))
     print("Gripper: {}".format(np.round(gripper_pos, decimals=3)))
