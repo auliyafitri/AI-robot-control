@@ -245,10 +245,10 @@ def append_to_csv(csv_filename, anarray):
     outfile.close()
 
 def dict_to_csv(csv_filename, dictionary):
-    f = open(csv_filename, 'wb')
-    w = csv.DictWriter(f, dictionary.keys())
-    w.writerow(dictionary)
-    f.close()
+    with open(csv_filename, 'w') as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in dictionary.items():
+            writer.writerow([key, value])
 
 def load_samples_from_prev_task(filename):  # currently for door handle only
     output = np.genfromtxt(filename, delimiter=',')

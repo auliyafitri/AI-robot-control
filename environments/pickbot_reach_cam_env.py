@@ -404,7 +404,7 @@ class PickbotReachCamEnv(gym.Env):
             self.min_distance = new_status["distance_gripper_to_object"]
 
         # Turn on gripper and try to gripp
-        if new_status["gripper_pos"][-1] <= 1.1:
+        if new_status["gripper_pos"][-1] <= 1.2:
             self.movement_complete.data = False
 
             self.turn_on_gripper()
@@ -412,9 +412,10 @@ class PickbotReachCamEnv(gym.Env):
             self.publisher_to_moveit_object.pub_pose_to_moveit(gripping_pos) # grip
             while not self.movement_complete.data:
                 pass
+            time.sleep(1)
             if self.is_gripper_attached():
                 # pick up
-                self.publisher_to_moveit_object.pub_relative_pose_to_moveit(0.5, is_discrete=True, axis='z')
+                self.publisher_to_moveit_object.pub_relative_pose_to_moveit(0.3, is_discrete=True, axis='z')
 
         # 5) Convert Observations into state
         state = U.get_state(new_observation)
@@ -807,6 +808,7 @@ class PickbotReachCamEnv(gym.Env):
             done_reward = reward_reached_goal
 
         # TODO: this only works for the Box
+        # the gripper tried to grasp but did not succeed
         if self._list_of_status["gripper_pos"][-1] <= 1.097:
             done = True
 
