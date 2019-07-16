@@ -365,12 +365,13 @@ class PickbotReachCamEnv(gym.Env):
 
                 realAction = [dx, dy, dz, da]
 
-        print("########################################")
-        print("Old Gripper position: {}".format(np.round(np.append(gripper_pos, self.joints_state.position[-1]), decimals=4)))
+
+        old_gripper_position = np.append(gripper_pos, self.joints_state.position[-1])
+
         next_pos = gripper_pos + realAction[0:3]
         next_wrist_3_angle = self.joints_state.position[-1] + realAction[-1]
         next_action_position = np.append(next_pos, next_wrist_3_angle)
-        print("Next_position: {}".format(next_action_position))
+
 
         # 3) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_pose_to_moveit(next_pos)
@@ -382,6 +383,7 @@ class PickbotReachCamEnv(gym.Env):
         while not self.movement_complete.data:
             pass
 
+        is_time_out = False
         start_ros_time = rospy.Time.now()
         while True:
             current_position = U.get_gripper_position()
@@ -390,7 +392,11 @@ class PickbotReachCamEnv(gym.Env):
             if np.isclose(next_action_position, current_position, rtol=0.0, atol=0.01).all():
                 break
             elif elapsed_time > rospy.Duration(2):
+                is_time_out = True
                 print(">>> Time Out!")
+                print("########################################")
+                print("Old Gripper position: {}".format(np.round(old_gripper_position, decimals=4)))
+                print("Next_position: {}".format(np.round(next_action_position, decimals=4)))
                 break
 
         # 4) Get new status and update min_distance after performing the action
@@ -398,8 +404,9 @@ class PickbotReachCamEnv(gym.Env):
         new_status = self.get_status()
 
         new_gripper_position = np.append(new_status["gripper_pos"], self.joints_state.position[-1])
-        print("New Gripper position: {}".format(np.round(new_gripper_position, decimals=4)))
-        print("########################################")
+        if is_time_out:
+            print("New Gripper position: {}".format(np.round(new_gripper_position, decimals=4)))
+            print("########################################")
 
         if new_status["distance_gripper_to_object"] < self.min_distance:
             self.min_distance = new_status["distance_gripper_to_object"]
