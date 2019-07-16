@@ -67,7 +67,7 @@ class PickbotReachCamEnv(gym.Env):
         self._is_discrete = is_discrete
         self._xy_increment = 0.01
         self._z_increment = 0.005
-        self._wrist_3_joint_increment = math.pi / 100
+        self._wrist_3_joint_increment = math.pi / 20
         self._use_z_axis = False
         self._action_bound = 1
 
@@ -276,7 +276,8 @@ class PickbotReachCamEnv(gym.Env):
         9) Return State
         """
         # print("Joint (reset): {}".format(np.around(self.joints_state.position, decimals=3)))
-        init_joint_pos = [1.5, -1.2, 1.4, -1.77, -1.57, 0]
+        # init_joint_pos = [1.5, -1.2, 1.4, -1.77, -1.57, 0]
+        init_joint_pos = [1.57, -1.479, 1.41, -1.66, -1.57, -0.08]
         self.publisher_to_moveit_object.set_joints(init_joint_pos)
 
         # Busy waiting for moveit to complete the movement
