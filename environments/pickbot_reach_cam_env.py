@@ -66,7 +66,7 @@ class PickbotReachCamEnv(gym.Env):
         # Parameters for action
         self._is_discrete = is_discrete
         self._xy_increment = 0.01
-        self._z_increment = 0.005
+        self._z_increment = 0.003
         self._wrist_3_joint_increment = math.pi / 20
         self._use_z_axis = False
         self._action_bound = 1
