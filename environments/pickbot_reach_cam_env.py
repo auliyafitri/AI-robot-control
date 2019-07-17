@@ -264,7 +264,7 @@ class PickbotReachCamEnv(gym.Env):
 
     def reset(self):
         """
-        Reset The Robot to its initial Position and restart the Controllers 
+        Reset The Robot to its initial Position and restart the Controllers
         1) Publish the initial joint_positions to MoveIt
         2) Busy waiting until the movement is completed by MoveIt
         3) set target_object to random position
@@ -292,6 +292,7 @@ class PickbotReachCamEnv(gym.Env):
             elif elapsed_time > rospy.Duration(2): # time out
                 break
 
+        self.turn_off_gripper()
         self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         self._check_all_systems_ready()
 
@@ -438,8 +439,6 @@ class PickbotReachCamEnv(gym.Env):
         self.accumulated_episode_reward += reward
 
         self.episode_steps += 1
-
-        self.turn_off_gripper()
 
         return state, reward, done, {}
 
