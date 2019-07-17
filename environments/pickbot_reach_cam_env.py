@@ -421,7 +421,7 @@ class PickbotReachCamEnv(gym.Env):
             self.publisher_to_moveit_object.pub_pose_to_moveit(gripping_pos) # grip
             while not self.movement_complete.data:
                 pass
-            time.sleep(1)
+            time.sleep(2)
             if self.is_gripper_attached():
                 # pick up
                 self.publisher_to_moveit_object.pub_relative_pose_to_moveit(0.3, is_discrete=True, axis='z')
