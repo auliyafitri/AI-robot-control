@@ -303,7 +303,7 @@ def manipulator_status():
     print(robot.get_current_state())
 
 
-def get_distance_gripper_to_object():
+def get_distance_gripper_to_object(object_name="unit_box_0"):
     """
     Get the Position of the endeffektor and the object via rosservice call /gazebo/get_model_state and /gazebo/get_link_state
     Calculate distance between them
@@ -316,7 +316,7 @@ def get_distance_gripper_to_object():
 
     try:
         model_coordinates = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-        blockName = "unit_box_0"
+        blockName = object_name
         relative_entity_name = "link"
         object_resp_coordinates = model_coordinates(blockName, relative_entity_name)
         Object = np.array((object_resp_coordinates.pose.position.x, object_resp_coordinates.pose.position.y,
@@ -408,8 +408,10 @@ class GripperControl:
 ########################################################
 
 def key(event):
+    object_name = "unit_box_0"
+    # object_name = "door_handle"
 
-    distance, _, _ = get_distance_gripper_to_object()
+    distance, _, _ = get_distance_gripper_to_object(object_name)
     if distance >= 0.1:
         # Increment for the robot
         xy_increment = 0.05
@@ -417,7 +419,7 @@ def key(event):
         wrist3_increment = math.pi / 10
     else:
         # Decrease the increment when getting near the object
-        xy_increment = 0.02
+        xy_increment = 0.01
         z_increment = 0.002
         wrist3_increment = math.pi / 10
 
@@ -432,7 +434,7 @@ def key(event):
         root.destroy()
     if event.char == event.keysym:
         # normal number and letter characters
-        print( 'Normal Key %r' % event.char )
+        print('Normal Key %r' % event.char)
         if event.char == 'z':
             relative_pose_target('z', -z_increment)
         if event.char == 'x':
@@ -453,13 +455,9 @@ def key(event):
         print('Punctuation Key %r (%r)' % (event.keysym, event.char))
     else:
         # f1 to f12, shift keys, caps lock, Home, End, Delete ...
-        print( 'Special Key %r' % event.keysym)
+        print('Special Key %r' % event.keysym)
         if event.keysym == 'Left':
             relative_pose_target('x', -xy_increment)
-            # distance, obj_pos, gripper_pos = get_distance_gripper_to_object
-            # print("distance: {}".format(distance))
-            # print("Object: {}".format(np.round(obj_pos, decimals=3)))
-            # print("Gripper: {}".format(np.round(gripper_pos, decimals=3)))
         if event.keysym == 'Right':
             relative_pose_target('x', xy_increment)
         if event.keysym == 'Up':
@@ -467,7 +465,7 @@ def key(event):
         if event.keysym == 'Down':
             relative_pose_target('y', -xy_increment)
 
-    distance, obj_pos, gripper_pos = get_distance_gripper_to_object()
+    distance, obj_pos, gripper_pos = get_distance_gripper_to_object(object_name)
     if gripper_pos[-1] < 1.2:
         gripperControl.turn_on_gripper()
         print("Z < 1.2, going dow and try to grasp the object.")
@@ -476,7 +474,7 @@ def key(event):
         if gripperControl.is_gripper_attached():
             # assign_pose_target('nil', 'nil', 1.3, 'nil', 'nil', 'nil', 'nil')
             relative_pose_target('z', 0.3)
-        distance, obj_pos, gripper_pos = get_distance_gripper_to_object()
+        distance, obj_pos, gripper_pos = get_distance_gripper_to_object(object_name)
 
     print("distance: {}".format(distance))
     print("Object: {}".format(np.round(obj_pos, decimals=3)))
@@ -486,7 +484,8 @@ def key(event):
 if __name__ == '__main__':
     # Moving the robot to starting position
     # assign_joint_value(1.5, -1.2, 1.4, -1.87, -1.57, 0)
-    assign_joint_value(1.5, -1.2, 1.4, -1.77, -1.57, 0)
+    # assign_joint_value(1.5, -1.2, 1.4, -1.77, -1.57, 0)
+    assign_joint_value(1.41, -1.479, 1.57, -1.66, -1.57, -0.08)
 
     gripperControl = GripperControl()
 
