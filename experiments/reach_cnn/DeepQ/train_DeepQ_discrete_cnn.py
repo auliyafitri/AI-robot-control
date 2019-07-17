@@ -1,14 +1,23 @@
 import gym
 import rospy
 import datetime
+import os
+
+import evaluations
 
 
 from environments import gazebo_connection
 from environments.pickbot_reach_cam_env import PickbotReachCamEnv
+from baselines import logger
 
 from baselines import deepq
 timestamp = datetime.datetime.now()
 
+
+task_name = "reach_cnn"
+logdir = os.path.dirname(evaluations.__file__) + '/' + task_name + '/deepQ/' + '/' + timestamp + '/'
+format_strs = ['stdout', 'log', 'csv', 'tensorboard']
+logger.configure(os.path.abspath(logdir), format_strs)
 
 def callback(lcl, _glb):
     # stop training if average reward exceeds 450
