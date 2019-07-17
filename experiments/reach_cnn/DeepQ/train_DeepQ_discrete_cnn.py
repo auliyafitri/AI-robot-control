@@ -4,20 +4,22 @@ import datetime
 import os
 
 import evaluations
-
+import models
 
 from environments import gazebo_connection
 from environments.pickbot_reach_cam_env import PickbotReachCamEnv
 from baselines import logger
 
 from baselines import deepq
-timestamp = datetime.datetime.now()
+timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
 
 
 task_name = "reach_cnn"
-logdir = os.path.dirname(evaluations.__file__) + '/' + task_name + '/deepQ/' + '/' + timestamp + '/'
+logdir = os.path.dirname(evaluations.__file__) + '/' + task_name + '/deepQ' + '/' + timestamp + '/'
 format_strs = ['stdout', 'log', 'csv', 'tensorboard']
 logger.configure(os.path.abspath(logdir), format_strs)
+
+modelsdir = os.path.dirname(models.__file__) + '/' + task_name + '/deepQ' + '/' + timestamp + '/'
 
 def callback(lcl, _glb):
     # stop training if average reward exceeds 450
@@ -42,8 +44,9 @@ def main():
         buffer_size=50000,
         exploration_fraction=0.1,
         exploration_final_eps=0.02,
-        print_freq=10,
-        callback=callback,
+        print_freq=100,
+        checkpoint_path=modelsdir,
+        callback=callback
     )
     print("Saving model to kuka_cam_model.pkl")
     act.save("pickbot_cam_model.pkl")
