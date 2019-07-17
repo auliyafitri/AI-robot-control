@@ -46,7 +46,7 @@ def main():
         callback=callback,
     )
     print("Saving model to kuka_cam_model.pkl")
-    act.save("kuka_cam_model.pkl")
+    act.save("pickbot_cam_model.pkl")
 
 
 if __name__ == '__main__':
