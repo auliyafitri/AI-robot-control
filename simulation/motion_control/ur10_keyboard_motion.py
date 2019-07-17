@@ -9,7 +9,9 @@ import copy
 import tf
 import numpy as np
 import moveit_commander 
-import moveit_msgs.msg 
+import moveit_msgs.msg
+import datetime
+import csv
 import geometry_msgs.msg
 import Tkinter as tk
 # from robotiq_c_model_control.msg import _CModel_robot_output as outputMsg
@@ -407,9 +409,39 @@ class GripperControl:
 # Gripper Control                                      #
 ########################################################
 
+########################################################
+# Test
+########################################################
+def dict_to_csv(csv_filename, dictionary):
+    with open(csv_filename, 'w') as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in dictionary.items():
+            writer.writerow([key, value])
+
+
+def get_status():
+    status = {"distance_gripper_to_object": -1,
+                            "gripper_pos": -1,
+                            "gripper_ori": -1,
+                            "object_pos": -1,
+                            "object_ori": -1,
+                            "min_distance_gripper_to_object": -1}
+    distance, obj_pos, gripper_pos = get_distance_gripper_to_object()
+
+    status["distance_gripper_to_object"] = distance
+    status["gripper_pos"] = gripper_pos
+    status["object_pos"] = obj_pos
+
+    return status
+########################################################
+# End of Test
+########################################################
+
 def key(event):
     object_name = "unit_box_0"
     # object_name = "door_handle"
+
+    csv_success_exp = "success_exp" + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + ".csv"
 
     distance, _, _ = get_distance_gripper_to_object(object_name)
     if distance >= 0.1:
@@ -470,10 +502,11 @@ def key(event):
         gripperControl.turn_on_gripper()
         print("Z < 1.2, going dow and try to grasp the object.")
         assign_pose_target('nil', 'nil', 1.047+0.05, 'nil', 'nil', 'nil', 'nil')
-        time.sleep(1)
+        time.sleep(2)
         if gripperControl.is_gripper_attached():
-            # assign_pose_target('nil', 'nil', 1.3, 'nil', 'nil', 'nil', 'nil')
             relative_pose_target('z', 0.3)
+            status = get_status()
+            # dict_to_csv(csv_success_exp, status)
         distance, obj_pos, gripper_pos = get_distance_gripper_to_object(object_name)
 
     print("distance: {}".format(distance))
