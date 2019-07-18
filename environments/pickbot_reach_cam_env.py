@@ -434,7 +434,7 @@ class PickbotReachCamEnv(gym.Env):
 
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         # reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
-        reward = UMath.computeReward(status=new_status, collision=True)
+        reward = UMath.computeReward(status=new_status, collision=invalid_contact)
 
         self.accumulated_episode_reward += reward
 
