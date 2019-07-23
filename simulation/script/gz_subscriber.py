@@ -11,12 +11,11 @@ import rospy
 from std_msgs.msg import Bool
 
 # global variables
-# allowed_comb = {
-#     'wrist_3_link': ['target'],
-#     'vacuum_gripper_link': ['target'],
-#     'target': ['wrist_3_link', 'vacuum_gripper_link']
-# }
-allowed_comb = {}
+allowed_comb = {
+    'wrist_3_link': ['target'],
+    'vacuum_gripper_link': ['target'],
+    'target': ['wrist_3_link', 'vacuum_gripper_link']
+}
 
 ignored_comb = ['container', 'target', 'the_object']
 
