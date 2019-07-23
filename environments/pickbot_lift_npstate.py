@@ -181,6 +181,9 @@ class PickbotEnv(gym.Env):
         self.csv_success_exp = logger.get_dir() + '/success_exp' + datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin') + '.csv'
         self.successful_attempts = 0
 
+        # variable to store last observation
+        self.old_obs = self.get_obs()
+
         # object name: name of the target object
         # object type: index of the object name in the object list
         # object list: pool of the available objects, have at least one entry
@@ -259,12 +262,13 @@ class PickbotEnv(gym.Env):
         18) Return State
         """
 
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Reset %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         # self.gazebo.change_gravity(0, 0, 0)
         self.controllers_object.turn_off_controllers()
         # turn off the gripper
         # U.turn_off_gripper()
-        # self.gazebo.pauseSim()
         self.gazebo.resetSim()
+        # self.gazebo.pauseSim()
 
         # turn on the gripper
         # U.turn_on_gripper()
@@ -280,7 +284,7 @@ class PickbotEnv(gym.Env):
             vg_geo = U.get_link_state("vacuum_gripper_link")
             to_geo = U.get_link_state("target")
             orientation_error = quaternion_multiply(vg_geo[3:], quaternion_conjugate(to_geo[3:]))
-            print("Orientation error {}".format(orientation_error))
+            # print("Orientation error {}".format(orientation_error))
             box_pos = U.get_random_door_handle_pos() if self._random_position else self.object_initial_position
             U.change_object_position(self.object_name, box_pos)
         # Code above is hard-coded for door handle, modify later.
@@ -292,20 +296,20 @@ class PickbotEnv(gym.Env):
         self._check_all_systems_ready()
 
         # last_position = [1.5, -1.2, 1.4, -1.87, -1.57, 0]
-        last_position = [0, 0, 0, 0, 0, 0]
-        with open('last_position.yml', 'w') as yaml_file:
-            yaml.dump(last_position, yaml_file, default_flow_style=False)
-        with open('contact_1_force.yml', 'w') as yaml_file:
-            yaml.dump(0.0, yaml_file, default_flow_style=False)
-        with open('contact_2_force.yml', 'w') as yaml_file:
-            yaml.dump(0.0, yaml_file, default_flow_style=False)
+        # last_position = [0, 0, 0, 0, 0, 0]
+        # with open('last_position.yml', 'w') as yaml_file:
+        #     yaml.dump(last_position, yaml_file, default_flow_style=False)
+        # with open('contact_1_force.yml', 'w') as yaml_file:
+        #     yaml.dump(0.0, yaml_file, default_flow_style=False)
+        # with open('contact_2_force.yml', 'w') as yaml_file:
+        #     yaml.dump(0.0, yaml_file, default_flow_style=False)
         with open('collision.yml', 'w') as yaml_file:
             yaml.dump(False, yaml_file, default_flow_style=False)
         observation = self.get_obs()
-        print("current joints {}".format(observation[:6]))
+        # print("current joints {}".format(observation[:6]))
         # get maximum distance to the object to calculate reward
-        self.max_distance, _ = U.get_distance_gripper_to_object()
-        self.min_distance = self.max_distance
+        # self.max_distance, _ = U.get_distance_gripper_to_object()
+        # self.min_distance = self.max_distance
         # self.gazebo.pauseSim()
         state = U.get_state(observation)
         self._update_episode()
@@ -330,20 +334,24 @@ class PickbotEnv(gym.Env):
         10) Return State, Reward, Done
         """
 
+        self.old_obs = self.get_obs()
+
+        print("====================================================================")
         print("action: {}".format(action))
 
         # 1) read last_position out of YAML File
-        with open("last_position.yml", 'r') as stream:
-            try:
-                last_position = (yaml.load(stream, Loader=yaml.Loader))
-            except yaml.YAMLError as exc:
-                print(exc)
+        last_position = self.old_obs[:6]
+        # with open("last_position.yml", 'r') as stream:
+        #     try:
+        #         last_position = (yaml.load(stream, Loader=yaml.Loader))
+        #     except yaml.YAMLError as exc:
+        #         print(exc)
         # 2) get the new joint positions according to chosen action
         next_action_position = self.get_action_to_position(action, last_position)
 
         # 3) write last_position into YAML File
-        with open('last_position.yml', 'w') as yaml_file:
-            yaml.dump(next_action_position, yaml_file, default_flow_style=False)
+        # with open('last_position.yml', 'w') as yaml_file:
+        #     yaml.dump(next_action_position, yaml_file, default_flow_style=False)
 
         # 4) unpause, move to position for certain time
         self.gazebo.unpauseSim()
@@ -359,7 +367,15 @@ class PickbotEnv(gym.Env):
                 print(">>>>>>>>>> Collision: RESET <<<<<<<<<<<<<<<")
                 observation = self.get_obs()
                 print("joints after reset collision : {} ".format(observation[:6]))
-                reward = -200
+
+                # calculate reward immediately
+                distance_error = observation[6:9] - observation[13:16]
+                orientation_error = quaternion_multiply(observation[9:13], quaternion_conjugate(observation[16:]))
+
+                rewardDist = UMath.rmseFunc(distance_error)
+                rewardOrientation = 2 * np.arccos(abs(orientation_error[0]))
+
+                reward = UMath.computeReward(rewardDist, rewardOrientation, invalid_collision)
                 self.accumulated_episode_reward += reward
                 return U.get_state(observation), reward, True, {}
 
@@ -367,10 +383,12 @@ class PickbotEnv(gym.Env):
             if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
                 break
             elif elapsed_time > rospy.Duration(2):  # time out
+                print("TIME OUT, joints haven't reach positions")
                 break
 
         # 5) Get Observations and pause Simulation
         observation = self.get_obs()
+        print("Observation in the step func {}".format(np.around(observation, decimals=3)))
         # if observation[0] < self.min_distance:
         #     self.min_distance = observation[0]
         self.gazebo.pauseSim()
@@ -382,7 +400,7 @@ class PickbotEnv(gym.Env):
 
         # 7) Unpause Simulation check if its done, calculate done_reward
         self.gazebo.unpauseSim()
-        done, done_reward, invalid_contact = self.is_done(observation, last_position)
+        done, done_reward, invalid_collision = self.is_done(observation, last_position)
         self.gazebo.pauseSim()
 
         # 8) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
@@ -395,8 +413,8 @@ class PickbotEnv(gym.Env):
         rewardDist = UMath.rmseFunc(distance_error)
         rewardOrientation = 2 * np.arccos(abs(orientation_error[0]))
 
-        reward = UMath.computeReward(rewardDist, rewardOrientation) + done_reward
-        print("Reward this step {}".format(reward))
+        reward = UMath.computeReward(rewardDist, rewardOrientation, invalid_collision) + done_reward
+        # print("Reward this step {}".format(reward))
 
         self.accumulated_episode_reward += reward
 
@@ -523,6 +541,7 @@ class PickbotEnv(gym.Env):
         """
         Take the last published joint and increment/decrement one joint according to action chosen
         :param action: Integer that goes from 0 to 11, because we have 12 actions.
+        :param last_position: array of 6 value
         :return: list with all joint positions according to chosen action
         """
 
@@ -534,14 +553,14 @@ class PickbotEnv(gym.Env):
 
         rospy.logdebug("get_action_to_position>>>" + str(joint_states_position))
         if action == 0:  # Increment joint3_position_controller (elbow joint)
-            action_position[0] = joint_states_position[0] + self._joint_increment_value / 2
+            action_position[0] = joint_states_position[0] + self._joint_increment_value
             action_position[1] = joint_states_position[1]
             action_position[2] = joint_states_position[2]
             action_position[3] = joint_states_position[3]
             action_position[4] = joint_states_position[4]
             action_position[5] = joint_states_position[5]
         elif action == 1:  # Decrement joint3_position_controller (elbow joint)
-            action_position[0] = joint_states_position[0] - self._joint_increment_value / 2
+            action_position[0] = joint_states_position[0] - self._joint_increment_value
             action_position[1] = joint_states_position[1]
             action_position[2] = joint_states_position[2]
             action_position[3] = joint_states_position[3]
@@ -550,14 +569,14 @@ class PickbotEnv(gym.Env):
 
         elif action == 2:  # Increment joint2_position_controller (shoulder_lift_joint)
             action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1] + self._joint_increment_value / 2
+            action_position[1] = joint_states_position[1] + self._joint_increment_value
             action_position[2] = joint_states_position[2]
             action_position[3] = joint_states_position[3]
             action_position[4] = joint_states_position[4]
             action_position[5] = joint_states_position[5]
         elif action == 3:  # Decrement joint2_position_controller (shoulder_lift_joint)
             action_position[0] = joint_states_position[0]
-            action_position[1] = joint_states_position[1] - self._joint_increment_value / 2
+            action_position[1] = joint_states_position[1] - self._joint_increment_value
             action_position[2] = joint_states_position[2]
             action_position[3] = joint_states_position[3]
             action_position[4] = joint_states_position[4]
@@ -566,14 +585,14 @@ class PickbotEnv(gym.Env):
         elif action == 4:  # Increment joint1_position_controller (shoulder_pan_joint)
             action_position[0] = joint_states_position[0]
             action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2] + self._joint_increment_value / 2
+            action_position[2] = joint_states_position[2] + self._joint_increment_value
             action_position[3] = joint_states_position[3]
             action_position[4] = joint_states_position[4]
             action_position[5] = joint_states_position[5]
         elif action == 5:  # Decrement joint1_position_controller (shoulder_pan_joint)
             action_position[0] = joint_states_position[0]
             action_position[1] = joint_states_position[1]
-            action_position[2] = joint_states_position[2] - self._joint_increment_value / 2
+            action_position[2] = joint_states_position[2] - self._joint_increment_value
             action_position[3] = joint_states_position[3]
             action_position[4] = joint_states_position[4]
             action_position[5] = joint_states_position[5]
@@ -792,7 +811,7 @@ class PickbotEnv(gym.Env):
         orientation_error = quaternion_multiply(observations[9:13], quaternion_conjugate(observations[16:]))
         print("Step func check distance {} and orientation err {} ".format(distance_gripper_to_target, orientation_error))
 
-        if distance_gripper_to_target < 0.05 and orientation_error[0] < 0.1:
+        if distance_gripper_to_target < 0.05 and np.abs(orientation_error[0]) < 0.1:
             done = True
             print("Success! Distance {} and orientation err {} ".format(distance_gripper_to_target, orientation_error[0]))
             done_reward = reward_reached_goal
@@ -811,33 +830,33 @@ class PickbotEnv(gym.Env):
         if invalid_collision:
             done = True
             print('>>>>>>>>>>>>>>>>>>>> crashing')
-            done_reward = reward_crashing
+            # done_reward = reward_crashing
 
         # Joints are going into limits set
-        if last_position[0] < -2.9 or last_position[0] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>> reset, joint 3 exceeds limit')
-        elif last_position[1] < -2.9 or last_position[1] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>> reset, joint 2 exceeds limit')
-        elif last_position[2] < -2.9 or last_position[2] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>> reset, joint 1 exceeds limit')
-        elif last_position[3] < -2.9 or last_position[3] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>> reset, joint 4 exceeds limit')
-        elif last_position[4] < -2.9 or last_position[4] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>> reset, joint 5 exceeds limit')
-        elif last_position[5] < -2.9 or last_position[5] > 2.9:
-            done = True
-            done_reward = reward_join_range
-            print('>>>>>> reset, joint 6 exceeds limit')
+        # if last_position[0] < -2.9 or last_position[0] > 2.9:
+        #     done = True
+        #     done_reward = reward_join_range
+        #     print('>>>>>> reset, joint 3 exceeds limit')
+        # elif last_position[1] < -2.9 or last_position[1] > 2.9:
+        #     done = True
+        #     done_reward = reward_join_range
+        #     print('>>>>>> reset, joint 2 exceeds limit')
+        # elif last_position[2] < -2.9 or last_position[2] > 2.9:
+        #     done = True
+        #     done_reward = reward_join_range
+        #     print('>>>>>> reset, joint 1 exceeds limit')
+        # elif last_position[3] < -2.9 or last_position[3] > 2.9:
+        #     done = True
+        #     done_reward = reward_join_range
+        #     print('>>>>>> reset, joint 4 exceeds limit')
+        # elif last_position[4] < -2.9 or last_position[4] > 2.9:
+        #     done = True
+        #     done_reward = reward_join_range
+        #     print('>>>>>> reset, joint 5 exceeds limit')
+        # elif last_position[5] < -2.9 or last_position[5] > 2.9:
+        #     done = True
+        #     done_reward = reward_join_range
+        #     print('>>>>>> reset, joint 6 exceeds limit')
 
         return done, done_reward, invalid_collision
 

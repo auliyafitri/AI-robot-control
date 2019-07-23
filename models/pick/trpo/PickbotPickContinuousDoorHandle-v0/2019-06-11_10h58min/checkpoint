@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/robotics/catkin_ws/src/AI-robot-control/models/pick/trpo/PickbotPickContinuousDoorHandle-v0/2019-06-11_10h58min/policy_best"
+all_model_checkpoint_paths: "/home/robotics/catkin_ws/src/AI-robot-control/models/pick/trpo/PickbotPickContinuousDoorHandle-v0/2019-06-11_10h58min/policy_best"

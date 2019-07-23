@@ -17,7 +17,7 @@ allowed_comb = {
     'target': ['wrist_3_link', 'vacuum_gripper_link']
 }
 
-ignored_comb = ['container', 'target']
+ignored_comb = ['container', 'target', 'the_object']
 
 collision_1 = ''
 collision_2 = ''

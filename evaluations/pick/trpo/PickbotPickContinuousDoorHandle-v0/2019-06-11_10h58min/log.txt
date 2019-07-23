@@ -1,0 +1,3552 @@
+Logging to /home/robotics/catkin_ws/src/AI-robot-control/evaluations/pick/trpo/PickbotPickContinuousDoorHandle-v0/2019-06-11_10h58min
+load_state method is deprecated, please use load_variables instead
+********** Iteration 0 ************
+Expected: 0.023 Actual: 0.023
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.414539     |
+| eplenmean       | 2.27         |
+| eprewmean       | -4.8800116   |
+| eprewsem        | 2.0619752    |
+| epsofar         | 543          |
+| epthisiter      | 543          |
+| ev_tdlam_before | 0.0872       |
+| meankl          | 0.0010000165 |
+| optimgain       | 0.023311276  |
+| surrgain        | 0.023311276  |
+| timelapsed      | 544          |
+| timestepsofar   | 1017         |
+----------------------------------
+********** Iteration 1 ************
+Expected: 0.023 Actual: 0.023
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.397185     |
+| eplenmean       | 2.1          |
+| eprewmean       | -4.762146    |
+| eprewsem        | 1.8679459    |
+| epsofar         | 1093         |
+| epthisiter      | 550          |
+| ev_tdlam_before | 0.105        |
+| meankl          | 0.0010561694 |
+| optimgain       | 0.022737624  |
+| surrgain        | 0.022737624  |
+| timelapsed      | 1.09e+03     |
+| timestepsofar   | 2048         |
+----------------------------------
+********** Iteration 2 ************
+Expected: 0.024 Actual: 0.024
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.377326     |
+| eplenmean       | 1.9          |
+| eprewmean       | -4.51959     |
+| eprewsem        | 1.799337     |
+| epsofar         | 1673         |
+| epthisiter      | 580          |
+| ev_tdlam_before | 0.089        |
+| meankl          | 0.0010025594 |
+| optimgain       | 0.024119724  |
+| surrgain        | 0.024119724  |
+| timelapsed      | 1.64e+03     |
+| timestepsofar   | 3070         |
+----------------------------------
+********** Iteration 3 ************
+Expected: 0.027 Actual: 0.026
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.354987     |
+| eplenmean       | 2.2          |
+| eprewmean       | -4.8127365   |
+| eprewsem        | 2.5747235    |
+| epsofar         | 2211         |
+| epthisiter      | 538          |
+| ev_tdlam_before | 0.111        |
+| meankl          | 0.0011066003 |
+| optimgain       | 0.026078079  |
+| surrgain        | 0.026078079  |
+| timelapsed      | 2.19e+03     |
+| timestepsofar   | 4094         |
+----------------------------------
+********** Iteration 4 ************
+Expected: 0.026 Actual: 0.026
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.332497     |
+| eplenmean       | 1.82         |
+| eprewmean       | -4.422091    |
+| eprewsem        | 1.8564645    |
+| epsofar         | 2806         |
+| epthisiter      | 595          |
+| ev_tdlam_before | 0.121        |
+| meankl          | 0.0010622838 |
+| optimgain       | 0.025642157  |
+| surrgain        | 0.025642157  |
+| timelapsed      | 2.75e+03     |
+| timestepsofar   | 5118         |
+----------------------------------
+********** Iteration 5 ************
+Expected: 0.026 Actual: 0.025
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.311931     |
+| eplenmean       | 1.65         |
+| eprewmean       | -4.3270407   |
+| eprewsem        | 0.9161081    |
+| epsofar         | 3415         |
+| epthisiter      | 609          |
+| ev_tdlam_before | 0.11         |
+| meankl          | 0.0011306882 |
+| optimgain       | 0.02513289   |
+| surrgain        | 0.02513289   |
+| timelapsed      | 3.3e+03      |
+| timestepsofar   | 6144         |
+----------------------------------
+********** Iteration 6 ************
+Expected: 0.026 Actual: 0.026
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.290061     |
+| eplenmean       | 1.5          |
+| eprewmean       | -4.0796204   |
+| eprewsem        | 0.9550544    |
+| epsofar         | 4050         |
+| epthisiter      | 635          |
+| ev_tdlam_before | 0.0989       |
+| meankl          | 0.0011345604 |
+| optimgain       | 0.025639204  |
+| surrgain        | 0.025639204  |
+| timelapsed      | 3.85e+03     |
+| timestepsofar   | 7163         |
+----------------------------------
+********** Iteration 7 ************
+Expected: 0.028 Actual: 0.027
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.265576     |
+| eplenmean       | 1.73         |
+| eprewmean       | -4.367793    |
+| eprewsem        | 1.6377187    |
+| epsofar         | 4711         |
+| epthisiter      | 661          |
+| ev_tdlam_before | 0.0922       |
+| meankl          | 0.0010402384 |
+| optimgain       | 0.026798675  |
+| surrgain        | 0.026798675  |
+| timelapsed      | 4.41e+03     |
+| timestepsofar   | 8192         |
+----------------------------------
+********** Iteration 8 ************
+Expected: 0.028 Actual: 0.028
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.241383     |
+| eplenmean       | 1.48         |
+| eprewmean       | -4.0444574   |
+| eprewsem        | 0.91304237   |
+| epsofar         | 5409         |
+| epthisiter      | 698          |
+| ev_tdlam_before | 0.0143       |
+| meankl          | 0.0010356526 |
+| optimgain       | 0.027628887  |
+| surrgain        | 0.027628887  |
+| timelapsed      | 4.97e+03     |
+| timestepsofar   | 9216         |
+----------------------------------
+********** Iteration 9 ************
+Expected: 0.027 Actual: 0.027
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.2170515    |
+| eplenmean       | 1.55         |
+| eprewmean       | -4.129077    |
+| eprewsem        | 0.9786149    |
+| epsofar         | 6104         |
+| epthisiter      | 695          |
+| ev_tdlam_before | 0.0673       |
+| meankl          | 0.0010362958 |
+| optimgain       | 0.0266614    |
+| surrgain        | 0.0266614    |
+| timelapsed      | 5.53e+03     |
+| timestepsofar   | 10240        |
+----------------------------------
+********** Iteration 10 ************
+Expected: 0.027 Actual: 0.027
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.191421     |
+| eplenmean       | 1.5          |
+| eprewmean       | -4.0238333   |
+| eprewsem        | 1.0977404    |
+| epsofar         | 6821         |
+| epthisiter      | 717          |
+| ev_tdlam_before | 0.0524       |
+| meankl          | 0.0010696778 |
+| optimgain       | 0.027267316  |
+| surrgain        | 0.027267316  |
+| timelapsed      | 6.1e+03      |
+| timestepsofar   | 11264        |
+----------------------------------
+********** Iteration 11 ************
+Expected: 0.028 Actual: 0.027
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.165206     |
+| eplenmean       | 1.38         |
+| eprewmean       | -3.9451356   |
+| eprewsem        | 1.2159235    |
+| epsofar         | 7546         |
+| epthisiter      | 725          |
+| ev_tdlam_before | 0.063        |
+| meankl          | 0.0010288891 |
+| optimgain       | 0.026996557  |
+| surrgain        | 0.026996557  |
+| timelapsed      | 6.66e+03     |
+| timestepsofar   | 12287        |
+----------------------------------
+********** Iteration 12 ************
+Expected: 0.029 Actual: 0.029
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.132869     |
+| eplenmean       | 1.32         |
+| eprewmean       | -3.8664322   |
+| eprewsem        | 0.7852416    |
+| epsofar         | 8300         |
+| epthisiter      | 754          |
+| ev_tdlam_before | 0.041        |
+| meankl          | 0.0009971324 |
+| optimgain       | 0.029155916  |
+| surrgain        | 0.029155916  |
+| timelapsed      | 7.23e+03     |
+| timestepsofar   | 13312        |
+----------------------------------
+********** Iteration 13 ************
+Expected: 0.030 Actual: 0.029
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.104588     |
+| eplenmean       | 1.48         |
+| eprewmean       | -4.0177526   |
+| eprewsem        | 1.0769279    |
+| epsofar         | 9043         |
+| epthisiter      | 743          |
+| ev_tdlam_before | 0.0981       |
+| meankl          | 0.0010503463 |
+| optimgain       | 0.02940423   |
+| surrgain        | 0.02940423   |
+| timelapsed      | 7.8e+03      |
+| timestepsofar   | 14336        |
+----------------------------------
+********** Iteration 14 ************
+Expected: 0.028 Actual: 0.028
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.075072     |
+| eplenmean       | 1.65         |
+| eprewmean       | -4.201864    |
+| eprewsem        | 1.4259394    |
+| epsofar         | 9803         |
+| epthisiter      | 760          |
+| ev_tdlam_before | 0.0746       |
+| meankl          | 0.0010396317 |
+| optimgain       | 0.027752776  |
+| surrgain        | 0.027752776  |
+| timelapsed      | 8.37e+03     |
+| timestepsofar   | 15360        |
+----------------------------------
+********** Iteration 15 ************
+Expected: 0.031 Actual: 0.030
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 8.050483     |
+| eplenmean       | 1.1          |
+| eprewmean       | -3.656324    |
+| eprewsem        | 0.36806092   |
+| epsofar         | 10570        |
+| epthisiter      | 767          |
+| ev_tdlam_before | 0.0934       |
+| meankl          | 0.0011647844 |
+| optimgain       | 0.030397283  |
+| surrgain        | 0.030397283  |
+| timelapsed      | 8.93e+03     |
+| timestepsofar   | 16384        |
+----------------------------------
+********** Iteration 16 ************
+Expected: 0.029 Actual: 0.029
+Stepsize OK!
+---------------------------------
+| entloss         | 0.0         |
+| entropy         | 8.01865     |
+| eplenmean       | 1.3         |
+| eprewmean       | -3.8817742  |
+| eprewsem        | 0.8218739   |
+| epsofar         | 11372       |
+| epthisiter      | 802         |
+| ev_tdlam_before | 0.0569      |
+| meankl          | 0.00103078  |
+| optimgain       | 0.028922763 |
+| surrgain        | 0.028922763 |
+| timelapsed      | 9.5e+03     |
+| timestepsofar   | 17406       |
+---------------------------------
+********** Iteration 17 ************
+Expected: 0.032 Actual: 0.031
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.9876966    |
+| eplenmean       | 1.25         |
+| eprewmean       | -3.8919137   |
+| eprewsem        | 0.6182046    |
+| epsofar         | 12182        |
+| epthisiter      | 810          |
+| ev_tdlam_before | 0.0411       |
+| meankl          | 0.0010455889 |
+| optimgain       | 0.031334896  |
+| surrgain        | 0.031334896  |
+| timelapsed      | 1.01e+04     |
+| timestepsofar   | 18432        |
+----------------------------------
+********** Iteration 18 ************
+Expected: 0.033 Actual: 0.033
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.955986     |
+| eplenmean       | 1.3          |
+| eprewmean       | -3.8725028   |
+| eprewsem        | 1.0055605    |
+| epsofar         | 12994        |
+| epthisiter      | 812          |
+| ev_tdlam_before | 0.0583       |
+| meankl          | 0.0010303799 |
+| optimgain       | 0.03270291   |
+| surrgain        | 0.03270291   |
+| timelapsed      | 1.06e+04     |
+| timestepsofar   | 19456        |
+----------------------------------
+********** Iteration 19 ************
+Expected: 0.031 Actual: 0.030
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.9221873    |
+| eplenmean       | 1.35         |
+| eprewmean       | -3.961042    |
+| eprewsem        | 0.64942014   |
+| epsofar         | 13817        |
+| epthisiter      | 823          |
+| ev_tdlam_before | 0.0556       |
+| meankl          | 0.0010706487 |
+| optimgain       | 0.030006405  |
+| surrgain        | 0.030006405  |
+| timelapsed      | 1.12e+04     |
+| timestepsofar   | 20480        |
+----------------------------------
+********** Iteration 20 ************
+Expected: 0.033 Actual: 0.033
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.8877406    |
+| eplenmean       | 1.05         |
+| eprewmean       | -3.5716596   |
+| eprewsem        | 0.4135684    |
+| epsofar         | 14670        |
+| epthisiter      | 853          |
+| ev_tdlam_before | 0.0701       |
+| meankl          | 0.0010458843 |
+| optimgain       | 0.03252905   |
+| surrgain        | 0.03252905   |
+| timelapsed      | 1.18e+04     |
+| timestepsofar   | 21501        |
+----------------------------------
+********** Iteration 21 ************
+Expected: 0.032 Actual: 0.030
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.8525243    |
+| eplenmean       | 1.12         |
+| eprewmean       | -3.5825043   |
+| eprewsem        | 0.5494467    |
+| epsofar         | 15555        |
+| epthisiter      | 885          |
+| ev_tdlam_before | 0.0611       |
+| meankl          | 0.0010560763 |
+| optimgain       | 0.030384861  |
+| surrgain        | 0.030384861  |
+| timelapsed      | 1.24e+04     |
+| timestepsofar   | 22528        |
+----------------------------------
+********** Iteration 22 ************
+Expected: 0.030 Actual: 0.029
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.8155336    |
+| eplenmean       | 1.12         |
+| eprewmean       | -3.619409    |
+| eprewsem        | 0.5234879    |
+| epsofar         | 16431        |
+| epthisiter      | 876          |
+| ev_tdlam_before | 0.0577       |
+| meankl          | 0.0009969869 |
+| optimgain       | 0.029348932  |
+| surrgain        | 0.029348932  |
+| timelapsed      | 1.29e+04     |
+| timestepsofar   | 23552        |
+----------------------------------
+********** Iteration 23 ************
+Expected: 0.032 Actual: 0.032
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.779721     |
+| eplenmean       | 1.27         |
+| eprewmean       | -3.8860106   |
+| eprewsem        | 0.6939283    |
+| epsofar         | 17321        |
+| epthisiter      | 890          |
+| ev_tdlam_before | 0.0747       |
+| meankl          | 0.0010199372 |
+| optimgain       | 0.031629033  |
+| surrgain        | 0.031629033  |
+| timelapsed      | 1.35e+04     |
+| timestepsofar   | 24576        |
+----------------------------------
+********** Iteration 24 ************
+Expected: 0.029 Actual: 0.028
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.7425237    |
+| eplenmean       | 1.07         |
+| eprewmean       | -3.6218631   |
+| eprewsem        | 0.40852034   |
+| epsofar         | 18238        |
+| epthisiter      | 917          |
+| ev_tdlam_before | 0.0649       |
+| meankl          | 0.0010114708 |
+| optimgain       | 0.028327197  |
+| surrgain        | 0.028327197  |
+| timelapsed      | 1.41e+04     |
+| timestepsofar   | 25600        |
+----------------------------------
+********** Iteration 25 ************
+Expected: 0.030 Actual: 0.030
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.7077475    |
+| eplenmean       | 1.2          |
+| eprewmean       | -3.6811562   |
+| eprewsem        | 0.55401164   |
+| epsofar         | 19164        |
+| epthisiter      | 926          |
+| ev_tdlam_before | 0.0552       |
+| meankl          | 0.0011547328 |
+| optimgain       | 0.02988407   |
+| surrgain        | 0.02988407   |
+| timelapsed      | 1.47e+04     |
+| timestepsofar   | 26624        |
+----------------------------------
+********** Iteration 26 ************
+Expected: 0.030 Actual: 0.028
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+---------------------------------
+| entloss         | 0.0         |
+| entropy         | 7.6731687   |
+| eplenmean       | 1.05        |
+| eprewmean       | -3.5368533  |
+| eprewsem        | 0.35085726  |
+| epsofar         | 20085       |
+| epthisiter      | 921         |
+| ev_tdlam_before | 0.0822      |
+| meankl          | 0.001178291 |
+| optimgain       | 0.027876686 |
+| surrgain        | 0.027876686 |
+| timelapsed      | 1.53e+04    |
+| timestepsofar   | 27648       |
+---------------------------------
+********** Iteration 27 ************
+Expected: 0.030 Actual: 0.029
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.6341505    |
+| eplenmean       | 1.07         |
+| eprewmean       | -3.5252013   |
+| eprewsem        | 0.23586643   |
+| epsofar         | 21022        |
+| epthisiter      | 937          |
+| ev_tdlam_before | 0.0431       |
+| meankl          | 0.0010151591 |
+| optimgain       | 0.029115012  |
+| surrgain        | 0.029115012  |
+| timelapsed      | 1.59e+04     |
+| timestepsofar   | 28672        |
+----------------------------------
+********** Iteration 28 ************
+Expected: 0.033 Actual: 0.032
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.596534     |
+| eplenmean       | 1.15         |
+| eprewmean       | -3.6795223   |
+| eprewsem        | 0.6744399    |
+| epsofar         | 21943        |
+| epthisiter      | 921          |
+| ev_tdlam_before | 0.0933       |
+| meankl          | 0.0010235675 |
+| optimgain       | 0.03158149   |
+| surrgain        | 0.03158149   |
+| timelapsed      | 1.64e+04     |
+| timestepsofar   | 29696        |
+----------------------------------
+********** Iteration 29 ************
+Expected: 0.029 Actual: 0.028
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.556458     |
+| eplenmean       | 1.12         |
+| eprewmean       | -3.6356797   |
+| eprewsem        | 0.48576474   |
+| epsofar         | 22891        |
+| epthisiter      | 948          |
+| ev_tdlam_before | 0.0796       |
+| meankl          | 0.0010187895 |
+| optimgain       | 0.028057028  |
+| surrgain        | 0.028057028  |
+| timelapsed      | 1.7e+04      |
+| timestepsofar   | 30720        |
+----------------------------------
+********** Iteration 30 ************
+Expected: 0.030 Actual: 0.029
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.517308     |
+| eplenmean       | 1.12         |
+| eprewmean       | -3.652574    |
+| eprewsem        | 0.50546855   |
+| epsofar         | 23838        |
+| epthisiter      | 947          |
+| ev_tdlam_before | 0.0719       |
+| meankl          | 0.0010017164 |
+| optimgain       | 0.028622225  |
+| surrgain        | 0.028622225  |
+| timelapsed      | 1.76e+04     |
+| timestepsofar   | 31744        |
+----------------------------------
+********** Iteration 31 ************
+Expected: 0.028 Actual: 0.028
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.4790077    |
+| eplenmean       | 1.12         |
+| eprewmean       | -3.582994    |
+| eprewsem        | 0.45727876   |
+| epsofar         | 24806        |
+| epthisiter      | 968          |
+| ev_tdlam_before | 0.0541       |
+| meankl          | 0.0010928377 |
+| optimgain       | 0.027852189  |
+| surrgain        | 0.027852189  |
+| timelapsed      | 1.82e+04     |
+| timestepsofar   | 32768        |
+----------------------------------
+********** Iteration 32 ************
+Expected: 0.030 Actual: 0.028
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.4387393    |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.5006566   |
+| eprewsem        | 0.31557158   |
+| epsofar         | 25772        |
+| epthisiter      | 966          |
+| ev_tdlam_before | 0.0635       |
+| meankl          | 0.0010036166 |
+| optimgain       | 0.028239489  |
+| surrgain        | 0.028239489  |
+| timelapsed      | 1.87e+04     |
+| timestepsofar   | 33792        |
+----------------------------------
+********** Iteration 33 ************
+Expected: 0.027 Actual: 0.027
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.400035     |
+| eplenmean       | 1.12         |
+| eprewmean       | -3.631548    |
+| eprewsem        | 0.52232873   |
+| epsofar         | 26748        |
+| epthisiter      | 976          |
+| ev_tdlam_before | 0.0614       |
+| meankl          | 0.0010622942 |
+| optimgain       | 0.02674956   |
+| surrgain        | 0.02674956   |
+| timelapsed      | 1.93e+04     |
+| timestepsofar   | 34816        |
+----------------------------------
+********** Iteration 34 ************
+Expected: 0.029 Actual: 0.028
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.3600225    |
+| eplenmean       | 1.05         |
+| eprewmean       | -3.536403    |
+| eprewsem        | 0.37831685   |
+| epsofar         | 27723        |
+| epthisiter      | 975          |
+| ev_tdlam_before | 0.0716       |
+| meankl          | 0.0011324498 |
+| optimgain       | 0.027685083  |
+| surrgain        | 0.027685083  |
+| timelapsed      | 1.99e+04     |
+| timestepsofar   | 35840        |
+----------------------------------
+********** Iteration 35 ************
+Expected: 0.026 Actual: 0.025
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+---------------------------------
+| entloss         | 0.0         |
+| entropy         | 7.317085    |
+| eplenmean       | 1           |
+| eprewmean       | -3.408342   |
+| eprewsem        | 0.20383501  |
+| epsofar         | 28714       |
+| epthisiter      | 991         |
+| ev_tdlam_before | 0.0555      |
+| meankl          | 0.000992006 |
+| optimgain       | 0.024784766 |
+| surrgain        | 0.024784766 |
+| timelapsed      | 2.05e+04    |
+| timestepsofar   | 36864       |
+---------------------------------
+********** Iteration 36 ************
+Expected: 0.029 Actual: 0.028
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.2764597    |
+| eplenmean       | 1.05         |
+| eprewmean       | -3.497686    |
+| eprewsem        | 0.2786514    |
+| epsofar         | 29690        |
+| epthisiter      | 976          |
+| ev_tdlam_before | 0.052        |
+| meankl          | 0.0010588445 |
+| optimgain       | 0.027777363  |
+| surrgain        | 0.027777363  |
+| timelapsed      | 2.11e+04     |
+| timestepsofar   | 37888        |
+----------------------------------
+********** Iteration 37 ************
+Expected: 0.027 Actual: 0.023
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.2388306    |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.5058036   |
+| eprewsem        | 0.2377854    |
+| epsofar         | 30679        |
+| epthisiter      | 989          |
+| ev_tdlam_before | 0.0516       |
+| meankl          | 0.0014316831 |
+| optimgain       | 0.023474788  |
+| surrgain        | 0.023474788  |
+| timelapsed      | 2.16e+04     |
+| timestepsofar   | 38912        |
+----------------------------------
+********** Iteration 38 ************
+Expected: 0.024 Actual: 0.023
+Stepsize OK!
+---------------------------------
+| entloss         | 0.0         |
+| entropy         | 7.197362    |
+| eplenmean       | 1.02        |
+| eprewmean       | -3.4562263  |
+| eprewsem        | 0.32078046  |
+| epsofar         | 31680       |
+| epthisiter      | 1001        |
+| ev_tdlam_before | 0.0333      |
+| meankl          | 0.001021234 |
+| optimgain       | 0.02323832  |
+| surrgain        | 0.02323832  |
+| timelapsed      | 2.22e+04    |
+| timestepsofar   | 39936       |
+---------------------------------
+********** Iteration 39 ************
+Expected: 0.023 Actual: 0.023
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.161621     |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.3922982   |
+| eprewsem        | 0.21490513   |
+| epsofar         | 32687        |
+| epthisiter      | 1007         |
+| ev_tdlam_before | 0.0231       |
+| meankl          | 0.0010158403 |
+| optimgain       | 0.022983547  |
+| surrgain        | 0.022983547  |
+| timelapsed      | 2.28e+04     |
+| timestepsofar   | 40960        |
+----------------------------------
+********** Iteration 40 ************
+Expected: 0.022 Actual: 0.022
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.120251     |
+| eplenmean       | 1            |
+| eprewmean       | -3.454837    |
+| eprewsem        | 0.1861654    |
+| epsofar         | 33694        |
+| epthisiter      | 1007         |
+| ev_tdlam_before | 0.0308       |
+| meankl          | 0.0010674864 |
+| optimgain       | 0.021530932  |
+| surrgain        | 0.021530932  |
+| timelapsed      | 2.34e+04     |
+| timestepsofar   | 41984        |
+----------------------------------
+********** Iteration 41 ************
+Expected: 0.025 Actual: 0.025
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.0800104    |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.4794655   |
+| eprewsem        | 0.28600815   |
+| epsofar         | 34697        |
+| epthisiter      | 1003         |
+| ev_tdlam_before | 0.0419       |
+| meankl          | 0.0010139251 |
+| optimgain       | 0.024716044  |
+| surrgain        | 0.024716044  |
+| timelapsed      | 2.4e+04      |
+| timestepsofar   | 43008        |
+----------------------------------
+********** Iteration 42 ************
+Expected: 0.026 Actual: 0.024
+violated KL constraint. shrinking step.
+Expected: 0.026 Actual: 0.012
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 7.0569987     |
+| eplenmean       | 1             |
+| eprewmean       | -3.4283624    |
+| eprewsem        | 0.19197944    |
+| epsofar         | 35700         |
+| epthisiter      | 1003          |
+| ev_tdlam_before | 0.0269        |
+| meankl          | 0.00047292875 |
+| optimgain       | 0.012427648   |
+| surrgain        | 0.012427648   |
+| timelapsed      | 2.45e+04      |
+| timestepsofar   | 44032         |
+-----------------------------------
+********** Iteration 43 ************
+Expected: 0.026 Actual: 0.025
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 7.0148463    |
+| eplenmean       | 1            |
+| eprewmean       | -3.4319568   |
+| eprewsem        | 0.20929468   |
+| epsofar         | 36701        |
+| epthisiter      | 1001         |
+| ev_tdlam_before | 0.0642       |
+| meankl          | 0.0010522432 |
+| optimgain       | 0.025428848  |
+| surrgain        | 0.025428848  |
+| timelapsed      | 2.51e+04     |
+| timestepsofar   | 45056        |
+----------------------------------
+********** Iteration 44 ************
+Expected: 0.022 Actual: 0.022
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.971291     |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.395567    |
+| eprewsem        | 0.33451104   |
+| epsofar         | 37703        |
+| epthisiter      | 1002         |
+| ev_tdlam_before | 0.0347       |
+| meankl          | 0.0010067002 |
+| optimgain       | 0.02212653   |
+| surrgain        | 0.02212653   |
+| timelapsed      | 2.57e+04     |
+| timestepsofar   | 46080        |
+----------------------------------
+********** Iteration 45 ************
+Expected: 0.030 Actual: 0.024
+violated KL constraint. shrinking step.
+Expected: 0.030 Actual: 0.014
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.9534945    |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.5334187   |
+| eprewsem        | 0.30926895   |
+| epsofar         | 38715        |
+| epthisiter      | 1012         |
+| ev_tdlam_before | 0.0272       |
+| meankl          | 0.0012692942 |
+| optimgain       | 0.013503772  |
+| surrgain        | 0.013503772  |
+| timelapsed      | 2.63e+04     |
+| timestepsofar   | 47104        |
+----------------------------------
+********** Iteration 46 ************
+Expected: 0.025 Actual: 0.021
+violated KL constraint. shrinking step.
+Expected: 0.025 Actual: 0.011
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.933308     |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.4555612   |
+| eprewsem        | 0.24603347   |
+| epsofar         | 39723        |
+| epthisiter      | 1008         |
+| ev_tdlam_before | 0.0354       |
+| meankl          | 0.0005719667 |
+| optimgain       | 0.0114691965 |
+| surrgain        | 0.0114691965 |
+| timelapsed      | 2.69e+04     |
+| timestepsofar   | 48128        |
+----------------------------------
+********** Iteration 47 ************
+Expected: 0.025 Actual: 0.021
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.8939476    |
+| eplenmean       | 1            |
+| eprewmean       | -3.4632945   |
+| eprewsem        | 0.22129859   |
+| epsofar         | 40736        |
+| epthisiter      | 1013         |
+| ev_tdlam_before | 0.0271       |
+| meankl          | 0.0014242099 |
+| optimgain       | 0.021272004  |
+| surrgain        | 0.021272004  |
+| timelapsed      | 2.74e+04     |
+| timestepsofar   | 49152        |
+----------------------------------
+********** Iteration 48 ************
+Expected: 0.027 Actual: 0.026
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.8477864    |
+| eplenmean       | 1            |
+| eprewmean       | -3.3998578   |
+| eprewsem        | 0.21948023   |
+| epsofar         | 41743        |
+| epthisiter      | 1007         |
+| ev_tdlam_before | 0.0601       |
+| meankl          | 0.0010300823 |
+| optimgain       | 0.026367586  |
+| surrgain        | 0.026367586  |
+| timelapsed      | 2.8e+04      |
+| timestepsofar   | 50176        |
+----------------------------------
+********** Iteration 49 ************
+Expected: 0.034 Actual: 0.007
+violated KL constraint. shrinking step.
+Expected: 0.034 Actual: 0.009
+violated KL constraint. shrinking step.
+Expected: 0.034 Actual: 0.006
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.8401146    |
+| eplenmean       | 1            |
+| eprewmean       | -3.4194465   |
+| eprewsem        | 0.23529947   |
+| epsofar         | 42757        |
+| epthisiter      | 1014         |
+| ev_tdlam_before | 0.023        |
+| meankl          | 0.0004610985 |
+| optimgain       | 0.0060794232 |
+| surrgain        | 0.0060794232 |
+| timelapsed      | 2.86e+04     |
+| timestepsofar   | 51200        |
+----------------------------------
+********** Iteration 50 ************
+Expected: 0.031 Actual: 0.024
+violated KL constraint. shrinking step.
+Expected: 0.031 Actual: 0.013
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 6.8199153     |
+| eplenmean       | 1             |
+| eprewmean       | -3.3664017    |
+| eprewsem        | 0.23388352    |
+| epsofar         | 43763         |
+| epthisiter      | 1006          |
+| ev_tdlam_before | 0.0539        |
+| meankl          | 0.00047777797 |
+| optimgain       | 0.013436644   |
+| surrgain        | 0.013436644   |
+| timelapsed      | 2.92e+04      |
+| timestepsofar   | 52224         |
+-----------------------------------
+********** Iteration 51 ************
+Expected: 0.033 Actual: 0.009
+violated KL constraint. shrinking step.
+Expected: 0.033 Actual: 0.008
+violated KL constraint. shrinking step.
+Expected: 0.033 Actual: 0.006
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.8117228    |
+| eplenmean       | 1            |
+| eprewmean       | -3.4165618   |
+| eprewsem        | 0.20692417   |
+| epsofar         | 44775        |
+| epthisiter      | 1012         |
+| ev_tdlam_before | 0.0266       |
+| meankl          | 0.0004724277 |
+| optimgain       | 0.005512537  |
+| surrgain        | 0.005512537  |
+| timelapsed      | 2.98e+04     |
+| timestepsofar   | 53248        |
+----------------------------------
+********** Iteration 52 ************
+Expected: 0.025 Actual: 0.025
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.7711487    |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.417128    |
+| eprewsem        | 0.23805456   |
+| epsofar         | 45790        |
+| epthisiter      | 1015         |
+| ev_tdlam_before | 0.0124       |
+| meankl          | 0.0010105261 |
+| optimgain       | 0.025361553  |
+| surrgain        | 0.025361553  |
+| timelapsed      | 3.03e+04     |
+| timestepsofar   | 54272        |
+----------------------------------
+********** Iteration 53 ************
+Expected: 0.029 Actual: 0.025
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.731187     |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.3862152   |
+| eprewsem        | 0.31937256   |
+| epsofar         | 46801        |
+| epthisiter      | 1011         |
+| ev_tdlam_before | 0.0445       |
+| meankl          | 0.0011429142 |
+| optimgain       | 0.025110785  |
+| surrgain        | 0.025110785  |
+| timelapsed      | 3.09e+04     |
+| timestepsofar   | 55296        |
+----------------------------------
+********** Iteration 54 ************
+Expected: 0.042 Actual: 0.015
+violated KL constraint. shrinking step.
+Expected: 0.042 Actual: 0.012
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.7153783    |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.4730384   |
+| eprewsem        | 0.31052136   |
+| epsofar         | 47812        |
+| epthisiter      | 1011         |
+| ev_tdlam_before | 0.0558       |
+| meankl          | 0.0008938225 |
+| optimgain       | 0.01163483   |
+| surrgain        | 0.01163483   |
+| timelapsed      | 3.15e+04     |
+| timestepsofar   | 56320        |
+----------------------------------
+********** Iteration 55 ************
+Expected: 0.025 Actual: 0.025
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.670212     |
+| eplenmean       | 1            |
+| eprewmean       | -3.4492214   |
+| eprewsem        | 0.22321974   |
+| epsofar         | 48824        |
+| epthisiter      | 1012         |
+| ev_tdlam_before | 0.0258       |
+| meankl          | 0.0010184811 |
+| optimgain       | 0.025369259  |
+| surrgain        | 0.025369259  |
+| timelapsed      | 3.21e+04     |
+| timestepsofar   | 57344        |
+----------------------------------
+********** Iteration 56 ************
+Expected: 0.026 Actual: 0.026
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.622231     |
+| eplenmean       | 1            |
+| eprewmean       | -3.3558114   |
+| eprewsem        | 0.2336809    |
+| epsofar         | 49836        |
+| epthisiter      | 1012         |
+| ev_tdlam_before | 0.027        |
+| meankl          | 0.0010003026 |
+| optimgain       | 0.026154825  |
+| surrgain        | 0.026154825  |
+| timelapsed      | 3.27e+04     |
+| timestepsofar   | 58368        |
+----------------------------------
+********** Iteration 57 ************
+Expected: 0.049 Actual: 0.003
+violated KL constraint. shrinking step.
+Expected: 0.049 Actual: 0.008
+violated KL constraint. shrinking step.
+Expected: 0.049 Actual: 0.005
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.615933     |
+| eplenmean       | 1            |
+| eprewmean       | -3.3806908   |
+| eprewsem        | 0.20830558   |
+| epsofar         | 50850        |
+| epthisiter      | 1014         |
+| ev_tdlam_before | 0.00424      |
+| meankl          | 0.0009329378 |
+| optimgain       | 0.0054236217 |
+| surrgain        | 0.0054236217 |
+| timelapsed      | 3.32e+04     |
+| timestepsofar   | 59392        |
+----------------------------------
+********** Iteration 58 ************
+Expected: 0.030 Actual: 0.024
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.57145      |
+| eplenmean       | 1            |
+| eprewmean       | -3.37057     |
+| eprewsem        | 0.23031893   |
+| epsofar         | 51865        |
+| epthisiter      | 1015         |
+| ev_tdlam_before | 0.0215       |
+| meankl          | 0.0013237982 |
+| optimgain       | 0.02394583   |
+| surrgain        | 0.02394583   |
+| timelapsed      | 3.38e+04     |
+| timestepsofar   | 60416        |
+----------------------------------
+********** Iteration 59 ************
+Expected: 0.031 Actual: 0.026
+violated KL constraint. shrinking step.
+Expected: 0.031 Actual: 0.014
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 6.549958      |
+| eplenmean       | 1.05          |
+| eprewmean       | -3.45571      |
+| eprewsem        | 0.3476177     |
+| epsofar         | 52875         |
+| epthisiter      | 1010          |
+| ev_tdlam_before | 0.0313        |
+| meankl          | 0.00037364685 |
+| optimgain       | 0.013665048   |
+| surrgain        | 0.013665048   |
+| timelapsed      | 3.44e+04      |
+| timestepsofar   | 61440         |
+-----------------------------------
+********** Iteration 60 ************
+Expected: 0.070 Actual: -0.001
+violated KL constraint. shrinking step.
+Expected: 0.070 Actual: 0.008
+violated KL constraint. shrinking step.
+Expected: 0.070 Actual: 0.007
+violated KL constraint. shrinking step.
+Expected: 0.070 Actual: 0.005
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.5479116    |
+| eplenmean       | 1            |
+| eprewmean       | -3.4093928   |
+| eprewsem        | 0.16853401   |
+| epsofar         | 53884        |
+| epthisiter      | 1009         |
+| ev_tdlam_before | 0.0497       |
+| meankl          | 0.0007068096 |
+| optimgain       | 0.005141315  |
+| surrgain        | 0.005141315  |
+| timelapsed      | 3.5e+04      |
+| timestepsofar   | 62464        |
+----------------------------------
+********** Iteration 61 ************
+Expected: 0.027 Actual: 0.027
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.503491     |
+| eplenmean       | 1            |
+| eprewmean       | -3.379313    |
+| eprewsem        | 0.24321374   |
+| epsofar         | 54897        |
+| epthisiter      | 1013         |
+| ev_tdlam_before | 0.0209       |
+| meankl          | 0.0010049442 |
+| optimgain       | 0.027131325  |
+| surrgain        | 0.027131325  |
+| timelapsed      | 3.56e+04     |
+| timestepsofar   | 63488        |
+----------------------------------
+********** Iteration 62 ************
+Expected: 0.026 Actual: 0.027
+violated KL constraint. shrinking step.
+Expected: 0.026 Actual: 0.013
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 6.4800215     |
+| eplenmean       | 1             |
+| eprewmean       | -3.3695843    |
+| eprewsem        | 0.2251919     |
+| epsofar         | 55914         |
+| epthisiter      | 1017          |
+| ev_tdlam_before | 0.0203        |
+| meankl          | 0.00039153884 |
+| optimgain       | 0.013103635   |
+| surrgain        | 0.013103635   |
+| timelapsed      | 3.61e+04      |
+| timestepsofar   | 64512         |
+-----------------------------------
+********** Iteration 63 ************
+Expected: 0.026 Actual: 0.026
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.437156     |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.390232    |
+| eprewsem        | 0.31218544   |
+| epsofar         | 56933        |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.0142       |
+| meankl          | 0.0010125516 |
+| optimgain       | 0.026122313  |
+| surrgain        | 0.026122313  |
+| timelapsed      | 3.67e+04     |
+| timestepsofar   | 65536        |
+----------------------------------
+********** Iteration 64 ************
+Expected: 0.033 Actual: 0.025
+violated KL constraint. shrinking step.
+Expected: 0.033 Actual: 0.014
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 6.4172053     |
+| eplenmean       | 1.02          |
+| eprewmean       | -3.3713658    |
+| eprewsem        | 0.2784614     |
+| epsofar         | 57943         |
+| epthisiter      | 1010          |
+| ev_tdlam_before | 0.0179        |
+| meankl          | 0.00038353656 |
+| optimgain       | 0.013522634   |
+| surrgain        | 0.013522634   |
+| timelapsed      | 3.73e+04      |
+| timestepsofar   | 66560         |
+-----------------------------------
+********** Iteration 65 ************
+Expected: 0.028 Actual: 0.029
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.377357     |
+| eplenmean       | 1            |
+| eprewmean       | -3.4396477   |
+| eprewsem        | 0.22378181   |
+| epsofar         | 58959        |
+| epthisiter      | 1016         |
+| ev_tdlam_before | 0.0292       |
+| meankl          | 0.0010047324 |
+| optimgain       | 0.028667888  |
+| surrgain        | 0.028667888  |
+| timelapsed      | 3.79e+04     |
+| timestepsofar   | 67584        |
+----------------------------------
+********** Iteration 66 ************
+Expected: 0.029 Actual: 0.030
+violated KL constraint. shrinking step.
+Expected: 0.029 Actual: 0.015
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 6.356316      |
+| eplenmean       | 1.02          |
+| eprewmean       | -3.4012496    |
+| eprewsem        | 0.30559853    |
+| epsofar         | 59973         |
+| epthisiter      | 1014          |
+| ev_tdlam_before | 0.0182        |
+| meankl          | 0.00037564547 |
+| optimgain       | 0.014636077   |
+| surrgain        | 0.014636077   |
+| timelapsed      | 3.85e+04      |
+| timestepsofar   | 68608         |
+-----------------------------------
+********** Iteration 67 ************
+Expected: 0.027 Actual: 0.028
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.316325     |
+| eplenmean       | 1            |
+| eprewmean       | -3.3297143   |
+| eprewsem        | 0.19668972   |
+| epsofar         | 60992        |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.0149       |
+| meankl          | 0.0010434953 |
+| optimgain       | 0.027644789  |
+| surrgain        | 0.027644789  |
+| timelapsed      | 3.91e+04     |
+| timestepsofar   | 69632        |
+----------------------------------
+********** Iteration 68 ************
+Expected: 0.031 Actual: 0.029
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.2799044    |
+| eplenmean       | 1            |
+| eprewmean       | -3.302414    |
+| eprewsem        | 0.19897288   |
+| epsofar         | 62004        |
+| epthisiter      | 1012         |
+| ev_tdlam_before | 0.0697       |
+| meankl          | 0.0010732517 |
+| optimgain       | 0.028500017  |
+| surrgain        | 0.028500017  |
+| timelapsed      | 3.96e+04     |
+| timestepsofar   | 70656        |
+----------------------------------
+********** Iteration 69 ************
+Expected: 0.029 Actual: 0.028
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.2322617    |
+| eplenmean       | 1            |
+| eprewmean       | -3.3299282   |
+| eprewsem        | 0.23406973   |
+| epsofar         | 63022        |
+| epthisiter      | 1018         |
+| ev_tdlam_before | 0.025        |
+| meankl          | 0.0011321772 |
+| optimgain       | 0.028033946  |
+| surrgain        | 0.028033946  |
+| timelapsed      | 4.02e+04     |
+| timestepsofar   | 71680        |
+----------------------------------
+********** Iteration 70 ************
+Expected: 0.056 Actual: 0.002
+violated KL constraint. shrinking step.
+Expected: 0.056 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.056 Actual: 0.004
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.2259045    |
+| eplenmean       | 1            |
+| eprewmean       | -3.3003097   |
+| eprewsem        | 0.23875187   |
+| epsofar         | 64039        |
+| epthisiter      | 1017         |
+| ev_tdlam_before | 0.0199       |
+| meankl          | 0.0008378742 |
+| optimgain       | 0.0037771352 |
+| surrgain        | 0.0037771352 |
+| timelapsed      | 4.08e+04     |
+| timestepsofar   | 72704        |
+----------------------------------
+********** Iteration 71 ************
+Expected: 0.045 Actual: 0.022
+violated KL constraint. shrinking step.
+Expected: 0.045 Actual: 0.012
+violated KL constraint. shrinking step.
+Expected: 0.045 Actual: 0.007
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 6.218635      |
+| eplenmean       | 1             |
+| eprewmean       | -3.318587     |
+| eprewsem        | 0.1944711     |
+| epsofar         | 65059         |
+| epthisiter      | 1020          |
+| ev_tdlam_before | 0.0125        |
+| meankl          | 0.00036928104 |
+| optimgain       | 0.006678044   |
+| surrgain        | 0.006678044   |
+| timelapsed      | 4.14e+04      |
+| timestepsofar   | 73728         |
+-----------------------------------
+********** Iteration 72 ************
+Expected: 0.030 Actual: 0.030
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.1719317    |
+| eplenmean       | 1            |
+| eprewmean       | -3.3071144   |
+| eprewsem        | 0.22027743   |
+| epsofar         | 66075        |
+| epthisiter      | 1016         |
+| ev_tdlam_before | 0.0226       |
+| meankl          | 0.0010155449 |
+| optimgain       | 0.030204697  |
+| surrgain        | 0.030204697  |
+| timelapsed      | 4.2e+04      |
+| timestepsofar   | 74752        |
+----------------------------------
+********** Iteration 73 ************
+Expected: 0.029 Actual: 0.029
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.1305995    |
+| eplenmean       | 1            |
+| eprewmean       | -3.3099613   |
+| eprewsem        | 0.23287533   |
+| epsofar         | 67097        |
+| epthisiter      | 1022         |
+| ev_tdlam_before | -0.000713    |
+| meankl          | 0.0011093585 |
+| optimgain       | 0.028601931  |
+| surrgain        | 0.028601931  |
+| timelapsed      | 4.25e+04     |
+| timestepsofar   | 75776        |
+----------------------------------
+********** Iteration 74 ************
+Expected: 0.054 Actual: 0.018
+violated KL constraint. shrinking step.
+Expected: 0.054 Actual: 0.013
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.117032     |
+| eplenmean       | 1.05         |
+| eprewmean       | -3.3957915   |
+| eprewsem        | 0.2905404    |
+| epsofar         | 68111        |
+| epthisiter      | 1014         |
+| ev_tdlam_before | 0.0527       |
+| meankl          | 0.0014512015 |
+| optimgain       | 0.012645116  |
+| surrgain        | 0.012645116  |
+| timelapsed      | 4.31e+04     |
+| timestepsofar   | 76800        |
+----------------------------------
+********** Iteration 75 ************
+Expected: 0.028 Actual: 0.028
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.0683994    |
+| eplenmean       | 1            |
+| eprewmean       | -3.3274522   |
+| eprewsem        | 0.1975926    |
+| epsofar         | 69132        |
+| epthisiter      | 1021         |
+| ev_tdlam_before | 0.0119       |
+| meankl          | 0.0010118992 |
+| optimgain       | 0.028205793  |
+| surrgain        | 0.028205793  |
+| timelapsed      | 4.37e+04     |
+| timestepsofar   | 77824        |
+----------------------------------
+********** Iteration 76 ************
+Expected: 0.053 Actual: 0.003
+violated KL constraint. shrinking step.
+Expected: 0.053 Actual: 0.007
+violated KL constraint. shrinking step.
+Expected: 0.053 Actual: 0.005
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 6.0609136     |
+| eplenmean       | 1.02          |
+| eprewmean       | -3.389939     |
+| eprewsem        | 0.30134445    |
+| epsofar         | 70147         |
+| epthisiter      | 1015          |
+| ev_tdlam_before | 0.0311        |
+| meankl          | 0.00046755967 |
+| optimgain       | 0.004797266   |
+| surrgain        | 0.004797266   |
+| timelapsed      | 4.43e+04      |
+| timestepsofar   | 78848         |
+-----------------------------------
+********** Iteration 77 ************
+Expected: 0.030 Actual: 0.027
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 6.0132785    |
+| eplenmean       | 1            |
+| eprewmean       | -3.3238697   |
+| eprewsem        | 0.21699868   |
+| epsofar         | 71162        |
+| epthisiter      | 1015         |
+| ev_tdlam_before | 0.0222       |
+| meankl          | 0.0013709438 |
+| optimgain       | 0.02698297   |
+| surrgain        | 0.02698297   |
+| timelapsed      | 4.49e+04     |
+| timestepsofar   | 79872        |
+----------------------------------
+********** Iteration 78 ************
+Expected: 0.038 Actual: 0.012
+violated KL constraint. shrinking step.
+Expected: 0.038 Actual: 0.009
+violated KL constraint. shrinking step.
+Expected: 0.038 Actual: 0.005
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 6.001942      |
+| eplenmean       | 1             |
+| eprewmean       | -3.3190522    |
+| eprewsem        | 0.22588448    |
+| epsofar         | 72174         |
+| epthisiter      | 1012          |
+| ev_tdlam_before | 0.0335        |
+| meankl          | 0.00073022925 |
+| optimgain       | 0.0053739734  |
+| surrgain        | 0.0053739734  |
+| timelapsed      | 4.55e+04      |
+| timestepsofar   | 80896         |
+-----------------------------------
+********** Iteration 79 ************
+Expected: 0.032 Actual: 0.027
+violated KL constraint. shrinking step.
+Expected: 0.032 Actual: 0.014
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 5.9778323     |
+| eplenmean       | 1.02          |
+| eprewmean       | -3.291422     |
+| eprewsem        | 0.23040533    |
+| epsofar         | 73194         |
+| epthisiter      | 1020          |
+| ev_tdlam_before | 0.00228       |
+| meankl          | 0.00044902472 |
+| optimgain       | 0.013608947   |
+| surrgain        | 0.013608947   |
+| timelapsed      | 4.6e+04       |
+| timestepsofar   | 81920         |
+-----------------------------------
+********** Iteration 80 ************
+Expected: 0.030 Actual: 0.029
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.9294124    |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.331205    |
+| eprewsem        | 0.24765688   |
+| epsofar         | 74207        |
+| epthisiter      | 1013         |
+| ev_tdlam_before | 0.0174       |
+| meankl          | 0.0012157003 |
+| optimgain       | 0.029280681  |
+| surrgain        | 0.029280681  |
+| timelapsed      | 4.66e+04     |
+| timestepsofar   | 82944        |
+----------------------------------
+********** Iteration 81 ************
+Expected: 0.034 Actual: 0.031
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.8773503    |
+| eplenmean       | 1            |
+| eprewmean       | -3.3050575   |
+| eprewsem        | 0.18890965   |
+| epsofar         | 75226        |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.0199       |
+| meankl          | 0.0009621957 |
+| optimgain       | 0.030938113  |
+| surrgain        | 0.030938113  |
+| timelapsed      | 4.72e+04     |
+| timestepsofar   | 83968        |
+----------------------------------
+********** Iteration 82 ************
+Expected: 0.038 Actual: 42.798
+violated KL constraint. shrinking step.
+Expected: 0.038 Actual: 0.924
+violated KL constraint. shrinking step.
+Expected: 0.038 Actual: 0.044
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 5.867405      |
+| eplenmean       | 1             |
+| eprewmean       | -3.3430855    |
+| eprewsem        | 0.21201912    |
+| epsofar         | 76245         |
+| epthisiter      | 1019          |
+| ev_tdlam_before | 0.0109        |
+| meankl          | 0.00061090325 |
+| optimgain       | 0.044366874   |
+| surrgain        | 0.044366874   |
+| timelapsed      | 4.78e+04      |
+| timestepsofar   | 84992         |
+-----------------------------------
+********** Iteration 83 ************
+Expected: 0.031 Actual: 0.031
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.81805      |
+| eplenmean       | 1            |
+| eprewmean       | -3.2962105   |
+| eprewsem        | 0.19847918   |
+| epsofar         | 77267        |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.0162       |
+| meankl          | 0.0010818788 |
+| optimgain       | 0.03098813   |
+| surrgain        | 0.03098813   |
+| timelapsed      | 4.84e+04     |
+| timestepsofar   | 86016        |
+----------------------------------
+********** Iteration 84 ************
+Expected: 0.071 Actual: 0.006
+violated KL constraint. shrinking step.
+Expected: 0.071 Actual: 0.007
+violated KL constraint. shrinking step.
+Expected: 0.071 Actual: 0.005
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.8126216    |
+| eplenmean       | 1            |
+| eprewmean       | -3.3869643   |
+| eprewsem        | 0.22064388   |
+| epsofar         | 78286        |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.0069       |
+| meankl          | 0.0007805071 |
+| optimgain       | 0.005335428  |
+| surrgain        | 0.005335428  |
+| timelapsed      | 4.9e+04      |
+| timestepsofar   | 87040        |
+----------------------------------
+********** Iteration 85 ************
+Expected: 0.033 Actual: 0.032
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.767207     |
+| eplenmean       | 1            |
+| eprewmean       | -3.3179047   |
+| eprewsem        | 0.22534727   |
+| epsofar         | 79304        |
+| epthisiter      | 1018         |
+| ev_tdlam_before | 0.00953      |
+| meankl          | 0.0010273124 |
+| optimgain       | 0.032429103  |
+| surrgain        | 0.032429103  |
+| timelapsed      | 4.95e+04     |
+| timestepsofar   | 88064        |
+----------------------------------
+********** Iteration 86 ************
+Expected: 0.043 Actual: 0.024
+violated KL constraint. shrinking step.
+Expected: 0.043 Actual: 0.014
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.751388     |
+| eplenmean       | 1            |
+| eprewmean       | -3.2525215   |
+| eprewsem        | 0.22460859   |
+| epsofar         | 80318        |
+| epthisiter      | 1014         |
+| ev_tdlam_before | 0.04         |
+| meankl          | 0.0006116846 |
+| optimgain       | 0.014412972  |
+| surrgain        | 0.014412972  |
+| timelapsed      | 5.01e+04     |
+| timestepsofar   | 89088        |
+----------------------------------
+********** Iteration 87 ************
+Expected: 0.051 Actual: 0.017
+violated KL constraint. shrinking step.
+Expected: 0.051 Actual: 0.011
+violated KL constraint. shrinking step.
+Expected: 0.051 Actual: 0.006
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.74326      |
+| eplenmean       | 1            |
+| eprewmean       | -3.259734    |
+| eprewsem        | 0.2163977    |
+| epsofar         | 81336        |
+| epthisiter      | 1018         |
+| ev_tdlam_before | 0.0112       |
+| meankl          | 0.0004315655 |
+| optimgain       | 0.006225311  |
+| surrgain        | 0.006225311  |
+| timelapsed      | 5.07e+04     |
+| timestepsofar   | 90112        |
+----------------------------------
+********** Iteration 88 ************
+Expected: 0.030 Actual: 0.031
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.6947484    |
+| eplenmean       | 1            |
+| eprewmean       | -3.2717662   |
+| eprewsem        | 0.19787441   |
+| epsofar         | 82358        |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.00835      |
+| meankl          | 0.0010130866 |
+| optimgain       | 0.03052451   |
+| surrgain        | 0.03052451   |
+| timelapsed      | 5.13e+04     |
+| timestepsofar   | 91136        |
+----------------------------------
+********** Iteration 89 ************
+Expected: 0.031 Actual: 0.031
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.6416965    |
+| eplenmean       | 1            |
+| eprewmean       | -3.2625847   |
+| eprewsem        | 0.24216147   |
+| epsofar         | 83377        |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.0244       |
+| meankl          | 0.0010199274 |
+| optimgain       | 0.030922784  |
+| surrgain        | 0.030922784  |
+| timelapsed      | 5.19e+04     |
+| timestepsofar   | 92160        |
+----------------------------------
+********** Iteration 90 ************
+Expected: 0.034 Actual: 0.032
+violated KL constraint. shrinking step.
+Expected: 0.034 Actual: 0.017
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.617152     |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.3050206   |
+| eprewsem        | 0.20069048   |
+| epsofar         | 84398        |
+| epthisiter      | 1021         |
+| ev_tdlam_before | 0.0131       |
+| meankl          | 0.0003810872 |
+| optimgain       | 0.016506378  |
+| surrgain        | 0.016506378  |
+| timelapsed      | 5.24e+04     |
+| timestepsofar   | 93184        |
+----------------------------------
+********** Iteration 91 ************
+Expected: 0.031 Actual: 13.490
+violated KL constraint. shrinking step.
+Expected: 0.031 Actual: 0.114
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.5954294    |
+| eplenmean       | 1            |
+| eprewmean       | -3.2551665   |
+| eprewsem        | 0.19837236   |
+| epsofar         | 85420        |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.00951      |
+| meankl          | 0.0007492135 |
+| optimgain       | 0.11437182   |
+| surrgain        | 0.11437182   |
+| timelapsed      | 5.3e+04      |
+| timestepsofar   | 94208        |
+----------------------------------
+********** Iteration 92 ************
+Expected: 0.030 Actual: 0.030
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.5448933    |
+| eplenmean       | 1            |
+| eprewmean       | -3.2658813   |
+| eprewsem        | 0.20703955   |
+| epsofar         | 86439        |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.0386       |
+| meankl          | 0.0010139545 |
+| optimgain       | 0.029720563  |
+| surrgain        | 0.029720563  |
+| timelapsed      | 5.36e+04     |
+| timestepsofar   | 95232        |
+----------------------------------
+********** Iteration 93 ************
+Expected: 0.089 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.089 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.089 Actual: 0.004
+violated KL constraint. shrinking step.
+Expected: 0.089 Actual: 0.002
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.542462     |
+| eplenmean       | 1            |
+| eprewmean       | -3.2473323   |
+| eprewsem        | 0.21507704   |
+| epsofar         | 87459        |
+| epthisiter      | 1020         |
+| ev_tdlam_before | 0.0077       |
+| meankl          | 0.0003918163 |
+| optimgain       | 0.0023481012 |
+| surrgain        | 0.0023481012 |
+| timelapsed      | 5.42e+04     |
+| timestepsofar   | 96256        |
+----------------------------------
+********** Iteration 94 ************
+Expected: 0.079 Actual: 0.018
+violated KL constraint. shrinking step.
+Expected: 0.079 Actual: 0.014
+violated KL constraint. shrinking step.
+Expected: 0.079 Actual: 0.010
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.537157     |
+| eplenmean       | 1            |
+| eprewmean       | -3.1686628   |
+| eprewsem        | 0.17254473   |
+| epsofar         | 88476        |
+| epthisiter      | 1017         |
+| ev_tdlam_before | 0.0268       |
+| meankl          | 0.0003611574 |
+| optimgain       | 0.010134257  |
+| surrgain        | 0.010134257  |
+| timelapsed      | 5.48e+04     |
+| timestepsofar   | 97280        |
+----------------------------------
+********** Iteration 95 ************
+Expected: 0.032 Actual: 0.032
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.4890804    |
+| eplenmean       | 1            |
+| eprewmean       | -3.2633934   |
+| eprewsem        | 0.20957565   |
+| epsofar         | 89499        |
+| epthisiter      | 1023         |
+| ev_tdlam_before | 0.0132       |
+| meankl          | 0.0010141814 |
+| optimgain       | 0.032284446  |
+| surrgain        | 0.032284446  |
+| timelapsed      | 5.54e+04     |
+| timestepsofar   | 98304        |
+----------------------------------
+********** Iteration 96 ************
+Expected: 0.034 Actual: 0.034
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.4404144    |
+| eplenmean       | 1            |
+| eprewmean       | -3.293914    |
+| eprewsem        | 0.18792903   |
+| epsofar         | 90518        |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.00936      |
+| meankl          | 0.0010239114 |
+| optimgain       | 0.034304626  |
+| surrgain        | 0.034304626  |
+| timelapsed      | 5.59e+04     |
+| timestepsofar   | 99328        |
+----------------------------------
+********** Iteration 97 ************
+Expected: 0.091 Actual: -0.007
+violated KL constraint. shrinking step.
+Expected: 0.091 Actual: 0.004
+violated KL constraint. shrinking step.
+Expected: 0.091 Actual: 0.004
+Stepsize OK!
+---------------------------------
+| entloss         | 0.0         |
+| entropy         | 5.434889    |
+| eplenmean       | 1.02        |
+| eprewmean       | -3.2137806  |
+| eprewsem        | 0.28983405  |
+| epsofar         | 91536       |
+| epthisiter      | 1018        |
+| ev_tdlam_before | 0.0404      |
+| meankl          | 0.001400443 |
+| optimgain       | 0.003752959 |
+| surrgain        | 0.003752959 |
+| timelapsed      | 5.65e+04    |
+| timestepsofar   | 100352      |
+---------------------------------
+********** Iteration 98 ************
+Expected: 0.047 Actual: 0.025
+violated KL constraint. shrinking step.
+Expected: 0.047 Actual: 0.013
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.4153976    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1636477   |
+| eprewsem        | 0.1652118    |
+| epsofar         | 92557        |
+| epthisiter      | 1021         |
+| ev_tdlam_before | 0.00891      |
+| meankl          | 0.0004920271 |
+| optimgain       | 0.013090853  |
+| surrgain        | 0.013090853  |
+| timelapsed      | 5.71e+04     |
+| timestepsofar   | 101376       |
+----------------------------------
+********** Iteration 99 ************
+Expected: 0.036 Actual: 0.024
+violated KL constraint. shrinking step.
+Expected: 0.036 Actual: 0.013
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.393433     |
+| eplenmean       | 1            |
+| eprewmean       | -3.2369552   |
+| eprewsem        | 0.18926847   |
+| epsofar         | 93579        |
+| epthisiter      | 1022         |
+| ev_tdlam_before | -0.000236    |
+| meankl          | 0.0012474552 |
+| optimgain       | 0.013419757  |
+| surrgain        | 0.013419757  |
+| timelapsed      | 5.77e+04     |
+| timestepsofar   | 102400       |
+----------------------------------
+********** Iteration 100 ************
+Expected: 0.031 Actual: 0.031
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.3400154    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1461787   |
+| eprewsem        | 0.16896595   |
+| epsofar         | 94595        |
+| epthisiter      | 1016         |
+| ev_tdlam_before | 0.0214       |
+| meankl          | 0.0011052844 |
+| optimgain       | 0.031406723  |
+| surrgain        | 0.031406723  |
+| timelapsed      | 5.83e+04     |
+| timestepsofar   | 103424       |
+----------------------------------
+********** Iteration 101 ************
+Expected: 0.041 Actual: 0.012
+violated KL constraint. shrinking step.
+Expected: 0.041 Actual: 0.011
+violated KL constraint. shrinking step.
+Expected: 0.041 Actual: 0.007
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.330267     |
+| eplenmean       | 1            |
+| eprewmean       | -3.2149296   |
+| eprewsem        | 0.17911935   |
+| epsofar         | 95618        |
+| epthisiter      | 1023         |
+| ev_tdlam_before | 0.0112       |
+| meankl          | 0.0007139196 |
+| optimgain       | 0.0069910698 |
+| surrgain        | 0.0069910698 |
+| timelapsed      | 5.89e+04     |
+| timestepsofar   | 104448       |
+----------------------------------
+********** Iteration 102 ************
+Expected: 0.038 Actual: 9.537
+violated KL constraint. shrinking step.
+Expected: 0.038 Actual: 0.112
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.3077855    |
+| eplenmean       | 1            |
+| eprewmean       | -3.2662082   |
+| eprewsem        | 0.17603597   |
+| epsofar         | 96636        |
+| epthisiter      | 1018         |
+| ev_tdlam_before | 0.00996      |
+| meankl          | 0.0004385381 |
+| optimgain       | 0.111570425  |
+| surrgain        | 0.111570425  |
+| timelapsed      | 5.94e+04     |
+| timestepsofar   | 105472       |
+----------------------------------
+********** Iteration 103 ************
+Expected: 0.034 Actual: 0.030
+violated KL constraint. shrinking step.
+Expected: 0.034 Actual: 0.016
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 5.283566      |
+| eplenmean       | 1             |
+| eprewmean       | -3.223613     |
+| eprewsem        | 0.22585215    |
+| epsofar         | 97659         |
+| epthisiter      | 1023          |
+| ev_tdlam_before | 0.0106        |
+| meankl          | 0.00073014025 |
+| optimgain       | 0.015775887   |
+| surrgain        | 0.015775887   |
+| timelapsed      | 6e+04         |
+| timestepsofar   | 106496        |
+-----------------------------------
+********** Iteration 104 ************
+Expected: 0.147 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.147 Actual: 0.006
+violated KL constraint. shrinking step.
+Expected: 0.147 Actual: 0.006
+violated KL constraint. shrinking step.
+Expected: 0.147 Actual: 0.005
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 5.2822266     |
+| eplenmean       | 1             |
+| eprewmean       | -3.199065     |
+| eprewsem        | 0.14999977    |
+| epsofar         | 98676         |
+| epthisiter      | 1017          |
+| ev_tdlam_before | -0.00627      |
+| meankl          | 0.00082699634 |
+| optimgain       | 0.0054073436  |
+| surrgain        | 0.0054073436  |
+| timelapsed      | 6.06e+04      |
+| timestepsofar   | 107520        |
+-----------------------------------
+********** Iteration 105 ************
+Expected: 0.033 Actual: 0.034
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.235056     |
+| eplenmean       | 1            |
+| eprewmean       | -3.211387    |
+| eprewsem        | 0.17387393   |
+| epsofar         | 99695        |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.00328      |
+| meankl          | 0.0010020005 |
+| optimgain       | 0.03355403   |
+| surrgain        | 0.03355403   |
+| timelapsed      | 6.12e+04     |
+| timestepsofar   | 108544       |
+----------------------------------
+********** Iteration 106 ************
+Expected: 0.030 Actual: 0.029
+violated KL constraint. shrinking step.
+Expected: 0.030 Actual: 0.015
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 5.209139      |
+| eplenmean       | 1             |
+| eprewmean       | -3.2204614    |
+| eprewsem        | 0.19812915    |
+| epsofar         | 100717        |
+| epthisiter      | 1022          |
+| ev_tdlam_before | 0.0119        |
+| meankl          | 0.00047565508 |
+| optimgain       | 0.01498865    |
+| surrgain        | 0.01498865    |
+| timelapsed      | 6.18e+04      |
+| timestepsofar   | 109568        |
+-----------------------------------
+********** Iteration 107 ************
+Expected: 0.036 Actual: 0.034
+violated KL constraint. shrinking step.
+Expected: 0.036 Actual: 0.017
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.1836267    |
+| eplenmean       | 1            |
+| eprewmean       | -3.2385159   |
+| eprewsem        | 0.2265199    |
+| epsofar         | 101736       |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.0211       |
+| meankl          | 0.0004919932 |
+| optimgain       | 0.017390018  |
+| surrgain        | 0.017390018  |
+| timelapsed      | 6.24e+04     |
+| timestepsofar   | 110592       |
+----------------------------------
+********** Iteration 108 ************
+Expected: 0.073 Actual: 0.008
+violated KL constraint. shrinking step.
+Expected: 0.073 Actual: 0.009
+violated KL constraint. shrinking step.
+Expected: 0.073 Actual: 0.006
+violated KL constraint. shrinking step.
+Expected: 0.073 Actual: 0.004
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.1805286    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1687412   |
+| eprewsem        | 0.12760055   |
+| epsofar         | 102753       |
+| epthisiter      | 1017         |
+| ev_tdlam_before | 0.0187       |
+| meankl          | 0.0004668103 |
+| optimgain       | 0.0036701746 |
+| surrgain        | 0.0036701746 |
+| timelapsed      | 6.3e+04      |
+| timestepsofar   | 111616       |
+----------------------------------
+********** Iteration 109 ************
+Expected: 0.061 Actual: 191463751680.000
+violated KL constraint. shrinking step.
+Expected: 0.061 Actual: 341089.625
+violated KL constraint. shrinking step.
+Expected: 0.061 Actual: 39.601
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.1740727    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1722686   |
+| eprewsem        | 0.17836241   |
+| epsofar         | 103774       |
+| epthisiter      | 1021         |
+| ev_tdlam_before | -0.000473    |
+| meankl          | 0.0009892263 |
+| optimgain       | 39.601192    |
+| surrgain        | 39.601192    |
+| timelapsed      | 6.35e+04     |
+| timestepsofar   | 112640       |
+----------------------------------
+********** Iteration 110 ************
+Expected: 0.053 Actual: 820.970
+violated KL constraint. shrinking step.
+Expected: 0.053 Actual: 411.142
+violated KL constraint. shrinking step.
+Expected: 0.053 Actual: 2.895
+violated KL constraint. shrinking step.
+Expected: 0.053 Actual: 0.072
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 5.170242      |
+| eplenmean       | 1             |
+| eprewmean       | -3.2265773    |
+| eprewsem        | 0.19292302    |
+| epsofar         | 104794        |
+| epthisiter      | 1020          |
+| ev_tdlam_before | 0.00431       |
+| meankl          | 0.00064531044 |
+| optimgain       | 0.071519375   |
+| surrgain        | 0.071519375   |
+| timelapsed      | 6.41e+04      |
+| timestepsofar   | 113664        |
+-----------------------------------
+********** Iteration 111 ************
+Expected: 0.116 Actual: -0.010
+violated KL constraint. shrinking step.
+Expected: 0.116 Actual: 0.001
+violated KL constraint. shrinking step.
+Expected: 0.116 Actual: 0.002
+violated KL constraint. shrinking step.
+Expected: 0.116 Actual: 0.002
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 5.168057      |
+| eplenmean       | 1             |
+| eprewmean       | -3.2123017    |
+| eprewsem        | 0.1708106     |
+| epsofar         | 105813        |
+| epthisiter      | 1019          |
+| ev_tdlam_before | 0.0209        |
+| meankl          | 0.00035084208 |
+| optimgain       | 0.001975662   |
+| surrgain        | 0.001975662   |
+| timelapsed      | 6.47e+04      |
+| timestepsofar   | 114688        |
+-----------------------------------
+********** Iteration 112 ************
+Expected: 0.034 Actual: 0.033
+violated KL constraint. shrinking step.
+Expected: 0.034 Actual: 0.017
+Stepsize OK!
+---------------------------------
+| entloss         | 0.0         |
+| entropy         | 5.1437893   |
+| eplenmean       | 1           |
+| eprewmean       | -3.1880014  |
+| eprewsem        | 0.18611573  |
+| epsofar         | 106835      |
+| epthisiter      | 1022        |
+| ev_tdlam_before | -0.000512   |
+| meankl          | 0.000443979 |
+| optimgain       | 0.016895123 |
+| surrgain        | 0.016895123 |
+| timelapsed      | 6.53e+04    |
+| timestepsofar   | 115712      |
+---------------------------------
+********** Iteration 113 ************
+Expected: 0.062 Actual: 87332.359
+violated KL constraint. shrinking step.
+Expected: 0.062 Actual: 172.130
+violated KL constraint. shrinking step.
+Expected: 0.062 Actual: 0.987
+violated KL constraint. shrinking step.
+Expected: 0.062 Actual: 0.046
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 5.14018       |
+| eplenmean       | 1.02          |
+| eprewmean       | -3.2323098    |
+| eprewsem        | 0.23097186    |
+| epsofar         | 107850        |
+| epthisiter      | 1015          |
+| ev_tdlam_before | 0.0158        |
+| meankl          | 0.00058443856 |
+| optimgain       | 0.045748062   |
+| surrgain        | 0.045748062   |
+| timelapsed      | 6.59e+04      |
+| timestepsofar   | 116736        |
+-----------------------------------
+********** Iteration 114 ************
+Expected: 0.040 Actual: 416.061
+violated KL constraint. shrinking step.
+Expected: 0.040 Actual: 2.112
+violated KL constraint. shrinking step.
+Expected: 0.040 Actual: 0.056
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 5.1293635     |
+| eplenmean       | 1             |
+| eprewmean       | -3.2204232    |
+| eprewsem        | 0.20906581    |
+| epsofar         | 108871        |
+| epthisiter      | 1021          |
+| ev_tdlam_before | 0.00759       |
+| meankl          | 0.00042018353 |
+| optimgain       | 0.056411676   |
+| surrgain        | 0.056411676   |
+| timelapsed      | 6.65e+04      |
+| timestepsofar   | 117760        |
+-----------------------------------
+********** Iteration 115 ************
+Expected: 0.064 Actual: 0.009
+violated KL constraint. shrinking step.
+Expected: 0.064 Actual: 0.007
+violated KL constraint. shrinking step.
+Expected: 0.064 Actual: 0.005
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.1224284    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1825423   |
+| eprewsem        | 0.17189875   |
+| epsofar         | 109893       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.00602      |
+| meankl          | 0.0012669899 |
+| optimgain       | 0.004960887  |
+| surrgain        | 0.004960887  |
+| timelapsed      | 6.7e+04      |
+| timestepsofar   | 118784       |
+----------------------------------
+********** Iteration 116 ************
+Expected: 0.048 Actual: 0.025
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.0802903    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1480856   |
+| eprewsem        | 0.15853119   |
+| epsofar         | 110911       |
+| epthisiter      | 1018         |
+| ev_tdlam_before | 0.0396       |
+| meankl          | 0.0011683297 |
+| optimgain       | 0.024803432  |
+| surrgain        | 0.024803432  |
+| timelapsed      | 6.76e+04     |
+| timestepsofar   | 119808       |
+----------------------------------
+********** Iteration 117 ************
+Expected: 0.046 Actual: 5.662
+violated KL constraint. shrinking step.
+Expected: 0.046 Actual: 0.190
+violated KL constraint. shrinking step.
+Expected: 0.046 Actual: 0.024
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.07049      |
+| eplenmean       | 1            |
+| eprewmean       | -3.1856594   |
+| eprewsem        | 0.18007883   |
+| epsofar         | 111931       |
+| epthisiter      | 1020         |
+| ev_tdlam_before | -0.00018     |
+| meankl          | 0.0011574107 |
+| optimgain       | 0.02375175   |
+| surrgain        | 0.02375175   |
+| timelapsed      | 6.82e+04     |
+| timestepsofar   | 120832       |
+----------------------------------
+********** Iteration 118 ************
+Expected: 0.036 Actual: 0.032
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 5.01482      |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.2226398   |
+| eprewsem        | 0.28827816   |
+| epsofar         | 112952       |
+| epthisiter      | 1021         |
+| ev_tdlam_before | 0.0109       |
+| meankl          | 0.0009371908 |
+| optimgain       | 0.03248756   |
+| surrgain        | 0.03248756   |
+| timelapsed      | 6.88e+04     |
+| timestepsofar   | 121856       |
+----------------------------------
+********** Iteration 119 ************
+Expected: 0.054 Actual: 0.019
+violated KL constraint. shrinking step.
+Expected: 0.054 Actual: 0.011
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.9967237    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1475072   |
+| eprewsem        | 0.18095286   |
+| epsofar         | 113971       |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.0332       |
+| meankl          | 0.0005005317 |
+| optimgain       | 0.010596117  |
+| surrgain        | 0.010596117  |
+| timelapsed      | 6.94e+04     |
+| timestepsofar   | 122880       |
+----------------------------------
+********** Iteration 120 ************
+Expected: 0.033 Actual: 0.030
+violated KL constraint. shrinking step.
+Expected: 0.033 Actual: 0.016
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 4.970527      |
+| eplenmean       | 1.02          |
+| eprewmean       | -3.160578     |
+| eprewsem        | 0.27540645    |
+| epsofar         | 114991        |
+| epthisiter      | 1020          |
+| ev_tdlam_before | 0.0209        |
+| meankl          | 0.00073601125 |
+| optimgain       | 0.015939754   |
+| surrgain        | 0.015939754   |
+| timelapsed      | 7e+04         |
+| timestepsofar   | 123904        |
+-----------------------------------
+********** Iteration 121 ************
+Expected: 0.033 Actual: 0.032
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.9149003    |
+| eplenmean       | 1.05         |
+| eprewmean       | -3.240731    |
+| eprewsem        | 0.35488492   |
+| epsofar         | 116008       |
+| epthisiter      | 1017         |
+| ev_tdlam_before | 0.0262       |
+| meankl          | 0.0010625387 |
+| optimgain       | 0.032038573  |
+| surrgain        | 0.032038573  |
+| timelapsed      | 7.06e+04     |
+| timestepsofar   | 124928       |
+----------------------------------
+********** Iteration 122 ************
+Expected: 0.065 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.065 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.065 Actual: 0.003
+violated KL constraint. shrinking step.
+Expected: 0.065 Actual: 0.002
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 4.9113812     |
+| eplenmean       | 1             |
+| eprewmean       | -3.1284213    |
+| eprewsem        | 0.14709044    |
+| epsofar         | 117027        |
+| epthisiter      | 1019          |
+| ev_tdlam_before | 0.0361        |
+| meankl          | 0.00085527514 |
+| optimgain       | 0.0019980832  |
+| surrgain        | 0.0019980832  |
+| timelapsed      | 7.11e+04      |
+| timestepsofar   | 125952        |
+-----------------------------------
+********** Iteration 123 ************
+Expected: 0.323 Actual: -0.005
+violated KL constraint. shrinking step.
+Expected: 0.323 Actual: 0.004
+violated KL constraint. shrinking step.
+Expected: 0.323 Actual: 0.006
+violated KL constraint. shrinking step.
+Expected: 0.323 Actual: 0.006
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.910642     |
+| eplenmean       | 1            |
+| eprewmean       | -3.1478412   |
+| eprewsem        | 0.108199924  |
+| epsofar         | 118046       |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.071        |
+| meankl          | 0.0013370597 |
+| optimgain       | 0.0064195315 |
+| surrgain        | 0.0064195315 |
+| timelapsed      | 7.17e+04     |
+| timestepsofar   | 126976       |
+----------------------------------
+********** Iteration 124 ************
+Expected: 0.034 Actual: 0.034
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.8600802    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1705773   |
+| eprewsem        | 0.20094855   |
+| epsofar         | 119063       |
+| epthisiter      | 1017         |
+| ev_tdlam_before | 0.0152       |
+| meankl          | 0.0010124797 |
+| optimgain       | 0.03387087   |
+| surrgain        | 0.03387087   |
+| timelapsed      | 7.23e+04     |
+| timestepsofar   | 128000       |
+----------------------------------
+********** Iteration 125 ************
+Expected: 0.093 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.093 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.093 Actual: 0.004
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.8550334    |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.2146072   |
+| eprewsem        | 0.18956485   |
+| epsofar         | 120080       |
+| epthisiter      | 1017         |
+| ev_tdlam_before | 0.0247       |
+| meankl          | 0.0008505482 |
+| optimgain       | 0.004187893  |
+| surrgain        | 0.004187893  |
+| timelapsed      | 7.29e+04     |
+| timestepsofar   | 129024       |
+----------------------------------
+********** Iteration 126 ************
+Expected: 0.210 Actual: -0.000
+violated KL constraint. shrinking step.
+Expected: 0.210 Actual: 0.002
+violated KL constraint. shrinking step.
+Expected: 0.210 Actual: 0.002
+violated KL constraint. shrinking step.
+Expected: 0.210 Actual: 0.002
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 4.8536963     |
+| eplenmean       | 1             |
+| eprewmean       | -3.1178372    |
+| eprewsem        | 0.1368014     |
+| epsofar         | 121103        |
+| epthisiter      | 1023          |
+| ev_tdlam_before | 0.0152        |
+| meankl          | 0.00043134124 |
+| optimgain       | 0.0020598734  |
+| surrgain        | 0.0020598734  |
+| timelapsed      | 7.35e+04      |
+| timestepsofar   | 130048        |
+-----------------------------------
+********** Iteration 127 ************
+Expected: 0.043 Actual: 0.016
+violated KL constraint. shrinking step.
+Expected: 0.043 Actual: 0.011
+violated KL constraint. shrinking step.
+Expected: 0.043 Actual: 0.007
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.8435645    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1918254   |
+| eprewsem        | 0.19625147   |
+| epsofar         | 122126       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | -0.00119     |
+| meankl          | 0.0005616521 |
+| optimgain       | 0.006964772  |
+| surrgain        | 0.006964772  |
+| timelapsed      | 7.41e+04     |
+| timestepsofar   | 131072       |
+----------------------------------
+********** Iteration 128 ************
+Expected: 0.102 Actual: -0.024
+violated KL constraint. shrinking step.
+Expected: 0.102 Actual: -0.001
+violated KL constraint. shrinking step.
+Expected: 0.102 Actual: 0.002
+violated KL constraint. shrinking step.
+Expected: 0.102 Actual: 0.001
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 4.841103      |
+| eplenmean       | 1             |
+| eprewmean       | -3.1537902    |
+| eprewsem        | 0.16808105    |
+| epsofar         | 123148        |
+| epthisiter      | 1022          |
+| ev_tdlam_before | 0.0297        |
+| meankl          | 0.00058039103 |
+| optimgain       | 0.001478862   |
+| surrgain        | 0.001478862   |
+| timelapsed      | 7.46e+04      |
+| timestepsofar   | 132096        |
+-----------------------------------
+********** Iteration 129 ************
+Expected: 0.039 Actual: 0.020
+violated KL constraint. shrinking step.
+Expected: 0.039 Actual: 0.012
+violated KL constraint. shrinking step.
+Expected: 0.039 Actual: 0.007
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.8300424    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1163635   |
+| eprewsem        | 0.123952284  |
+| epsofar         | 124170       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.0194       |
+| meankl          | 0.0005010564 |
+| optimgain       | 0.006827567  |
+| surrgain        | 0.006827567  |
+| timelapsed      | 7.52e+04     |
+| timestepsofar   | 133120       |
+----------------------------------
+********** Iteration 130 ************
+Expected: 0.032 Actual: 0.030
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.774114     |
+| eplenmean       | 1            |
+| eprewmean       | -3.1552262   |
+| eprewsem        | 0.17674573   |
+| epsofar         | 125192       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.0149       |
+| meankl          | 0.0011501347 |
+| optimgain       | 0.029647678  |
+| surrgain        | 0.029647678  |
+| timelapsed      | 7.58e+04     |
+| timestepsofar   | 134144       |
+----------------------------------
+********** Iteration 131 ************
+Expected: 0.035 Actual: 0.035
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.7218165    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1322243   |
+| eprewsem        | 0.17948958   |
+| epsofar         | 126216       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | 3.41e-05     |
+| meankl          | 0.0010117748 |
+| optimgain       | 0.035416022  |
+| surrgain        | 0.035416022  |
+| timelapsed      | 7.64e+04     |
+| timestepsofar   | 135168       |
+----------------------------------
+********** Iteration 132 ************
+Expected: 0.032 Actual: 0.030
+violated KL constraint. shrinking step.
+Expected: 0.032 Actual: 0.015
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.6929398    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1587386   |
+| eprewsem        | 0.16689551   |
+| epsofar         | 127238       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.0193       |
+| meankl          | 0.0003922006 |
+| optimgain       | 0.015441194  |
+| surrgain        | 0.015441194  |
+| timelapsed      | 7.7e+04      |
+| timestepsofar   | 136191       |
+----------------------------------
+********** Iteration 133 ************
+Expected: 0.037 Actual: 0.031
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.62982      |
+| eplenmean       | 1            |
+| eprewmean       | -3.1203656   |
+| eprewsem        | 0.1545385    |
+| epsofar         | 128257       |
+| epthisiter      | 1019         |
+| ev_tdlam_before | 0.0467       |
+| meankl          | 0.0009830355 |
+| optimgain       | 0.03108128   |
+| surrgain        | 0.03108128   |
+| timelapsed      | 7.76e+04     |
+| timestepsofar   | 137216       |
+----------------------------------
+********** Iteration 134 ************
+Expected: 0.034 Actual: 0.034
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.5758367    |
+| eplenmean       | 1            |
+| eprewmean       | -3.137937    |
+| eprewsem        | 0.15251006   |
+| epsofar         | 129281       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | 3.8e-05      |
+| meankl          | 0.0010110543 |
+| optimgain       | 0.033975963  |
+| surrgain        | 0.033975963  |
+| timelapsed      | 7.82e+04     |
+| timestepsofar   | 138240       |
+----------------------------------
+********** Iteration 135 ************
+Expected: 0.038 Actual: 0.029
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.524429     |
+| eplenmean       | 1            |
+| eprewmean       | -3.1279926   |
+| eprewsem        | 0.12839124   |
+| epsofar         | 130301       |
+| epthisiter      | 1020         |
+| ev_tdlam_before | 0.0016       |
+| meankl          | 0.0008949739 |
+| optimgain       | 0.028901076  |
+| surrgain        | 0.028901076  |
+| timelapsed      | 7.87e+04     |
+| timestepsofar   | 139264       |
+----------------------------------
+********** Iteration 136 ************
+Expected: 0.043 Actual: 3.207
+violated KL constraint. shrinking step.
+Expected: 0.043 Actual: 0.921
+violated KL constraint. shrinking step.
+Expected: 0.043 Actual: 0.065
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 4.5132732     |
+| eplenmean       | 1             |
+| eprewmean       | -3.1391196    |
+| eprewsem        | 0.15442705    |
+| epsofar         | 131324        |
+| epthisiter      | 1023          |
+| ev_tdlam_before | -0.000223     |
+| meankl          | 0.00077999634 |
+| optimgain       | 0.06485177    |
+| surrgain        | 0.06485177    |
+| timelapsed      | 7.93e+04      |
+| timestepsofar   | 140288        |
+-----------------------------------
+********** Iteration 137 ************
+Expected: 0.055 Actual: 0.025
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 4.461561      |
+| eplenmean       | 1             |
+| eprewmean       | -3.1274626    |
+| eprewsem        | 0.17874676    |
+| epsofar         | 132344        |
+| epthisiter      | 1020          |
+| ev_tdlam_before | 0.0355        |
+| meankl          | 0.00078197883 |
+| optimgain       | 0.025366198   |
+| surrgain        | 0.025366198   |
+| timelapsed      | 7.99e+04      |
+| timestepsofar   | 141312        |
+-----------------------------------
+********** Iteration 138 ************
+Expected: 0.031 Actual: 0.031
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.4048076    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1343822   |
+| eprewsem        | 0.16761667   |
+| epsofar         | 133366       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.0136       |
+| meankl          | 0.0010072277 |
+| optimgain       | 0.031288072  |
+| surrgain        | 0.031288072  |
+| timelapsed      | 8.05e+04     |
+| timestepsofar   | 142336       |
+----------------------------------
+********** Iteration 139 ************
+Expected: 0.037 Actual: 0.030
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.351717     |
+| eplenmean       | 1            |
+| eprewmean       | -3.1184344   |
+| eprewsem        | 0.1347311    |
+| epsofar         | 134388       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.00265      |
+| meankl          | 0.0008760535 |
+| optimgain       | 0.030249638  |
+| surrgain        | 0.030249638  |
+| timelapsed      | 8.11e+04     |
+| timestepsofar   | 143360       |
+----------------------------------
+********** Iteration 140 ************
+Expected: 0.055 Actual: 0.015
+violated KL constraint. shrinking step.
+Expected: 0.055 Actual: 0.008
+violated KL constraint. shrinking step.
+Expected: 0.055 Actual: 0.005
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 4.3433704     |
+| eplenmean       | 1.02          |
+| eprewmean       | -3.1171594    |
+| eprewsem        | 0.14704596    |
+| epsofar         | 135410        |
+| epthisiter      | 1022          |
+| ev_tdlam_before | 0.0265        |
+| meankl          | 0.00056159403 |
+| optimgain       | 0.0045270696  |
+| surrgain        | 0.0045270696  |
+| timelapsed      | 8.17e+04      |
+| timestepsofar   | 144384        |
+-----------------------------------
+********** Iteration 141 ************
+Expected: 0.035 Actual: 0.029
+violated KL constraint. shrinking step.
+Expected: 0.035 Actual: 0.016
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.3173175    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1277962   |
+| eprewsem        | 0.14130145   |
+| epsofar         | 136433       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | -0.000808    |
+| meankl          | 0.0008279936 |
+| optimgain       | 0.016268764  |
+| surrgain        | 0.016268764  |
+| timelapsed      | 8.22e+04     |
+| timestepsofar   | 145408       |
+----------------------------------
+********** Iteration 142 ************
+Expected: 0.037 Actual: 0.026
+violated KL constraint. shrinking step.
+Expected: 0.037 Actual: 0.016
+violated KL constraint. shrinking step.
+Expected: 0.037 Actual: 0.009
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 4.3043866     |
+| eplenmean       | 1             |
+| eprewmean       | -3.1576447    |
+| eprewsem        | 0.17812024    |
+| epsofar         | 137454        |
+| epthisiter      | 1021          |
+| ev_tdlam_before | 0.023         |
+| meankl          | 0.00043304753 |
+| optimgain       | 0.008587593   |
+| surrgain        | 0.008587593   |
+| timelapsed      | 8.28e+04      |
+| timestepsofar   | 146432        |
+-----------------------------------
+********** Iteration 143 ************
+Expected: 0.041 Actual: 0.010
+violated KL constraint. shrinking step.
+Expected: 0.041 Actual: 0.009
+violated KL constraint. shrinking step.
+Expected: 0.041 Actual: 0.006
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.2931576    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0847678   |
+| eprewsem        | 0.14529413   |
+| epsofar         | 138477       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | 0.000761     |
+| meankl          | 0.0007650701 |
+| optimgain       | 0.005913879  |
+| surrgain        | 0.005913879  |
+| timelapsed      | 8.34e+04     |
+| timestepsofar   | 147456       |
+----------------------------------
+********** Iteration 144 ************
+Expected: 0.057 Actual: 0.012
+violated KL constraint. shrinking step.
+Expected: 0.057 Actual: 0.009
+violated KL constraint. shrinking step.
+Expected: 0.057 Actual: 0.006
+violated KL constraint. shrinking step.
+Expected: 0.057 Actual: 0.003
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 4.2889233     |
+| eplenmean       | 1.02          |
+| eprewmean       | -3.157454     |
+| eprewsem        | 0.2868016     |
+| epsofar         | 139500        |
+| epthisiter      | 1023          |
+| ev_tdlam_before | 0.0216        |
+| meankl          | 0.00046783767 |
+| optimgain       | 0.0034843544  |
+| surrgain        | 0.0034843544  |
+| timelapsed      | 8.4e+04       |
+| timestepsofar   | 148480        |
+-----------------------------------
+********** Iteration 145 ************
+Expected: 0.048 Actual: 0.015
+violated KL constraint. shrinking step.
+Expected: 0.048 Actual: 0.186
+violated KL constraint. shrinking step.
+Expected: 0.048 Actual: 0.065
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.279871     |
+| eplenmean       | 1            |
+| eprewmean       | -3.1067612   |
+| eprewsem        | 0.13347867   |
+| epsofar         | 140523       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | -0.0011      |
+| meankl          | 0.0014127104 |
+| optimgain       | 0.06455393   |
+| surrgain        | 0.06455393   |
+| timelapsed      | 8.46e+04     |
+| timestepsofar   | 149504       |
+----------------------------------
+********** Iteration 146 ************
+Expected: 0.102 Actual: 0.007
+violated KL constraint. shrinking step.
+Expected: 0.102 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.102 Actual: 0.003
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.2731366    |
+| eplenmean       | 1.02         |
+| eprewmean       | -3.1258092   |
+| eprewsem        | 0.28202397   |
+| epsofar         | 141545       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.0339       |
+| meankl          | 0.0008759952 |
+| optimgain       | 0.0031812647 |
+| surrgain        | 0.0031812647 |
+| timelapsed      | 8.52e+04     |
+| timestepsofar   | 150528       |
+----------------------------------
+********** Iteration 147 ************
+Expected: 0.033 Actual: 0.030
+Stepsize OK!
+---------------------------------
+| entloss         | 0.0         |
+| entropy         | 4.2088113   |
+| eplenmean       | 1           |
+| eprewmean       | -3.135739   |
+| eprewsem        | 0.13933663  |
+| epsofar         | 142567      |
+| epthisiter      | 1022        |
+| ev_tdlam_before | 0.0392      |
+| meankl          | 0.0010034   |
+| optimgain       | 0.029820902 |
+| surrgain        | 0.029820902 |
+| timelapsed      | 8.57e+04    |
+| timestepsofar   | 151552      |
+---------------------------------
+********** Iteration 148 ************
+Expected: 0.041 Actual: 0.021
+violated KL constraint. shrinking step.
+Expected: 0.041 Actual: 0.013
+violated KL constraint. shrinking step.
+Expected: 0.041 Actual: 0.007
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.1970134    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0799117   |
+| eprewsem        | 0.08454003   |
+| epsofar         | 143589       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | -0.000349    |
+| meankl          | 0.0010389206 |
+| optimgain       | 0.00713969   |
+| surrgain        | 0.00713969   |
+| timelapsed      | 8.63e+04     |
+| timestepsofar   | 152576       |
+----------------------------------
+********** Iteration 149 ************
+Expected: 0.034 Actual: 0.034
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.142135     |
+| eplenmean       | 1            |
+| eprewmean       | -3.1159883   |
+| eprewsem        | 0.12993596   |
+| epsofar         | 144611       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | -0.000627    |
+| meankl          | 0.0010108774 |
+| optimgain       | 0.034159172  |
+| surrgain        | 0.034159172  |
+| timelapsed      | 8.69e+04     |
+| timestepsofar   | 153600       |
+----------------------------------
+********** Iteration 150 ************
+Expected: 0.034 Actual: 0.040
+violated KL constraint. shrinking step.
+Expected: 0.034 Actual: 0.012
+violated KL constraint. shrinking step.
+Expected: 0.034 Actual: 0.007
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 4.1286182     |
+| eplenmean       | 1             |
+| eprewmean       | -3.0959556    |
+| eprewsem        | 0.14438373    |
+| epsofar         | 145633        |
+| epthisiter      | 1022          |
+| ev_tdlam_before | -0.00436      |
+| meankl          | 0.00062117144 |
+| optimgain       | 0.00710544    |
+| surrgain        | 0.00710544    |
+| timelapsed      | 8.75e+04      |
+| timestepsofar   | 154624        |
+-----------------------------------
+********** Iteration 151 ************
+Expected: 0.033 Actual: 0.033
+Stepsize OK!
+---------------------------------
+| entloss         | 0.0         |
+| entropy         | 4.07336     |
+| eplenmean       | 1           |
+| eprewmean       | -3.1144454  |
+| eprewsem        | 0.118860535 |
+| epsofar         | 146657      |
+| epthisiter      | 1024        |
+| ev_tdlam_before | -1.22e-05   |
+| meankl          | 0.001010597 |
+| optimgain       | 0.03271204  |
+| surrgain        | 0.03271204  |
+| timelapsed      | 8.81e+04    |
+| timestepsofar   | 155648      |
+---------------------------------
+********** Iteration 152 ************
+Expected: 0.038 Actual: 0.048
+violated KL constraint. shrinking step.
+Expected: 0.038 Actual: 0.051
+violated KL constraint. shrinking step.
+Expected: 0.038 Actual: 0.016
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.0613523    |
+| eplenmean       | 1            |
+| eprewmean       | -3.135646    |
+| eprewsem        | 0.14123976   |
+| epsofar         | 147679       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 3.04e-05     |
+| meankl          | 0.0010851477 |
+| optimgain       | 0.015785405  |
+| surrgain        | 0.015785405  |
+| timelapsed      | 8.87e+04     |
+| timestepsofar   | 156672       |
+----------------------------------
+********** Iteration 153 ************
+Expected: 0.034 Actual: 0.033
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 4.0033016    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1069934   |
+| eprewsem        | 0.11164278   |
+| epsofar         | 148703       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | 1.43e-05     |
+| meankl          | 0.0010101793 |
+| optimgain       | 0.033315215  |
+| surrgain        | 0.033315215  |
+| timelapsed      | 8.93e+04     |
+| timestepsofar   | 157696       |
+----------------------------------
+********** Iteration 154 ************
+Expected: 0.056 Actual: 0.008
+violated KL constraint. shrinking step.
+Expected: 0.056 Actual: 0.007
+violated KL constraint. shrinking step.
+Expected: 0.056 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.056 Actual: 0.003
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.9993956    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1098769   |
+| eprewsem        | 0.14391217   |
+| epsofar         | 149725       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | -0.00027     |
+| meankl          | 0.0008368857 |
+| optimgain       | 0.003048269  |
+| surrgain        | 0.003048269  |
+| timelapsed      | 8.98e+04     |
+| timestepsofar   | 158720       |
+----------------------------------
+********** Iteration 155 ************
+Expected: 0.042 Actual: 0.012
+violated KL constraint. shrinking step.
+Expected: 0.042 Actual: 0.028
+violated KL constraint. shrinking step.
+Expected: 0.042 Actual: 0.017
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.9894123    |
+| eplenmean       | 1            |
+| eprewmean       | -3.1235037   |
+| eprewsem        | 0.13002953   |
+| epsofar         | 150748       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | -0.00127     |
+| meankl          | 0.0010322124 |
+| optimgain       | 0.017280735  |
+| surrgain        | 0.017280735  |
+| timelapsed      | 9.04e+04     |
+| timestepsofar   | 159744       |
+----------------------------------
+********** Iteration 156 ************
+Expected: 0.070 Actual: 0.001
+violated KL constraint. shrinking step.
+Expected: 0.070 Actual: 0.006
+violated KL constraint. shrinking step.
+Expected: 0.070 Actual: 0.005
+violated KL constraint. shrinking step.
+Expected: 0.070 Actual: 0.004
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 3.9860551     |
+| eplenmean       | 1             |
+| eprewmean       | -3.0772328    |
+| eprewsem        | 0.13099612    |
+| epsofar         | 151771        |
+| epthisiter      | 1023          |
+| ev_tdlam_before | -0.000716     |
+| meankl          | 0.00033739884 |
+| optimgain       | 0.004015317   |
+| surrgain        | 0.004015317   |
+| timelapsed      | 9.1e+04       |
+| timestepsofar   | 160768        |
+-----------------------------------
+********** Iteration 157 ************
+Expected: 0.029 Actual: 0.029
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.925404     |
+| eplenmean       | 1            |
+| eprewmean       | -3.0849278   |
+| eprewsem        | 0.09699779   |
+| epsofar         | 152794       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | 0.0176       |
+| meankl          | 0.0010071989 |
+| optimgain       | 0.029229723  |
+| surrgain        | 0.029229723  |
+| timelapsed      | 9.16e+04     |
+| timestepsofar   | 161792       |
+----------------------------------
+********** Iteration 158 ************
+Expected: 0.031 Actual: 0.031
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.8683589    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0676663   |
+| eprewsem        | 0.12173109   |
+| epsofar         | 153818       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | -2.5e-05     |
+| meankl          | 0.0010108948 |
+| optimgain       | 0.031371437  |
+| surrgain        | 0.031371437  |
+| timelapsed      | 9.22e+04     |
+| timestepsofar   | 162816       |
+----------------------------------
+********** Iteration 159 ************
+Expected: 0.160 Actual: -0.010
+violated KL constraint. shrinking step.
+Expected: 0.160 Actual: 0.001
+violated KL constraint. shrinking step.
+Expected: 0.160 Actual: 0.002
+violated KL constraint. shrinking step.
+Expected: 0.160 Actual: 0.002
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 3.8668041     |
+| eplenmean       | 1             |
+| eprewmean       | -3.055079     |
+| eprewsem        | 0.09316221    |
+| epsofar         | 154841        |
+| epthisiter      | 1023          |
+| ev_tdlam_before | -0.000324     |
+| meankl          | 0.00052291155 |
+| optimgain       | 0.0024226028  |
+| surrgain        | 0.0024226028  |
+| timelapsed      | 9.28e+04      |
+| timestepsofar   | 163840        |
+-----------------------------------
+********** Iteration 160 ************
+Expected: 0.035 Actual: 0.006
+violated KL constraint. shrinking step.
+Expected: 0.035 Actual: 0.009
+violated KL constraint. shrinking step.
+Expected: 0.035 Actual: 0.006
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 3.85437       |
+| eplenmean       | 1             |
+| eprewmean       | -3.0920765    |
+| eprewsem        | 0.10160444    |
+| epsofar         | 155862        |
+| epthisiter      | 1021          |
+| ev_tdlam_before | 0.0338        |
+| meankl          | 0.00064791774 |
+| optimgain       | 0.006286946   |
+| surrgain        | 0.006286946   |
+| timelapsed      | 9.33e+04      |
+| timestepsofar   | 164864        |
+-----------------------------------
+********** Iteration 161 ************
+Expected: 0.031 Actual: 0.030
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 3.7984695     |
+| eplenmean       | 1             |
+| eprewmean       | -3.0711775    |
+| eprewsem        | 0.093892      |
+| epsofar         | 156885        |
+| epthisiter      | 1023          |
+| ev_tdlam_before | 0.00137       |
+| meankl          | 0.00096858514 |
+| optimgain       | 0.030097593   |
+| surrgain        | 0.030097593   |
+| timelapsed      | 9.39e+04      |
+| timestepsofar   | 165888        |
+-----------------------------------
+********** Iteration 162 ************
+Expected: 0.041 Actual: 0.022
+violated KL constraint. shrinking step.
+Expected: 0.041 Actual: 0.019
+violated KL constraint. shrinking step.
+Expected: 0.041 Actual: 0.013
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.7865164    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0503783   |
+| eprewsem        | 0.1072537    |
+| epsofar         | 157908       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | -0.00141     |
+| meankl          | 0.0008890117 |
+| optimgain       | 0.012510613  |
+| surrgain        | 0.012510613  |
+| timelapsed      | 9.45e+04     |
+| timestepsofar   | 166912       |
+----------------------------------
+********** Iteration 163 ************
+Expected: 0.037 Actual: 0.015
+violated KL constraint. shrinking step.
+Expected: 0.037 Actual: 0.010
+violated KL constraint. shrinking step.
+Expected: 0.037 Actual: 0.006
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.774837     |
+| eplenmean       | 1            |
+| eprewmean       | -3.1038005   |
+| eprewsem        | 0.12604544   |
+| epsofar         | 158931       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | 0.0248       |
+| meankl          | 0.0014926579 |
+| optimgain       | 0.005888879  |
+| surrgain        | 0.005888879  |
+| timelapsed      | 9.51e+04     |
+| timestepsofar   | 167936       |
+----------------------------------
+********** Iteration 164 ************
+Expected: 0.031 Actual: 1.730
+violated KL constraint. shrinking step.
+Expected: 0.031 Actual: 0.052
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 3.7463074     |
+| eplenmean       | 1             |
+| eprewmean       | -3.0729403    |
+| eprewsem        | 0.11662152    |
+| epsofar         | 159954        |
+| epthisiter      | 1023          |
+| ev_tdlam_before | -2.61e-05     |
+| meankl          | 0.00082948356 |
+| optimgain       | 0.052304808   |
+| surrgain        | 0.052304808   |
+| timelapsed      | 9.57e+04      |
+| timestepsofar   | 168960        |
+-----------------------------------
+********** Iteration 165 ************
+Expected: 0.031 Actual: 0.031
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.6896193    |
+| eplenmean       | 1            |
+| eprewmean       | -3.05662     |
+| eprewsem        | 0.11453894   |
+| epsofar         | 160978       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | -2.5e-06     |
+| meankl          | 0.0010108929 |
+| optimgain       | 0.0309263    |
+| surrgain        | 0.0309263    |
+| timelapsed      | 9.63e+04     |
+| timestepsofar   | 169984       |
+----------------------------------
+********** Iteration 166 ************
+Expected: 0.031 Actual: 0.031
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.6275942    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0717144   |
+| eprewsem        | 0.13262069   |
+| epsofar         | 162002       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | 6.39e-05     |
+| meankl          | 0.0010090527 |
+| optimgain       | 0.030824969  |
+| surrgain        | 0.030824969  |
+| timelapsed      | 9.68e+04     |
+| timestepsofar   | 171008       |
+----------------------------------
+********** Iteration 167 ************
+Expected: 0.031 Actual: 0.031
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.5727293    |
+| eplenmean       | 1            |
+| eprewmean       | -3.050336    |
+| eprewsem        | 0.10403806   |
+| epsofar         | 163026       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | -0.000263    |
+| meankl          | 0.0010119966 |
+| optimgain       | 0.030704174  |
+| surrgain        | 0.030704174  |
+| timelapsed      | 9.74e+04     |
+| timestepsofar   | 172032       |
+----------------------------------
+********** Iteration 168 ************
+Expected: 0.040 Actual: 0.008
+violated KL constraint. shrinking step.
+Expected: 0.040 Actual: 0.007
+violated KL constraint. shrinking step.
+Expected: 0.040 Actual: 0.004
+violated KL constraint. shrinking step.
+Expected: 0.040 Actual: 0.003
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 3.5680902     |
+| eplenmean       | 1             |
+| eprewmean       | -3.0554087    |
+| eprewsem        | 0.111104116   |
+| epsofar         | 164049        |
+| epthisiter      | 1023          |
+| ev_tdlam_before | 0.0315        |
+| meankl          | 0.00083982944 |
+| optimgain       | 0.0026002787  |
+| surrgain        | 0.0026002787  |
+| timelapsed      | 9.8e+04       |
+| timestepsofar   | 173056        |
+-----------------------------------
+********** Iteration 169 ************
+Expected: 0.029 Actual: 0.029
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.5093882    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0892406   |
+| eprewsem        | 0.123362064  |
+| epsofar         | 165073       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | 4.74e-05     |
+| meankl          | 0.0010098219 |
+| optimgain       | 0.02870422   |
+| surrgain        | 0.02870422   |
+| timelapsed      | 9.86e+04     |
+| timestepsofar   | 174080       |
+----------------------------------
+********** Iteration 170 ************
+Expected: 0.030 Actual: 0.029
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.4589975    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0659168   |
+| eprewsem        | 0.11090286   |
+| epsofar         | 166095       |
+| epthisiter      | 1022         |
+| ev_tdlam_before | 0.041        |
+| meankl          | 0.0009907986 |
+| optimgain       | 0.028930305  |
+| surrgain        | 0.028930305  |
+| timelapsed      | 9.92e+04     |
+| timestepsofar   | 175104       |
+----------------------------------
+********** Iteration 171 ************
+Expected: 0.029 Actual: 0.029
+Stepsize OK!
+---------------------------------
+| entloss         | 0.0         |
+| entropy         | 3.402052    |
+| eplenmean       | 1           |
+| eprewmean       | -3.1005616  |
+| eprewsem        | 0.11302599  |
+| epsofar         | 167119      |
+| epthisiter      | 1024        |
+| ev_tdlam_before | 4.88e-05    |
+| meankl          | 0.00101161  |
+| optimgain       | 0.028606724 |
+| surrgain        | 0.028606724 |
+| timelapsed      | 9.98e+04    |
+| timestepsofar   | 176128      |
+---------------------------------
+********** Iteration 172 ************
+Expected: 0.057 Actual: 0.021
+Stepsize OK!
+-----------------------------------
+| entloss         | 0.0           |
+| entropy         | 3.3546846     |
+| eplenmean       | 1             |
+| eprewmean       | -3.0621204    |
+| eprewsem        | 0.14298372    |
+| epsofar         | 168141        |
+| epthisiter      | 1022          |
+| ev_tdlam_before | 0.0396        |
+| meankl          | 0.00067100785 |
+| optimgain       | 0.02102125    |
+| surrgain        | 0.02102125    |
+| timelapsed      | 1e+05         |
+| timestepsofar   | 177152        |
+-----------------------------------
+********** Iteration 173 ************
+Expected: 0.031 Actual: 0.031
+Stepsize OK!
+save_state method is deprecated, please use save_variables instead
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.2969034    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0383313   |
+| eprewsem        | 0.10670465   |
+| epsofar         | 169165       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | 5.86e-05     |
+| meankl          | 0.0010102267 |
+| optimgain       | 0.031029824  |
+| surrgain        | 0.031029824  |
+| timelapsed      | 1.01e+05     |
+| timestepsofar   | 178176       |
+----------------------------------
+********** Iteration 174 ************
+Expected: 0.034 Actual: 0.018
+violated KL constraint. shrinking step.
+Expected: 0.034 Actual: 0.013
+violated KL constraint. shrinking step.
+Expected: 0.034 Actual: 0.008
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.2846103    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0534286   |
+| eprewsem        | 0.08868219   |
+| epsofar         | 170188       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | -0.00221     |
+| meankl          | 0.0004626435 |
+| optimgain       | 0.007852896  |
+| surrgain        | 0.007852896  |
+| timelapsed      | 1.02e+05     |
+| timestepsofar   | 179200       |
+----------------------------------
+********** Iteration 175 ************
+Expected: 0.032 Actual: 0.020
+violated KL constraint. shrinking step.
+Expected: 0.032 Actual: 0.015
+violated KL constraint. shrinking step.
+Expected: 0.032 Actual: 0.008
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.271658     |
+| eplenmean       | 1            |
+| eprewmean       | -3.0613456   |
+| eprewsem        | 0.085591584  |
+| epsofar         | 171211       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | -0.00075     |
+| meankl          | 0.0005010183 |
+| optimgain       | 0.00849001   |
+| surrgain        | 0.00849001   |
+| timelapsed      | 1.02e+05     |
+| timestepsofar   | 180224       |
+----------------------------------
+********** Iteration 176 ************
+Expected: 0.028 Actual: 0.028
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.2083874    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0681698   |
+| eprewsem        | 0.09414629   |
+| epsofar         | 172234       |
+| epthisiter      | 1023         |
+| ev_tdlam_before | 0.0245       |
+| meankl          | 0.0010099096 |
+| optimgain       | 0.027587777  |
+| surrgain        | 0.027587777  |
+| timelapsed      | 1.03e+05     |
+| timestepsofar   | 181248       |
+----------------------------------
+********** Iteration 177 ************
+Expected: 0.026 Actual: 0.026
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.1525462    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0583324   |
+| eprewsem        | 0.09143976   |
+| epsofar         | 173258       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | 6e-05        |
+| meankl          | 0.0010110139 |
+| optimgain       | 0.025860917  |
+| surrgain        | 0.025860917  |
+| timelapsed      | 1.03e+05     |
+| timestepsofar   | 182272       |
+----------------------------------
+********** Iteration 178 ************
+Expected: 0.026 Actual: 0.026
+Stepsize OK!
+----------------------------------
+| entloss         | 0.0          |
+| entropy         | 3.1022425    |
+| eplenmean       | 1            |
+| eprewmean       | -3.0388908   |
+| eprewsem        | 0.062816694  |
+| epsofar         | 174282       |
+| epthisiter      | 1024         |
+| ev_tdlam_before | 5.04e-05     |
+| meankl          | 0.0010129807 |
+| optimgain       | 0.026365183  |
+| surrgain        | 0.026365183  |
+| timelapsed      | 1.04e+05     |
+| timestepsofar   | 183296       |
+----------------------------------
+********** Iteration 179 ************
