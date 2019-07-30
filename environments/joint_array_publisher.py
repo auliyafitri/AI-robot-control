@@ -4,9 +4,10 @@ import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Header
 from sensor_msgs.msg import JointState
-from geometry_msgs.msg import Pose, Point
+from geometry_msgs.msg import Pose, Point, Quaternion
 from gazebo_msgs.srv import SetModelConfiguration
 from gazebo_msgs.srv import SetModelConfigurationRequest
+from transformations import quaternion_from_euler
 
 import math
 import random
@@ -64,6 +65,13 @@ class JointArrayPub(object):
     def pub_pose_to_moveit(self, position):
         self.check_publishers_connection()
         geomsg = Pose(position=Point(x=position[0], y=position[1], z=position[2]))
+        self.geomsg_pub.publish(geomsg)
+
+    # position is array of 7 [x, y, z, or_w, or_x, or_y, or_z]
+    def pub_pose_orient_to_moveit(self, position):
+        self.check_publishers_connection()
+        geomsg = Pose(position=Point(x=position[0], y=position[1], z=position[2]),
+                      orientation=Quaternion(position[3], position[4], position[5], position[6]))
         self.geomsg_pub.publish(geomsg)
 
     def pub_relative_pose_to_moveit(self, distance, is_discrete, axis=None):

@@ -169,3 +169,14 @@ register(
     },
     max_episode_steps=500,
 )
+
+# MoveIt Env
+register(
+    id='PickbotReachDiscrete-v0',
+    entry_point='environments.pickbot_env:PickbotReachEnv',
+    kwargs={
+        'is_discrete': True,
+        'random_position': True,
+    },
+    max_episode_steps=300,
+)

@@ -74,13 +74,15 @@ def joint_callback(data):
 
 def pose_callback(data):
     pos = data.position
+    orient = data.orientation
     pub = rospy.Publisher('/pickbot/movement_complete', Bool, queue_size=10)
     complete_msg = Bool()
     complete_msg.data = False
     check_publishers_connection(pub)
     pub.publish(complete_msg)
 
-    assign_pose_target(pos.x, pos.y, pos.z, 'nil', 'nil', 'nil', 'nil')
+    assign_pose_target(pos.x, pos.y, pos.z, orient.w, orient.x, orient.y, orient.z)
+    # assign_pose_target(pos.x, pos.y, pos.z, 'nil', 'nil', 'nil', 'nil')
 
     complete_msg.data = True
     pub.publish(complete_msg)
@@ -288,7 +290,7 @@ def assign_joint_value(joint_0, joint_1, joint_2, joint_3, joint_4, joint_5):
     # rospy.sleep(0.1)
 
 
-def assign_pose_target(pos_x, pos_y, pos_z, orient_x, orient_y, orient_z, orient_w):
+def assign_pose_target(pos_x, pos_y, pos_z, orient_w, orient_x, orient_y, orient_z):
     # group.set_max_velocity_scaling_factor(0.1)
     pose_target = group.get_current_pose() # create a pose variable. The parameters can be seen from "$ rosmsg show Pose"
 
