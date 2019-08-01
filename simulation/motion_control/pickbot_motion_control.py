@@ -81,8 +81,8 @@ def pose_callback(data):
     check_publishers_connection(pub)
     pub.publish(complete_msg)
 
-    assign_pose_target(pos.x, pos.y, pos.z, orient.w, orient.x, orient.y, orient.z)
-    # assign_pose_target(pos.x, pos.y, pos.z, 'nil', 'nil', 'nil', 'nil')
+    # assign_pose_target(pos.x, pos.y, pos.z, orient.w, orient.x, orient.y, orient.z)
+    assign_pose_target(pos.x, pos.y, pos.z, 'nil', 'nil', 'nil', 'nil')
 
     complete_msg.data = True
     pub.publish(complete_msg)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # IMPORT
+import os
 import gym
 import rospy
 import numpy as np
@@ -52,7 +53,7 @@ from simulation.srv import VacuumGripperControl
 # DEFINE ENVIRONMENT CLASS
 class PickbotReachEnv(gym.Env):
 
-    def __init__(self, sim_time_factor=0.001, random_object=False, random_position=False,
+    def __init__(self, joint_increment=0.02, sim_time_factor=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes', is_discrete=False):
         """
         initializing all the relevant variables and connections
@@ -70,11 +71,12 @@ class PickbotReachEnv(gym.Env):
         self._z_increment = 0.005
         self._rpy_increment = 1.0
         self._wrist_3_joint_increment = math.pi / 20
-        self._joint_increment = 0.04
+        self._joint_increment = joint_increment
         self._use_z_axis = True
         self._use_angle_as_action = False
         self._use_rpy_as_action = True
         self._action_bound = 1
+        self._load_init_pos = True  # for randomized initial state
 
         # Parameters for target-object
         self._random_object = random_object
@@ -147,39 +149,20 @@ class PickbotReachEnv(gym.Env):
         ################################################
         # Action space                                 #
         ################################################
-        if self._use_z_axis:
-            if self._is_discrete:
-                if self._use_angle_as_action:
-                    # +-x, +-y, +-z, +-angle
-                    self.action_space = spaces.Discrete(8)
-                elif self._use_rpy_as_action:
-                    # +-x, +-y, +-z, +-r, +-p, +-y
-                    self.action_space = spaces.Discrete(12)
-                else:
-                    # +-x, +-y, +-z
-                    self.action_space = spaces.Discrete(6)
-            else:
-                if self._use_angle_as_action:
-                    # +-x, +-y, +-z, +-angle
-                    action_dim = 4
-                else:
-                    # +-x, +-y, +-z
-                    action_dim = 3
-                action_high = np.array([self._action_bound] * action_dim)
-                self.action_space = spaces.Box(-action_high, action_high, dtype=np.float32)
-        # TODO Complete if else to satisfy all condition
-        else:   # not use the movement along z-axis as action. dz will always be -self._z_increment
-            if self._is_discrete:
-                # +-x, +-y, +-z, +-angle
-                self.action_space = spaces.Discrete(6)
-            else:
-                action_dim = 3
-                action_high = np.array([self._action_bound] * action_dim)
-                self.action_space = spaces.Box(-action_high, action_high, dtype=np.float32)
+        if self._is_discrete:
+            # 6 joints
+            self.action_space = spaces.Discrete(12)
+        else:
+            action_dim = 6
+            action_high = np.array([self._action_bound] * action_dim)
+            self.action_space = spaces.Box(-action_high, action_high, dtype=np.float32)
         ################################################
         # Action space                                 #
         ################################################
 
+        ################################################
+        # Observation space                            #
+        ################################################
         self._list_of_observations = ["elbow_joint_state",
                                       "shoulder_lift_joint_state",
                                       "shoulder_pan_joint_state",
@@ -206,6 +189,9 @@ class PickbotReachEnv(gym.Env):
         low = -high
 
         self.observation_space = spaces.Box(low, high)
+        ################################################
+        # Observation space                            #
+        ################################################
 
         self._list_of_status = {"distance_gripper_to_object": -1,
                                 "contact_1_force": -1,
@@ -263,6 +249,12 @@ class PickbotReachEnv(gym.Env):
         self.max_distance, _ = U.get_distance_gripper_to_object()
         self.min_distance = 999
 
+        # get samples from reaching task
+        if self._load_init_pos:
+            import environments
+            self.init_samples = U.load_samples_from_prev_task(os.path.dirname(environments.__file__) +
+                                                              "/contacts_sample/door_sample/success_exp2019-05-21_11h41min.csv")
+
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
@@ -275,30 +267,14 @@ class PickbotReachEnv(gym.Env):
         3) set target_object to random position
         4) Check all Systems work
         5) Create YAML Files for contact forces in order to get the average over 2 contacts
-        6) Create YAML Files for collision to make shure to see a collision due to high noise in topic
+        6) Create YAML Files for collision to make sure to see a collision due to high noise in topic
         7) Get Observations and return current State
         8) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
         9) Return State
         """
-        # print("Joint (reset): {}".format(np.around(self.joints_state.position, decimals=3)))
-        # init_joint_pos = [1.5, -1.2, 1.4, -1.77, -1.57, 0]
-        init_joint_pos = [1.57, -1.479, 1.41, -1.66, -1.57, -0.08]
-        self.publisher_to_moveit_object.set_joints(init_joint_pos)
 
-        # Busy waiting for moveit to complete the movement
-        while not self.movement_complete.data:
-            pass
-        # print(">>>>>>>>>>>>>>>>>>> RESET: Waiting complete")
-        start_ros_time = rospy.Time.now()
-        while True:
-            elapsed_time = rospy.Time.now() - start_ros_time
-            if np.isclose(init_joint_pos, self.joints_state.position, rtol=0.0, atol=0.01).all():
-                break
-            elif elapsed_time > rospy.Duration(2): # time out
-                break
-
+        self.set_initial_position()
         self.turn_off_gripper()
-        self.set_target_object(random_object=self._random_object, random_position=self._random_position)
         self._check_all_systems_ready()
 
         with open('contact_1_force.yml', 'w') as yaml_file:
@@ -330,88 +306,36 @@ class PickbotReachEnv(gym.Env):
         4) Get new observation after performing the action
         5) Convert Observations into States
         6) Check if the task is done or crashing happens, calculate done_reward and pause Simulation again
-        7) Calculate reward based on Observatin and done_reward
+        7) Calculate reward based on Observation and done_reward
         8) Return State, Reward, Done
         """
         # print("############################")
         # print("action: {}".format(action))
 
+        # 1) Read last joint positions by getting the observation before acting
+        old_observation = self.get_obs()
         self.movement_complete.data = False
         old_status = self.get_status()
         gripper_pos = U.get_gripper_position()
         gripper_geom = U.get_link_state("vacuum_gripper_link")
 
-        # TODO Complete if else statement to satisfy all conditions
-        if not self._use_z_axis:
-            if self._is_discrete:
-                dx = [-self._xy_increment, self._xy_increment, 0, 0, 0, 0][action]
-                dy = [0, 0, -self._xy_increment, self._xy_increment, 0, 0][action]
-                dz = -self._z_increment
-                da = [0, 0, 0, 0, -self._wrist_3_joint_increment, self._wrist_3_joint_increment][action]
+        # 2) Get the new joint positions according to chosen action (actions here are the joint increments)
+        if self._is_discrete:
+            dj2 = [-self._joint_increment, self._joint_increment, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0][action]
+            dj1 = [0, 0, -self._joint_increment, self._joint_increment, 0, 0, 0, 0, 0, 0, 0, 0][action]
+            dj0 = [0, 0, 0, 0, -self._joint_increment, self._joint_increment, 0, 0, 0, 0, 0, 0][action]
+            dj3 = [0, 0, 0, 0, 0, 0, -self._joint_increment, self._joint_increment, 0, 0, 0, 0][action]
+            dj4 = [0, 0, 0, 0, 0, 0, 0, 0, -self._joint_increment, self._joint_increment, 0, 0][action]
+            dj5 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -self._joint_increment, self._joint_increment][action]
 
-                realAction = [dx, dy, dz, da]
-            else:
-                dx = action[0] * self._xy_increment
-                dy = action[1] * self._xy_increment
-                dz = -self._z_increment
-                da = action[2] * self._wrist_3_joint_increment
+            realAction = [dj2, dj1, dj0, dj3, dj4, dj5]
 
-                realAction = [dx, dy, dz, da]
+            next_action_position = old_observation[:6] + realAction
         else:
-            if self._is_discrete:
-                if self._use_angle_as_action:
-                    dx = [-self._xy_increment, self._xy_increment, 0, 0, 0, 0, 0, 0][action]
-                    dy = [0, 0, -self._xy_increment, self._xy_increment, 0, 0, 0, 0][action]
-                    dz = [0, 0, 0, 0, -self._z_increment, self._z_increment,   0, 0][action]
-                    da = [0, 0, 0, 0, 0, 0 -self._wrist_3_joint_increment, self._wrist_3_joint_increment][action]
-
-                    realAction = [dx, dy, dz, da]
-                if self._use_rpy_as_action:
-                    dx = [-self._xy_increment, self._xy_increment, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0][action]
-                    dy = [0, 0, -self._xy_increment, self._xy_increment, 0, 0, 0, 0, 0, 0, 0, 0][action]
-                    dz = [0, 0, 0, 0, -self._z_increment, self._z_increment,   0, 0, 0, 0, 0, 0][action]
-                    dor = [0, 0, 0, 0, 0, 0, -self._rpy_increment, self._rpy_increment, 0, 0, 0, 0][action]
-                    dop = [0, 0, 0, 0, 0, 0, 0, 0, -self._rpy_increment, self._rpy_increment, 0, 0][action]
-                    doy = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -self._rpy_increment, self._rpy_increment][action]
-
-                    realAction = [dx, dy, dz, dor, dop, doy]
-                else:
-                    dx = [-self._xy_increment, self._xy_increment, 0, 0, 0, 0][action]
-                    dy = [0, 0, -self._xy_increment, self._xy_increment, 0, 0][action]
-                    dz = [0, 0, 0, 0, -self._z_increment, self._z_increment][action]
-                    da = 0
-
-                    realAction = [dx, dy, dz, da]
-            else:
-                dx = action[0] * self._xy_increment
-                dy = action[1] * self._xy_increment
-                dz = action[2] * self._z_increment
-                da = action[3] * self._wrist_3_joint_increment
-
-                realAction = [dx, dy, dz, da]
-
-
-        old_gripper_position = np.append(gripper_pos, self.joints_state.position[-1])
-
-        next_pos = gripper_pos + realAction[0:3]
-        if self._use_rpy_as_action:
-            next_orient = gripper_geom[3:] + quaternion_from_euler(realAction[3], realAction[4], realAction[5])
-            next_action_position = np.append(next_pos, next_orient)
-        else:
-            next_wrist_3_angle = self.joints_state.position[-1] + realAction[-1]
-            next_action_position = np.append(next_pos, next_wrist_3_angle)
-
+            next_action_position = action
 
         # 3) Move to position and wait for moveit to complete the execution
-        if self._use_rpy_as_action:
-            print("===================================================")
-            print("Action {}".format(action))
-            print("old gripper geometry {}".format(np.around(gripper_geom, decimals=4)))
-            print("new gripper geometry {}".format(np.around(next_action_position, decimals=4)))
-            print("===================================================")
-            self.publisher_to_moveit_object.pub_pose_orient_to_moveit(next_action_position)
-        else:
-            self.publisher_to_moveit_object.pub_pose_to_moveit(next_pos)
+        self.publisher_to_moveit_object.pub_joints_to_moveit(next_action_position)
         while not self.movement_complete.data:
             pass
         self.movement_complete.data = False
@@ -423,20 +347,15 @@ class PickbotReachEnv(gym.Env):
         is_time_out = False
         start_ros_time = rospy.Time.now()
         while True:
-            if self._use_rpy_as_action:
-                current_position = U.get_link_state("vacuum_gripper_link")
-            else:
-                current_position = U.get_gripper_position()
-                # current_position = np.append(current_position, self.joints_state.position[-1])
             elapsed_time = rospy.Time.now() - start_ros_time
-            if np.isclose(next_action_position, current_position, rtol=0.0, atol=0.01).all():
+            if np.isclose(next_action_position, self.joints_state.position, rtol=0.0, atol=0.01).all():
                 break
             elif elapsed_time > rospy.Duration(2):
                 is_time_out = True
                 print(">>> Time Out!")
                 print("########################################")
-                print("Old Gripper position: {}".format(np.round(old_gripper_position, decimals=4)))
-                print("Next_position: {}".format(np.round(next_action_position, decimals=4)))
+                print("Old  position: {}".format(np.round(old_observation[:6], decimals=4)))
+                print("Next position: {}".format(np.round(next_action_position, decimals=4)))
                 break
 
         # 4) Get new status and update min_distance after performing the action
@@ -456,14 +375,23 @@ class PickbotReachEnv(gym.Env):
             self.movement_complete.data = False
 
             self.turn_on_gripper()
-            gripping_pos = np.append(new_status["gripper_pos"][0:2], (1.047+0.05)) # this data is only for the cube
-            self.publisher_to_moveit_object.pub_pose_to_moveit(gripping_pos) # grip
-            while not self.movement_complete.data:
-                pass
-            time.sleep(2)
-            if self.is_gripper_attached():
-                # pick up
-                self.publisher_to_moveit_object.pub_relative_pose_to_moveit(0.3, is_discrete=True, axis='z')
+            gripping_pos = np.append(new_status["gripper_pos"][0:2], 1.08)  # this data is only for the cube
+            self.publisher_to_moveit_object.pub_pose_to_moveit(gripping_pos)  # grip
+
+            if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or \
+                    self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
+                    self.moveit_action_feedback.status.text == "Motion plan was found but it seems to be invalid (possibly due to postprocessing).Not executing.":
+                print(">>>>>>>>>>>> Gripping not succeed <<<<<<<<<<<<<<<")
+                while not self.movement_complete.data:
+                    pass
+                self.movement_complete.data = False
+            else:
+                while not self.movement_complete.data:
+                    pass
+                time.sleep(2)
+                if self.is_gripper_attached():
+                    # pick up
+                    self.publisher_to_moveit_object.pub_relative_pose_to_moveit(0.3, is_discrete=True, axis='z')
 
         # 5) Convert Observations into state
         state = U.get_state(new_observation)
@@ -481,57 +409,114 @@ class PickbotReachEnv(gym.Env):
 
         return state, reward, done, {}
 
-    def set_target_object(self, random_object=False, random_position=False):
-        """
-        Set target object
-        :param random_object: spawn object randomly from the object pool. If false, object will be the first entry of the object list
-        :param random_position: spawn object with random position
-        """
-        if random_object:
-            rand_object = random.choice(self.object_list)
-            self.object_name = rand_object["name"]
-            self.object_type_str = rand_object["type"]
-            self.object_type = self.object_list.index(rand_object)
-            init_pos = rand_object["init_pos"]
-            self.object_initial_position = Pose(position=Point(x=init_pos[0], y=init_pos[1], z=init_pos[2]),
-                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4], init_pos[5]))
-        else:
-            self.object_name = self.object_list[0]["name"]
-            self.object_type_str = self.object_list[0]["type"]
-            self.object_type = 0
-            init_pos = self.object_list[0]["init_pos"]
-            self.object_initial_position = Pose(position=Point(x=init_pos[0], y=init_pos[1], z=init_pos[2]),
-                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4], init_pos[5]))
+    def is_done(self, status):
+        """Checks if episode is done based on observations given.
 
-        if random_position:
-            if self.object_type_str == "door_handle":
-                box_pos = U.get_random_door_handle_pos()
+        Done when:
+        -Successfully reached goal: Contact with both contact sensors and contact is a valid one(Wrist3 or/and Vavuum Gripper with unit_box)
+        -Crashing with itself, shelf, base
+        -Joints are going into limits set
+        """
+        ####################################################################
+        #                        Plan0: init                               #
+        ####################################################################
+        # done = False
+        # done_reward = 0
+        # reward_reached_goal = 2000
+        # reward_crashing = -200
+        # reward_no_motion_plan = -50
+        # reward_joint_range = -150
+
+        ####################################################################################
+        # Plan1: Reach a point in 3D space (usually right above the target object)         #
+        # Reward only dependent on distance. Nu punishment for crashing or joint_limits    #
+        ####################################################################################
+        done = False
+        done_reward = 0
+        reward_reached_goal = 100
+        reward_crashing = 0
+        reward_no_motion_plan = 0
+        reward_joint_range = 0
+
+        # Check if there are invalid collisions
+        invalid_collision = self.get_collisions()
+
+        if self.is_gripper_attached():
+            done = True
+            done_reward = reward_reached_goal
+            print("%%%%%%%%%%%%%% reset gripper attached")
+
+        # TODO: this only works for the Box
+        # the gripper tried to grasp but did not succeed
+        if self._list_of_status["gripper_pos"][-1] <= 1.08:
+            done = True
+            print("%%%%%%%%%%%%%% reset gripper not succeed")
+
+        # print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
+        if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or \
+                self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
+                self.moveit_action_feedback.status.text == "Motion plan was found but it seems to be invalid (possibly due to postprocessing).Not executing.":
+            print(">>>>>>>>>>>> NO MOTION PLAN!!! <<<<<<<<<<<<<<<")
+            done = True
+            done_reward = reward_no_motion_plan
+
+        # Successfully reached goal: Contact with at least one contact sensor and there is no invalid contact
+        if status["contact_1_force"] != 0 and status["contact_2_force"] != 0 and not invalid_collision:
+            done = True
+            print('>>>>>>>>>>>>> get two contacts <<<<<<<<<<<<<<<<<<')
+            done_reward = reward_reached_goal
+            # save state in csv file
+            U.dict_to_csv(self.csv_success_exp, status)
+            self.success_2_contacts += 1
+            print("Successful 2 contacts so far: {} attempts".format(self.success_2_contacts))
+
+        if status["contact_1_force"] != 0 or status["contact_2_force"] != 0 and not invalid_collision:
+            done = True
+            print('>>>>>>>>>>>>> get one contacts <<<<<<<<<<<<<<<<<<')
+            self.success_1_contact += 1
+            print("Successful 1 contact so far: {} attempts".format(self.success_1_contact))
+
+        # Check if the box has been moved compared to the last observation
+        # target_pos = U.get_target_position()
+        # if not np.allclose(self.object_position, target_pos, rtol=0.0, atol=0.0001):
+        #     print(">>>>>>>>>>>>>>>>>>> Target moved <<<<<<<<<<<<<<<<<<<<<<<")
+        #     done = True
+
+        # Crashing with itself, shelf, base
+        if invalid_collision:
+            done = True
+            print('>>>>>>>>>>>>>>>>>>>> crashing <<<<<<<<<<<<<<<<<<<<<<<')
+            done_reward = reward_crashing
+
+        ##################################################################################
+        # Joint Safety                                                                   #
+        ##################################################################################
+        joint_exceeds_limits = False
+        for joint_pos in self.joints_state.position:
+            joint_correction = []
+            if joint_pos < -math.pi or joint_pos > math.pi:
+                joint_exceeds_limits = True
+                done = True
+                done_reward = reward_joint_range
+                print('>>>>>>>>>>>>>>>>>>>> joint exceeds limit <<<<<<<<<<<<<<<<<<<<<<<')
+                joint_correction.append(-joint_pos)
             else:
-                box_pos = Pose(position=Point(x=np.random.uniform(low=-0.3, high=0.3, size=None),
-                                              y=np.random.uniform(low=0.9, high=1.1, size=None),
-                                              z=1.05),
-                               orientation=quaternion_from_euler(0, 0, 0))
-        else:
-            box_pos = self.object_initial_position
+                joint_correction.append(0.0)
 
-        U.change_object_position(self.object_name, box_pos)
-        print("Current target: ", self.object_name)
+        if joint_exceeds_limits:
+            print("is_done: Joints: {}".format(np.round(self.joints_state.position, decimals=3)))
+            self.publisher_to_moveit_object.pub_joints_to_moveit([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+            while not self.movement_complete.data:
+                pass
+            self.publisher_to_moveit_object.pub_relative_joints_to_moveit(joint_correction)
+            while not self.movement_complete.data:
+                pass
+            print('>>>>>>>>>>>>>>>> joint corrected <<<<<<<<<<<<<<<<<')
+        ##################################################################################
+        # Joint Safety                                                                   #
+        ##################################################################################
 
-    def populate_objects(self):
-        """
-        populate objects, called in init
-        :return: -
-        """
-        if not self._random_object:  # only populate the first object
-            U.spawn_object(self.object_list[0], self.object_initial_position)
-        else:
-            rand_x = np.random.uniform(low=-0.35, high=0.35, size=(len(self.object_list),))
-            rand_y = np.random.uniform(low=2.2, high=2.45, size=(len(self.object_list),))
-            for idx, obj in enumerate(self.object_list):
-                box_pos = Pose(position=Point(x=rand_x[idx],
-                                              y=rand_y[idx],
-                                              z=1.05))
-                U.spawn_object(obj, box_pos)
+        return done, done_reward, invalid_collision
 
     def get_action_to_position(self, action, last_position):
         """
@@ -643,6 +628,123 @@ class PickbotReachEnv(gym.Env):
 
         return self._list_of_status
 
+    def set_initial_position(self):
+        # load sample from previous training result with 25% probability,
+        # the rest is randomized near initial position [1.57, -1.479, 1.41, -1.66, -1.57, -0.08]
+
+        # set joints using moveit to initial position
+        init_joint_pos = [1.57, -1.479, 1.41, -1.66, -1.57, -0.08]
+        self.publisher_to_moveit_object.set_joints(init_joint_pos)
+
+        # if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or \
+        #         self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
+        #         self.moveit_action_feedback.status.text == "Motion plan was found but it seems to be invalid (possibly due to postprocessing).Not executing.":
+        #      print("<<<<<<<<<<<<<<<<< Set init position no motion plan found")
+
+        while not self.movement_complete.data:
+            pass
+        self.movement_complete.data = False
+
+        # draw if the arm position is from experience of randomized
+        draw = np.random.choice([0, 1], p=[0.75, 0.25])
+        if self._load_init_pos and draw == 1:
+            sample_ep = random.choice(self.init_samples)
+
+            # change object position
+            obj_pos_rpy = sample_ep[-6:]
+            obj_pos_quat = Pose(position=Point(x=obj_pos_rpy[0], y=obj_pos_rpy[1], z=obj_pos_rpy[2]),
+                                orientation=quaternion_from_euler(obj_pos_rpy[3], obj_pos_rpy[4], obj_pos_rpy[5]))
+            U.change_object_position(self.object_name, obj_pos_quat)
+
+            # set joints using moveit
+            # print("Joints from samples: {}".format(sample_ep[0:6]))
+            self.publisher_to_moveit_object.pub_joints_to_moveit(sample_ep[0:6])
+
+            while not self.movement_complete.data:
+                pass
+            self.movement_complete.data = False
+
+            # move a little back in z axis
+            new_status = self.get_status()
+            new_gripper_pos = np.append(new_status["gripper_pos"][0:2], 1.25)
+            self.publisher_to_moveit_object.pub_pose_to_moveit(new_gripper_pos)
+
+            while not self.movement_complete.data:
+                pass
+            self.movement_complete.data = False
+
+        else:
+            # change object position
+            self.set_target_object(random_object=self._random_object, random_position=self._random_position)
+
+            # randomize joints position near initial position, ensuring it's possible to go there
+            joint_possible = False
+            while not joint_possible:
+                new_joint_pos = np.zeros(len(init_joint_pos))
+                for i in range(len(init_joint_pos)):
+                    new_joint_pos[i] = init_joint_pos[i] + np.random.uniform(-np.pi/6, np.pi/6)
+
+                # print("new joint position {}".format(new_joint_pos))
+                self.publisher_to_moveit_object.pub_joints_to_moveit(new_joint_pos)
+
+                if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or \
+                        self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
+                        self.moveit_action_feedback.status.text == "Motion plan was found but it seems to be invalid (possibly due to postprocessing).Not executing.":
+                    # print("generate new initial position of arm")
+                    while not self.movement_complete.data:
+                        pass
+                    self.movement_complete.data = False
+                else:
+                    joint_possible = True
+                    # print("new joint position will be executed")
+
+                    # Busy waiting for moveit to complete the movement
+                    while not self.movement_complete.data:
+                        pass
+                    start_ros_time = rospy.Time.now()
+                    while True:
+                        elapsed_time = rospy.Time.now() - start_ros_time
+                        if np.isclose(new_joint_pos, self.joints_state.position, rtol=0.0, atol=0.01).all():
+                            break
+                        elif elapsed_time > rospy.Duration(2):  # time out
+                            break
+
+    def set_target_object(self, random_object=False, random_position=False):
+        """
+        Set target object
+        :param random_object: spawn object randomly from the object pool. If false, object will be the first entry of the object list
+        :param random_position: spawn object with random position
+        """
+        if random_object:
+            rand_object = random.choice(self.object_list)
+            self.object_name = rand_object["name"]
+            self.object_type_str = rand_object["type"]
+            self.object_type = self.object_list.index(rand_object)
+            init_pos = rand_object["init_pos"]
+            self.object_initial_position = Pose(position=Point(x=init_pos[0], y=init_pos[1], z=init_pos[2]),
+                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4], init_pos[5]))
+        else:
+            self.object_name = self.object_list[0]["name"]
+            self.object_type_str = self.object_list[0]["type"]
+            self.object_type = 0
+            init_pos = self.object_list[0]["init_pos"]
+            self.object_initial_position = Pose(position=Point(x=init_pos[0], y=init_pos[1], z=init_pos[2]),
+                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4], init_pos[5]))
+
+        if random_position:
+            if self.object_type_str == "door_handle":
+                box_pos = U.get_random_door_handle_pos()
+            else:
+                box_pos = Pose(position=Point(x=np.random.uniform(low=-0.3, high=0.3, size=None),
+                                              y=np.random.uniform(low=0.9, high=1.1, size=None),
+                                              z=1.05),
+                               orientation=quaternion_from_euler(0, 0, 0))
+        else:
+            box_pos = self.object_initial_position
+
+        U.change_object_position(self.object_name, box_pos)
+        print("Current target: ", self.object_name)
+
     def get_contact_force_1(self):
         """
         Get Contact Force of contact sensor 1
@@ -734,113 +836,21 @@ class PickbotReachEnv(gym.Env):
         else:
             return False
 
-    def is_done(self, status):
-        """Checks if episode is done based on observations given.
-        
-        Done when:
-        -Successfully reached goal: Contact with both contact sensors and contact is a valid one(Wrist3 or/and Vavuum Gripper with unit_box)
-        -Crashing with itself, shelf, base
-        -Joints are going into limits set
+    def populate_objects(self):
         """
-        ####################################################################
-        #                        Plan0: init                               #
-        ####################################################################
-        # done = False
-        # done_reward = 0
-        # reward_reached_goal = 2000
-        # reward_crashing = -200
-        # reward_no_motion_plan = -50
-        # reward_joint_range = -150
-
-        ####################################################################################
-        # Plan1: Reach a point in 3D space (usually right above the target object)         #
-        # Reward only dependent on distance. Nu punishment for crashing or joint_limits    #
-        ####################################################################################
-        done = False
-        done_reward = 0
-        reward_reached_goal = 100
-        reward_crashing = 0
-        reward_no_motion_plan = 0
-        reward_joint_range = 0
-
-        # Check if there are invalid collisions
-        invalid_collision = self.get_collisions()
-
-        if self.is_gripper_attached():
-            done = True
-            done_reward = reward_reached_goal
-
-        # TODO: this only works for the Box
-        # the gripper tried to grasp but did not succeed
-        if self._list_of_status["gripper_pos"][-1] <= 1.097:
-            done = True
-
-        # print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
-        if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or  \
-                self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
-                self.moveit_action_feedback.status.text == "Motion plan was found but it seems to be invalid (possibly due to postprocessing).Not executing.":
-
-            print(">>>>>>>>>>>> NO MOTION PLAN!!! <<<<<<<<<<<<<<<")
-            done = True
-            done_reward = reward_no_motion_plan
-
-        # Successfully reached goal: Contact with at least one contact sensor and there is no invalid contact
-        if status["contact_1_force"] != 0 and status["contact_2_force"] != 0 and not invalid_collision:
-            done = True
-            print('>>>>>>>>>>>>> get two contacts <<<<<<<<<<<<<<<<<<')
-            done_reward = reward_reached_goal
-            # save state in csv file
-            U.dict_to_csv(self.csv_success_exp, status)
-            self.success_2_contacts += 1
-            print("Successful 2 contacts so far: {} attempts".format(self.success_2_contacts))
-
-        if status["contact_1_force"] != 0 or status["contact_2_force"] != 0 and not invalid_collision:
-            done = True
-            print('>>>>>>>>>>>>> get one contacts <<<<<<<<<<<<<<<<<<')
-            self.success_1_contact += 1
-            print("Successful 1 contact so far: {} attempts".format(self.success_1_contact))
-
-        # Check if the box has been moved compared to the last observation
-        target_pos = U.get_target_position()
-        if not np.allclose(self.object_position, target_pos, rtol=0.0, atol=0.0001):
-            print(">>>>>>>>>>>>>>>>>>> Target moved <<<<<<<<<<<<<<<<<<<<<<<")
-            done = True
-
-        # Crashing with itself, shelf, base
-        if invalid_collision:
-            done = True
-            print('>>>>>>>>>>>>>>>>>>>> crashing <<<<<<<<<<<<<<<<<<<<<<<')
-            done_reward = reward_crashing
-
-        ##################################################################################
-        # Joint Safety                                                                   #
-        ##################################################################################
-        joint_exceeds_limits = False
-        for joint_pos in self.joints_state.position:
-            joint_correction = []
-            if joint_pos < -math.pi or joint_pos > math.pi:
-                joint_exceeds_limits = True
-                done = True
-                done_reward = reward_joint_range
-                print('>>>>>>>>>>>>>>>>>>>> joint exceeds limit <<<<<<<<<<<<<<<<<<<<<<<')
-                joint_correction.append(-joint_pos)
-            else:
-                joint_correction.append(0.0)
-
-        if joint_exceeds_limits:
-            print("is_done: Joints: {}".format(np.round(self.joints_state.position, decimals=3)))
-            self.publisher_to_moveit_object.pub_joints_to_moveit([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-            while not self.movement_complete.data:
-                pass
-            self.publisher_to_moveit_object.pub_relative_joints_to_moveit(joint_correction)
-            while not self.movement_complete.data:
-                pass
-            print('>>>>>>>>>>>>>>>> joint corrected <<<<<<<<<<<<<<<<<')
-        ##################################################################################
-        # Joint Safety                                                                   #
-        ##################################################################################
-
-        return done, done_reward, invalid_collision
+        populate objects, called in init
+        :return: -
+        """
+        if not self._random_object:  # only populate the first object
+            U.spawn_object(self.object_list[0], self.object_initial_position)
+        else:
+            rand_x = np.random.uniform(low=-0.35, high=0.35, size=(len(self.object_list),))
+            rand_y = np.random.uniform(low=2.2, high=2.45, size=(len(self.object_list),))
+            for idx, obj in enumerate(self.object_list):
+                box_pos = Pose(position=Point(x=rand_x[idx],
+                                              y=rand_y[idx],
+                                              z=1.05))
+                U.spawn_object(obj, box_pos)
 
     def turn_on_gripper(self):
         """
