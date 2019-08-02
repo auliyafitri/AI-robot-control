@@ -253,7 +253,7 @@ class PickbotReachEnv(gym.Env):
         if self._load_init_pos:
             import environments
             self.init_samples = U.load_samples_from_prev_task(os.path.dirname(environments.__file__) +
-                                                              "/contacts_sample/door_sample/success_exp2019-05-21_11h41min.csv")
+                                                              "/contacts_sample/door_sample/observation_record_2019-08-02.csv")
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -330,7 +330,7 @@ class PickbotReachEnv(gym.Env):
 
             realAction = [dj2, dj1, dj0, dj3, dj4, dj5]
 
-            next_action_position = old_observation[:6] + realAction
+            next_action_position = self.get_action_to_position(realAction, old_observation[:6])
         else:
             next_action_position = action
 
@@ -375,7 +375,7 @@ class PickbotReachEnv(gym.Env):
             self.movement_complete.data = False
 
             self.turn_on_gripper()
-            gripping_pos = np.append(new_status["gripper_pos"][0:2], 1.08)  # this data is only for the cube
+            gripping_pos = np.append(new_status["gripper_pos"][0:2], 1.0395)  # this data is only for the cube
             self.publisher_to_moveit_object.pub_pose_to_moveit(gripping_pos)  # grip
 
             if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or \
@@ -401,7 +401,7 @@ class PickbotReachEnv(gym.Env):
 
         # 7) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
         # reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
-        reward = UMath.computeReward(status=new_status, collision=invalid_contact)
+        reward = UMath.computeReward(status=new_status, collision=invalid_contact) + done_reward
 
         self.accumulated_episode_reward += reward
 
@@ -444,13 +444,13 @@ class PickbotReachEnv(gym.Env):
         if self.is_gripper_attached():
             done = True
             done_reward = reward_reached_goal
-            print("%%%%%%%%%%%%%% reset gripper attached")
+            print("YYYYYYYYY reset gripper attached YYYYYYY")
 
         # TODO: this only works for the Box
         # the gripper tried to grasp but did not succeed
-        if self._list_of_status["gripper_pos"][-1] <= 1.08:
+        if self._list_of_status["gripper_pos"][-1] <= 1.039:
             done = True
-            print("%%%%%%%%%%%%%% reset gripper not succeed")
+            print("NNNNNNNNN reset gripper not succeed NNNNNNNN")
 
         # print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
         if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or \
@@ -651,9 +651,9 @@ class PickbotReachEnv(gym.Env):
             sample_ep = random.choice(self.init_samples)
 
             # change object position
-            obj_pos_rpy = sample_ep[-6:]
+            obj_pos_rpy = sample_ep[-7:]
             obj_pos_quat = Pose(position=Point(x=obj_pos_rpy[0], y=obj_pos_rpy[1], z=obj_pos_rpy[2]),
-                                orientation=quaternion_from_euler(obj_pos_rpy[3], obj_pos_rpy[4], obj_pos_rpy[5]))
+                                orientation=obj_pos_rpy[-4:])
             U.change_object_position(self.object_name, obj_pos_quat)
 
             # set joints using moveit
@@ -738,7 +738,8 @@ class PickbotReachEnv(gym.Env):
                 box_pos = Pose(position=Point(x=np.random.uniform(low=-0.3, high=0.3, size=None),
                                               y=np.random.uniform(low=0.9, high=1.1, size=None),
                                               z=1.05),
-                               orientation=quaternion_from_euler(0, 0, 0))
+                               orientation=quaternion_from_euler(0, 0,
+                                                                 np.random.uniform(low=-np.pi, high=np.pi, size=None)))
         else:
             box_pos = self.object_initial_position
 

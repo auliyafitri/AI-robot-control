@@ -252,20 +252,20 @@ def dict_to_csv(csv_filename, dictionary):
 
 def load_samples_from_prev_task(filename):  # currently for door handle only
     output = np.genfromtxt(filename, delimiter=',')
-    action = output[:, 1:7]
-    pos = output[:, 9:12]
-    pos_orient = np.empty((0, 6))
+    action = output[:, 0:6]
+    pos = output[:, -7:]
+    # pos_orient = np.empty((0, 7))
 
-    for i in range(len(pos)):
-        _pos = pos[i]
-        if pos[i, 1] > 0.99:
-            _ori = [0, 0, -1.57]
-        else:
-            _ori = [0, 0, 1.57]
-        _pos_ori = np.append(_pos, _ori, axis=0)
-        pos_orient = np.append(pos_orient, [_pos_ori], axis=0)
+    # for i in range(len(pos)):
+    #     _pos = pos[i]
+    #     if pos[i, 1] > 0.99:
+    #         _ori = [0, 0, -1.57]
+    #     else:
+    #         _ori = [0, 0, 1.57]
+    #     _pos_ori = np.append(_pos, _ori, axis=0)
+    #     pos_orient = np.append(pos_orient, [_pos_ori], axis=0)
 
-    samples = np.append(action, pos_orient, axis=1)
+    samples = np.append(action, pos, axis=1)
     return samples
 
 

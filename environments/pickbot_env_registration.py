@@ -105,9 +105,9 @@ register(
     kwargs={
         'random_object': False,
         'random_position': True,
-        'env_object_type': 'door_handle',
+        # 'env_object_type': 'door_handle',
         'joint_increment': 0.02,
-        'sim_time_factor': 0.001,
+        'sim_time_factor': 0.005,
         'is_discrete': True,
     },
     max_episode_steps=300,
