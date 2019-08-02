@@ -116,8 +116,18 @@ def computeReward(status, collision=False):
     done = 0.02
 
     rewardDist = np.sqrt(1/3) * status["distance_gripper_to_object"]
-    orientation_error = quaternion_multiply(status["gripper_ori"], quaternion_conjugate(status["object_ori"]))
-    rewardOrientation = 2 * np.arccos(abs(orientation_error[0]))
+
+    # orientation_error = quaternion_multiply(status["gripper_ori"], quaternion_conjugate(status["object_ori"]))
+    # rewardOrientation = 2 * np.arccos(abs(orientation_error[0]))
+
+    vg_e = np.asarray(euler_from_quaternion(status["gripper_ori"]))
+    tg_e = np.asarray(euler_from_quaternion(status["object_ori"]))
+
+    # error only in z axis (yaw) with range [0, np.pi]
+    # should be small when the orientation is similar
+    if vg_e[2] < 0: vg_e[2] = vg_e[2] + np.pi
+    if tg_e[2] < 0: tg_e[2] = tg_e[2] + np.pi
+    rewardOrientation = abs(vg_e[2] - tg_e[2])
 
     distanceReward = (math.exp(-alpha * rewardDist) - math.exp(-alpha)) \
      / (1 - math.exp(-alpha)) + 10 * (math.exp(-alpha/done * rewardDist) - math.exp(-alpha/done)) \
