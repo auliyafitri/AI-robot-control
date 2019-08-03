@@ -390,7 +390,7 @@ class PickbotReachCamEnv(gym.Env):
             current_position = U.get_gripper_position()
             current_position = np.append(current_position, self.joints_state.position[-1])
             elapsed_time = rospy.Time.now() - start_ros_time
-            if np.isclose(next_action_position, current_position, rtol=0.0, atol=0.01).all():
+            if np.isclose(next_action_position[:3], current_position[:3], rtol=0.0, atol=0.01).all():
                 break
             elif elapsed_time > rospy.Duration(2):
                 is_time_out = True
@@ -436,11 +436,11 @@ class PickbotReachCamEnv(gym.Env):
         # reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
         reward = UMath.computeReward(status=new_status, collision=invalid_contact)
 
-        self.accumulated_episode_reward += reward
+        self.accumulated_episode_reward += reward + done_reward
 
         self.episode_steps += 1
 
-        return state, reward, done, {}
+        return state, reward + done_reward, done, {}
 
     def _check_all_systems_ready(self):
         """
