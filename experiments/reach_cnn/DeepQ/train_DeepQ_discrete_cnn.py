@@ -33,8 +33,8 @@ def main():
     rospy.init_node('pickbot_gym', anonymous=True, log_level=rospy.FATAL)
 
     env = PickbotReachCamEnv(is_discrete=True, random_position=True)
-    model = deepq.models.cnn_to_mlp(convs=[(32, 8, 4), (64, 4, 2), (64, 3, 1)],
-                                    hiddens=[256],
+    model = deepq.models.cnn_to_mlp(convs=[(32, 8, 4), (64, 4, 2), (64, 3, 1), (64, 3, 1), (128, 3, 1)],
+                                    hiddens=[512, 256],
                                     dueling=False)
     act = deepq.learn(
         env,
