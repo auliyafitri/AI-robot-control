@@ -277,6 +277,11 @@ class PickbotReachCamEnv(gym.Env):
         """
         # print("Joint (reset): {}".format(np.around(self.joints_state.position, decimals=3)))
         # init_joint_pos = [1.5, -1.2, 1.4, -1.77, -1.57, 0]
+
+        x_offset = np.random.uniform(low=-0.2, high=0.2, size=None)
+        y_offset = np.random.uniform(low=-0.2, high=0.2, size=None)
+        z_offset = np.random.uniform(low=-0.2, high=0.2, size=None)
+
         init_joint_pos = [1.57, -1.479, 1.41, -1.66, -1.57, -0.08]
         self.publisher_to_moveit_object.set_joints(init_joint_pos)
 
@@ -305,6 +310,15 @@ class PickbotReachCamEnv(gym.Env):
         observation = self.get_obs()
         self.get_status()
         self.object_position = self._list_of_status["object_pos"]
+
+        # random chance of moving to a pos which is very near the object
+        gripper_pos = self._list_of_status["gripper_pos"]
+        row_dice =  np.random.uniform(low=0, high=1, size=None)
+        if row_dice < 0.1:
+            print("Start near the object")
+            self.publisher_to_moveit_object.pub_pose_to_moveit([self.object_position[0], self.object_position[1], gripper_pos[2]])
+        else:
+            self.publisher_to_moveit_object.pub_pose_to_moveit([gripper_pos[0]+x_offset, gripper_pos[1]+y_offset, gripper_pos[2]+z_offset])
 
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
