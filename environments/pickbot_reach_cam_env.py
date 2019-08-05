@@ -275,6 +275,9 @@ class PickbotReachCamEnv(gym.Env):
         8) Publish Episode Reward and set accumulated reward back to 0 and iterate the Episode Number
         9) Return State
         """
+
+        self.movement_complete.data = False
+
         # print("Joint (reset): {}".format(np.around(self.joints_state.position, decimals=3)))
         # init_joint_pos = [1.5, -1.2, 1.4, -1.77, -1.57, 0]
 
@@ -312,20 +315,27 @@ class PickbotReachCamEnv(gym.Env):
         self.object_position = self._list_of_status["object_pos"]
 
         # random chance of moving to a pos which is very near the object
-        gripper_pos = self._list_of_status["gripper_pos"]
-        row_dice =  np.random.uniform(low=0, high=1, size=None)
-        if row_dice < 0.1:
+        self.movement_complete.data = False
+        # gripper_pos = self._list_of_status["gripper_pos"]
+        row_dice = np.random.uniform(low=0, high=1, size=None)
+        if row_dice < 0.2:
             print("Start near the object")
-            self.publisher_to_moveit_object.pub_pose_to_moveit([self.object_position[0], self.object_position[1], gripper_pos[2]])
+            self.publisher_to_moveit_object.pub_pose_to_moveit([self.object_position[0], self.object_position[1], 1.25])
         else:
-            self.publisher_to_moveit_object.pub_pose_to_moveit([gripper_pos[0]+x_offset, gripper_pos[1]+y_offset, gripper_pos[2]+z_offset])
+            # self.publisher_to_moveit_object.pub_pose_to_moveit([gripper_pos[0]+x_offset, gripper_pos[1]+y_offset, gripper_pos[2]+z_offset])
+            self.publisher_to_moveit_object.pub_pose_to_moveit([-0.043 + x_offset, 0.758 + y_offset, 1.5085 + z_offset])
+        while not self.movement_complete.data:
+            pass
+
+        # self.get_status()
+        # print("gripper_pos: {}".format(self._list_of_status["gripper_pos"]))
 
         # get maximum distance to the object to calculate reward
         self.max_distance, _ = U.get_distance_gripper_to_object()
         self.min_distance = self.max_distance
         self._update_episode()
         # print(">>>>>>>>>> observation: {}".format(np.array(observation).shape))
-        return np.array(observation)
+        return observation
 
     def step(self, action):
         """
@@ -436,9 +446,13 @@ class PickbotReachCamEnv(gym.Env):
             while not self.movement_complete.data:
                 pass
             time.sleep(2)
+            self.movement_complete.data = False
             if self.is_gripper_attached():
                 # pick up
-                self.publisher_to_moveit_object.pub_relative_pose_to_moveit(0.3, is_discrete=True, axis='z')
+                # print("Pick the cube up")
+                self.publisher_to_moveit_object.pub_relative_pose_to_moveit(0.4, is_discrete=True, axis='z')
+                while not self.movement_complete.data:
+                    pass
 
         # 5) Convert Observations into state
         state = U.get_state(new_observation)
@@ -827,6 +841,7 @@ class PickbotReachCamEnv(gym.Env):
         if self.is_gripper_attached():
             done = True
             done_reward = reward_reached_goal
+            print("Grabbed cube, given reward {}".format(done_reward))
 
         # TODO: this only works for the Box
         # the gripper tried to grasp but did not succeed
@@ -859,10 +874,10 @@ class PickbotReachCamEnv(gym.Env):
             print("Successful 1 contact so far: {} attempts".format(self.success_1_contact))
 
         # Check if the box has been moved compared to the last observation
-        target_pos = U.get_target_position()
-        if not np.allclose(self.object_position, target_pos, rtol=0.0, atol=0.0001):
-            print(">>>>>>>>>>>>>>>>>>> Target moved <<<<<<<<<<<<<<<<<<<<<<<")
-            done = True
+        # target_pos = U.get_target_position()
+        # if not np.allclose(self.object_position, target_pos, rtol=0.0, atol=0.0001):
+        #     print(">>>>>>>>>>>>>>>>>>> Target moved <<<<<<<<<<<<<<<<<<<<<<<")
+        #     done = True
 
         # Crashing with itself, shelf, base
         if invalid_collision:
