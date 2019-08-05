@@ -47,6 +47,35 @@ class JointArrayPub(object):
                 pass
         rospy.logdebug("joint_pub Publisher Connected")
 
+        while (self.relative_joint_pub.get_num_connections() == 0):
+            rospy.logdebug("No susbribers to _joint1_pub yet so we wait and try again")
+            try:
+                rate.sleep()
+            except rospy.ROSInterruptException:
+                # This is to avoid error when world is rested, time when backwards.
+                pass
+        rospy.logdebug("relative_joint_pub Publisher Connected")
+
+        while (self.geomsg_pub.get_num_connections() == 0):
+            rospy.logdebug("No susbribers to geomsg_pub yet so we wait and try again")
+            try:
+                rate.sleep()
+            except rospy.ROSInterruptException:
+                # This is to avoid error when world is rested, time when backwards.
+                pass
+        rospy.logdebug("geomsg_pub Publisher Connected")
+
+        while (self.relative_geomsg_pub.get_num_connections() == 0):
+            rospy.logdebug("No susbribers to geomsg_pub yet so we wait and try again")
+            try:
+                rate.sleep()
+            except rospy.ROSInterruptException:
+                # This is to avoid error when world is rested, time when backwards.
+                pass
+        rospy.logdebug("relative_geomsg_pub Publisher Connected")
+
+
+
     def pub_joints_to_moveit(self, joints_array):
         self.check_publishers_connection()
         
