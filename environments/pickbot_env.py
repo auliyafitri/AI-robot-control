@@ -371,7 +371,7 @@ class PickbotReachEnv(gym.Env):
             self.min_distance = new_status["distance_gripper_to_object"]
 
         # Turn on gripper and try to grip
-        if new_status["gripper_pos"][-1] <= 1.2:
+        if new_status["gripper_pos"][-1] <= 1.1:
             self.movement_complete.data = False
 
             self.turn_on_gripper()
@@ -389,9 +389,12 @@ class PickbotReachEnv(gym.Env):
                 while not self.movement_complete.data:
                     pass
                 time.sleep(2)
+                self.movement_complete.data = False
                 if self.is_gripper_attached():
                     # pick up
                     self.publisher_to_moveit_object.pub_relative_pose_to_moveit(0.3, is_discrete=True, axis='z')
+                    while not self.movement_complete.data:
+                        pass
 
         # 5) Convert Observations into state
         state = U.get_state(new_observation)
@@ -505,9 +508,11 @@ class PickbotReachEnv(gym.Env):
 
         if joint_exceeds_limits:
             print("is_done: Joints: {}".format(np.round(self.joints_state.position, decimals=3)))
+            self.movement_complete.data = False
             self.publisher_to_moveit_object.pub_joints_to_moveit([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
             while not self.movement_complete.data:
                 pass
+            self.movement_complete.data = False
             self.publisher_to_moveit_object.pub_relative_joints_to_moveit(joint_correction)
             while not self.movement_complete.data:
                 pass
@@ -633,6 +638,7 @@ class PickbotReachEnv(gym.Env):
         # the rest is randomized near initial position [1.57, -1.479, 1.41, -1.66, -1.57, -0.08]
 
         # set joints using moveit to initial position
+        self.movement_complete.data = False
         init_joint_pos = [1.57, -1.479, 1.41, -1.66, -1.57, -0.08]
         self.publisher_to_moveit_object.set_joints(init_joint_pos)
 
@@ -666,7 +672,7 @@ class PickbotReachEnv(gym.Env):
 
             # move a little back in z axis
             new_status = self.get_status()
-            new_gripper_pos = np.append(new_status["gripper_pos"][0:2], 1.25)
+            new_gripper_pos = np.append(new_status["gripper_pos"][0:2], 1.15)
             self.publisher_to_moveit_object.pub_pose_to_moveit(new_gripper_pos)
 
             while not self.movement_complete.data:
@@ -708,6 +714,7 @@ class PickbotReachEnv(gym.Env):
                             break
                         elif elapsed_time > rospy.Duration(2):  # time out
                             break
+                    self.movement_complete.data = False
 
     def set_target_object(self, random_object=False, random_position=False):
         """
