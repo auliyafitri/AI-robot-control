@@ -48,7 +48,7 @@ def main():
         checkpoint_path=modelsdir,
         callback=callback
     )
-    print("Saving model to kuka_cam_model.pkl")
+    print("Saving model to pickbot_cam_model.pkl")
     act.save("pickbot_cam_model.pkl")
 
 
