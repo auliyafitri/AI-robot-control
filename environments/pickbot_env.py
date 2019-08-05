@@ -54,7 +54,8 @@ from simulation.srv import VacuumGripperControl
 class PickbotReachEnv(gym.Env):
 
     def __init__(self, joint_increment=0.02, sim_time_factor=0.001, random_object=False, random_position=False,
-                 use_object_type=False, populate_object=False, env_object_type='free_shapes', is_discrete=False):
+                 use_object_type=False, populate_object=False, env_object_type='free_shapes', is_discrete=False,
+                 sparse=True):
         """
         initializing all the relevant variables and connections
         :param sim_time_factor: gazebo simulation time factor
@@ -77,6 +78,7 @@ class PickbotReachEnv(gym.Env):
         self._use_rpy_as_action = True
         self._action_bound = 1
         self._load_init_pos = True  # for randomized initial state
+        self._is_sparse = sparse
 
         # Parameters for target-object
         self._random_object = random_object
@@ -404,8 +406,12 @@ class PickbotReachEnv(gym.Env):
 
         # 7) Calculate reward based on Observation and done_reward and update the accumulated Episode Reward
         # reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
-        reward = UMath.computeReward(status=new_status, collision=invalid_contact) + done_reward
+        if self._is_sparse:
+            reward = done_reward
+        else:
+            reward = UMath.computeReward(status=new_status, collision=invalid_contact) + done_reward
 
+        if done: print("Reward this step: {}".format(reward))
         self.accumulated_episode_reward += reward
 
         self.episode_steps += 1
@@ -436,10 +442,16 @@ class PickbotReachEnv(gym.Env):
         ####################################################################################
         done = False
         done_reward = 0
-        reward_reached_goal = 100
-        reward_crashing = 0
-        reward_no_motion_plan = 0
-        reward_joint_range = 0
+        if self._is_sparse:
+            reward_reached_goal = 1
+            reward_crashing = 0
+            reward_no_motion_plan = 0
+            reward_joint_range = 0
+        else:
+            reward_reached_goal = 100
+            reward_crashing = 0
+            reward_no_motion_plan = 0
+            reward_joint_range = 0
 
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
@@ -447,13 +459,14 @@ class PickbotReachEnv(gym.Env):
         if self.is_gripper_attached():
             done = True
             done_reward = reward_reached_goal
-            print("YYYYYYYYY reset gripper attached YYYYYYY")
+            print(">>>>>>>>>>>> Success! Gripper is attached! <<<<<<<<<<<<<<<")
 
-        # TODO: this only works for the Box
+        # TODO: this only works for the dummy door handle
         # the gripper tried to grasp but did not succeed
         if self._list_of_status["gripper_pos"][-1] <= 1.039:
             done = True
-            print("NNNNNNNNN reset gripper not succeed NNNNNNNN")
+            if not self.is_gripper_attached():
+                print(">>>>>>>>>>>> reset gripper not succeed <<<<<<<<<<<<<<<")
 
         # print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
         if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or \
@@ -671,13 +684,14 @@ class PickbotReachEnv(gym.Env):
             self.movement_complete.data = False
 
             # move a little back in z axis
-            new_status = self.get_status()
-            new_gripper_pos = np.append(new_status["gripper_pos"][0:2], 1.15)
-            self.publisher_to_moveit_object.pub_pose_to_moveit(new_gripper_pos)
+            if not self._is_sparse:
+                new_status = self.get_status()
+                new_gripper_pos = np.append(new_status["gripper_pos"][0:2], 1.15)
+                self.publisher_to_moveit_object.pub_pose_to_moveit(new_gripper_pos)
 
-            while not self.movement_complete.data:
-                pass
-            self.movement_complete.data = False
+                while not self.movement_complete.data:
+                    pass
+                self.movement_complete.data = False
 
         else:
             # change object position
