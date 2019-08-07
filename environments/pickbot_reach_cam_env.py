@@ -48,10 +48,11 @@ from moveit_msgs.msg import MoveGroupActionFeedback
 from simulation.msg import VacuumGripperState
 from simulation.srv import VacuumGripperControl
 
+
 # DEFINE ENVIRONMENT CLASS
 class PickbotReachCamEnv(gym.Env):
 
-    def __init__(self, sim_time_factor=0.001, random_object=False, random_position=False,
+    def __init__(self, sim_time_factor=0.002, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes', is_discrete=False):
         """
         initializing all the relevant variables and connections
@@ -151,7 +152,7 @@ class PickbotReachCamEnv(gym.Env):
                 action_high = np.array([self._action_bound] * action_dim)
                 self.action_space = spaces.Box(-action_high, action_high, dtype=np.float32)
 
-        else:   # not use the movement along z-axis as action. dz will always be -self._z_increment
+        else:  # not use the movement along z-axis as action. dz will always be -self._z_increment
             if self._is_discrete:
                 # +-x, +-y, +-z, +-angle
                 self.action_space = spaces.Discrete(6)
@@ -297,7 +298,7 @@ class PickbotReachCamEnv(gym.Env):
             elapsed_time = rospy.Time.now() - start_ros_time
             if np.isclose(init_joint_pos, self.joints_state.position, rtol=0.0, atol=0.01).all():
                 break
-            elif elapsed_time > rospy.Duration(2): # time out
+            elif elapsed_time > rospy.Duration(2):  # time out
                 break
 
         self.turn_off_gripper()
@@ -378,8 +379,8 @@ class PickbotReachCamEnv(gym.Env):
             if self._is_discrete:
                 dx = [-self._xy_increment, self._xy_increment, 0, 0, 0, 0, 0, 0][action]
                 dy = [0, 0, -self._xy_increment, self._xy_increment, 0, 0, 0, 0][action]
-                dz = [0, 0, 0, 0, -self._z_increment, self._z_increment,   0, 0][action]
-                da = [0, 0, 0, 0, 0, 0 -self._wrist_3_joint_increment, self._wrist_3_joint_increment][action]
+                dz = [0, 0, 0, 0, -self._z_increment, self._z_increment, 0, 0][action]
+                da = [0, 0, 0, 0, 0, 0 - self._wrist_3_joint_increment, self._wrist_3_joint_increment][action]
 
                 realAction = [dx, dy, dz, da]
             else:
@@ -390,13 +391,11 @@ class PickbotReachCamEnv(gym.Env):
 
                 realAction = [dx, dy, dz, da]
 
-
         old_gripper_position = np.append(gripper_pos, self.joints_state.position[-1])
 
         next_pos = gripper_pos + realAction[0:3]
         next_wrist_3_angle = self.joints_state.position[-1] + realAction[-1]
         next_action_position = np.append(next_pos, next_wrist_3_angle)
-
 
         # 3) Move to position and wait for moveit to complete the execution
         self.publisher_to_moveit_object.pub_pose_to_moveit(next_pos)
@@ -441,14 +440,13 @@ class PickbotReachCamEnv(gym.Env):
             self.movement_complete.data = False
 
             self.turn_on_gripper()
-            gripping_pos = np.append(new_status["gripper_pos"][0:2], (1.047+0.05)) # this data is only for the cube
-            self.publisher_to_moveit_object.pub_pose_to_moveit(gripping_pos) # grip
+            gripping_pos = np.append(new_status["gripper_pos"][0:2], (1.047 + 0.05))  # this data is only for the cube
+            self.publisher_to_moveit_object.pub_pose_to_moveit(gripping_pos)  # grip
             while not self.movement_complete.data:
                 pass
-            time.sleep(2)
+            time.sleep(1)
             self.movement_complete.data = False
             if self.is_gripper_attached():
-                # pick up
                 # print("Pick the cube up")
                 self.publisher_to_moveit_object.pub_relative_pose_to_moveit(0.4, is_discrete=True, axis='z')
                 while not self.movement_complete.data:
@@ -463,6 +461,7 @@ class PickbotReachCamEnv(gym.Env):
         # 7) Calculate reward based on Observatin and done_reward and update the accumulated Episode Reward
         # reward = UMath.compute_reward(new_observation, done_reward, invalid_contact)
         reward = UMath.computeReward(status=new_status, collision=invalid_contact)
+        # print("reward: {}".format(reward))
 
         self.accumulated_episode_reward += reward + done_reward
 
@@ -542,7 +541,8 @@ class PickbotReachCamEnv(gym.Env):
         camera_rgb_states_msg = None
         while camera_rgb_states_msg is None and not rospy.is_shutdown():
             try:
-                camera_rgb_states_msg = rospy.wait_for_message("/intel_realsense_camera/rgb/image_raw", Image, timeout=0.1)
+                camera_rgb_states_msg = rospy.wait_for_message("/intel_realsense_camera/rgb/image_raw", Image,
+                                                               timeout=0.1)
                 self.camera_rgb_state = camera_rgb_states_msg
                 rospy.logdebug("rgb_image READY")
             except Exception as e:
@@ -552,7 +552,8 @@ class PickbotReachCamEnv(gym.Env):
         camera_depth_states_msg = None
         while camera_depth_states_msg is None and not rospy.is_shutdown():
             try:
-                camera_depth_states_msg = rospy.wait_for_message("/intel_realsense_camera/depth/image_raw", Image, timeout=0.1)
+                camera_depth_states_msg = rospy.wait_for_message("/intel_realsense_camera/depth/image_raw", Image,
+                                                                 timeout=0.1)
                 self.camera_depth_state = camera_depth_states_msg
                 rospy.logdebug("rgbd_image READY")
             except Exception as e:
@@ -581,14 +582,16 @@ class PickbotReachCamEnv(gym.Env):
             self.object_type = self.object_list.index(rand_object)
             init_pos = rand_object["init_pos"]
             self.object_initial_position = Pose(position=Point(x=init_pos[0], y=init_pos[1], z=init_pos[2]),
-                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4], init_pos[5]))
+                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4],
+                                                                                  init_pos[5]))
         else:
             self.object_name = self.object_list[0]["name"]
             self.object_type_str = self.object_list[0]["type"]
             self.object_type = 0
             init_pos = self.object_list[0]["init_pos"]
             self.object_initial_position = Pose(position=Point(x=init_pos[0], y=init_pos[1], z=init_pos[2]),
-                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4], init_pos[5]))
+                                                orientation=quaternion_from_euler(init_pos[3], init_pos[4],
+                                                                                  init_pos[5]))
 
         if random_position:
             if self.object_type_str == "door_handle":
@@ -627,7 +630,7 @@ class PickbotReachCamEnv(gym.Env):
         """
         action_position = np.asarray(last_position) + action
         # clip action that is going to be published to -2.9 and 2.9 just to make sure to avoid loosing controll of controllers
-        x = np.clip(action_position, -(math.pi-0.05), math.pi-0.05)
+        x = np.clip(action_position, -(math.pi - 0.05), math.pi - 0.05)
 
         return x.tolist()
 
@@ -686,7 +689,6 @@ class PickbotReachCamEnv(gym.Env):
         distance_gripper_to_object, position_xyz_object = U.get_distance_gripper_to_object()
         vacuum_gripper_pose = U.get_link_state("vacuum_gripper_link")
         target_pose = U.get_link_state("target")
-
 
         # Get Joints Data out of Subscriber
         joint_states = self.joints_state
@@ -834,7 +836,6 @@ class PickbotReachCamEnv(gym.Env):
         reward_no_motion_plan = 0
         reward_joint_range = 0
 
-
         # Check if there are invalid collisions
         invalid_collision = self.get_collisions()
 
@@ -849,10 +850,9 @@ class PickbotReachCamEnv(gym.Env):
             done = True
 
         # print("##################{}: {}".format(self.moveit_action_feedback.header.seq, self.moveit_action_feedback.status.text))
-        if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or  \
+        if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or \
                 self.moveit_action_feedback.status.text == "Solution found but controller failed during execution" or \
                 self.moveit_action_feedback.status.text == "Motion plan was found but it seems to be invalid (possibly due to postprocessing).Not executing.":
-
             print(">>>>>>>>>>>> NO MOTION PLAN!!! <<<<<<<<<<<<<<<")
             done = True
             done_reward = reward_no_motion_plan
