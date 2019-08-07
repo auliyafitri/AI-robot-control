@@ -502,8 +502,9 @@ def key(event):
         gripperControl.turn_on_gripper()
         print("Z < 1.2, going dow and try to grasp the object.")
         assign_pose_target('nil', 'nil', 1.047+0.05, 'nil', 'nil', 'nil', 'nil')
-        time.sleep(2)
+        time.sleep(1)
         if gripperControl.is_gripper_attached():
+        # if True:
             relative_pose_target('z', 0.3)
             status = get_status()
             # dict_to_csv(csv_success_exp, status)

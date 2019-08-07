@@ -44,6 +44,8 @@ def main():
         buffer_size=50000,
         exploration_fraction=0.1,
         exploration_final_eps=0.02,
+        learning_starts=100,
+        checkpoint_freq=100,
         print_freq=100,
         checkpoint_path=modelsdir,
         callback=callback
