@@ -255,7 +255,7 @@ class PickbotReachEnv(gym.Env):
         if self._load_init_pos:
             import environments
             self.init_samples = U.load_samples_from_prev_task(os.path.dirname(environments.__file__) +
-                                                              "/contacts_sample/door_sample/observation_record_2019-08-02.csv")
+                                                              "/contacts_sample/door_sample/observation_record_static_dummy_door_handle_2019-08-07.csv")
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -377,7 +377,7 @@ class PickbotReachEnv(gym.Env):
             self.movement_complete.data = False
 
             self.turn_on_gripper()
-            gripping_pos = np.append(new_status["gripper_pos"][0:2], 1.0395)  # this data is only for the cube
+            gripping_pos = np.append(new_status["gripper_pos"][0:2], 1.04)  # this data is only for the cube
             self.publisher_to_moveit_object.pub_pose_to_moveit(gripping_pos)  # grip
 
             if self.moveit_action_feedback.status.text == "No motion plan found. No execution attempted." or \
@@ -463,7 +463,7 @@ class PickbotReachEnv(gym.Env):
 
         # TODO: this only works for the dummy door handle
         # the gripper tried to grasp but did not succeed
-        if self._list_of_status["gripper_pos"][-1] <= 1.039:
+        if self._list_of_status["gripper_pos"][-1] <= 1.04:
             done = True
             if not self.is_gripper_attached():
                 print(">>>>>>>>>>>> reset gripper not succeed <<<<<<<<<<<<<<<")
@@ -684,14 +684,13 @@ class PickbotReachEnv(gym.Env):
             self.movement_complete.data = False
 
             # move a little back in z axis
-            if not self._is_sparse:
-                new_status = self.get_status()
-                new_gripper_pos = np.append(new_status["gripper_pos"][0:2], 1.15)
-                self.publisher_to_moveit_object.pub_pose_to_moveit(new_gripper_pos)
-
-                while not self.movement_complete.data:
-                    pass
-                self.movement_complete.data = False
+            # new_status = self.get_status()
+            # new_gripper_pos = np.append(new_status["gripper_pos"][0:2], 1.15)
+            # self.publisher_to_moveit_object.pub_pose_to_moveit(new_gripper_pos)
+            #
+            # while not self.movement_complete.data:
+            #     pass
+            # self.movement_complete.data = False
 
         else:
             # change object position
@@ -702,7 +701,7 @@ class PickbotReachEnv(gym.Env):
             while not joint_possible:
                 new_joint_pos = np.zeros(len(init_joint_pos))
                 for i in range(len(init_joint_pos)):
-                    new_joint_pos[i] = init_joint_pos[i] + np.random.uniform(-np.pi/6, np.pi/6)
+                    new_joint_pos[i] = init_joint_pos[i] + np.random.uniform(-np.pi/8, np.pi/8)
 
                 # print("new joint position {}".format(new_joint_pos))
                 self.publisher_to_moveit_object.pub_joints_to_moveit(new_joint_pos)

@@ -1,7 +1,7 @@
 items:
   - name: unit_box_0
     type: free_shapes
-    init_pos: [-0.13, 0.848, 1.06, 0, 0, 0]
+    init_pos: [-0.144, 0.919858, 1.047203, 0, -0, 0.78]
     height: 0
   - name: door_handle
     type: door_handle

@@ -16,7 +16,7 @@ from baselines.common.cmd_util import make_vec_env
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
 
 num_env = 1
-env_id = "PickbotReachOrientDoorHandle-v4"
+env_id = "PickbotReachOrientDoorHandle-v0"
 env_type = "classic_control"
 seed = None
 task_name = "reach_orient"

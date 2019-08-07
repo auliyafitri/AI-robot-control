@@ -100,6 +100,21 @@ register(
 )
 
 register(
+    id='PickbotReachOrientDoorHandle-v0',
+    entry_point='environments.pickbot_env:PickbotReachEnv',
+    kwargs={
+        'random_object': False,
+        'random_position': False,
+        # 'env_object_type': 'door_handle',
+        'joint_increment': 0.02,
+        'sim_time_factor': 0.005,
+        'is_discrete': True,
+        'load_experience': True,
+    },
+    max_episode_steps=500,
+)
+
+register(
     id='PickbotReachOrientDoorHandle-v1',
     entry_point='environments.pickbot_env:PickbotReachEnv',
     kwargs={
@@ -109,6 +124,7 @@ register(
         'joint_increment': 0.02,
         'sim_time_factor': 0.005,
         'is_discrete': True,
+        'load_experience': True,
     },
     max_episode_steps=300,
 )
