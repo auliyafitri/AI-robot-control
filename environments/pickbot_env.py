@@ -55,7 +55,7 @@ class PickbotReachEnv(gym.Env):
 
     def __init__(self, joint_increment=0.02, sim_time_factor=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes', is_discrete=False,
-                 sparse=True):
+                 sparse=True, load_experience=False):
         """
         initializing all the relevant variables and connections
         :param sim_time_factor: gazebo simulation time factor
@@ -77,7 +77,7 @@ class PickbotReachEnv(gym.Env):
         self._use_angle_as_action = False
         self._use_rpy_as_action = True
         self._action_bound = 1
-        self._load_init_pos = True  # for randomized initial state
+        self._load_init_pos = load_experience  # for randomized initial state
         self._is_sparse = sparse
 
         # Parameters for target-object
@@ -390,7 +390,7 @@ class PickbotReachEnv(gym.Env):
             else:
                 while not self.movement_complete.data:
                     pass
-                time.sleep(2)
+                time.sleep(1)
                 self.movement_complete.data = False
                 if self.is_gripper_attached():
                     # pick up

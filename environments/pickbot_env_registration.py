@@ -124,8 +124,9 @@ register(
         'sim_time_factor': 0.005,
         'is_discrete': True,
         'sparse': True,
+        'load_experience': True,
     },
-    max_episode_steps=300,
+    max_episode_steps=500,
 )
 
 register(
