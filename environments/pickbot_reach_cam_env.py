@@ -263,7 +263,7 @@ class PickbotReachCamEnv(gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def reset(self, t=0):
+    def reset(self, reset_count=0):
         """
         Reset The Robot to its initial Position and restart the Controllers
         1) Publish the initial joint_positions to MoveIt
@@ -320,8 +320,8 @@ class PickbotReachCamEnv(gym.Env):
         # gripper_pos = self._list_of_status["gripper_pos"]
         # row_dice = np.random.uniform(low=0, high=1, size=None)
         # if row_dice < 0.2:
-        if t % 10 == 0 and t > 0: # start from near the object once in every 10 resets
-            print("Start near the object")
+        if reset_count % 10 == 0 and reset_count > 0: # start from near the object once in every 10 resets
+            print(">>> reset_count = {}, start near the object".format(reset_count))
             self.publisher_to_moveit_object.pub_pose_to_moveit([self.object_position[0], self.object_position[1], 1.25])
         else:
             # self.publisher_to_moveit_object.pub_pose_to_moveit([gripper_pos[0]+x_offset, gripper_pos[1]+y_offset, gripper_pos[2]+z_offset])
