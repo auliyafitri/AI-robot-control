@@ -4,7 +4,7 @@
 import gym
 import rospy
 import numpy as np
-# import cv2
+import cv2
 import time
 import random
 import sys
@@ -86,8 +86,8 @@ class PickbotReachCamEnv(gym.Env):
         self.camera_rgb_state = Image()
         self.camera_depth_state = Image()
 
-        self._height = 480
-        self._width = 640
+        self._height = 224
+        self._width = 224
         self.realsense_rgb = Image()
         self.realsense_depth = Image()
 
@@ -635,6 +635,38 @@ class PickbotReachCamEnv(gym.Env):
 
         return x.tolist()
 
+    def image_resize(self, image, width=None, height=None, inter=cv2.INTER_AREA):
+        # initialize the dimensions of the image to be resized and
+        # grab the image size
+        dim = None
+        (h, w) = image.shape[:2]
+
+        # if both the width and height are None, then return the
+        # original image
+        if width is None and height is None:
+            return image
+
+        # check to see if the width is None
+        if width is None:
+            # calculate the ratio of the height and construct the
+            # dimensions
+            r = height / float(h)
+            dim = (int(w * r), height)
+
+        # otherwise, the height is None
+        else:
+            # calculate the ratio of the width and construct the
+            # dimensions
+            r = width / float(w)
+            dim = (width, int(h * r))
+            dim = (width, height)
+
+        # resize the image
+        resized = cv2.resize(image, dim, interpolation=inter)
+
+        # return the resized image
+        return resized
+
     def get_obs(self):
         """
         1) Get the rgb image and the depth image of the current step,
@@ -650,8 +682,13 @@ class PickbotReachCamEnv(gym.Env):
         # 2)
         grayscale = CvBridge().imgmsg_to_cv2(ros_rgb, desired_encoding="mono8")
         depth = CvBridge().imgmsg_to_cv2(ros_depth, desired_encoding="passthrough")
-        # imsave('grayscale.png', grayscale)
-        # imsave('depth.png', depth)
+
+        # resize the picture to 224x168
+        grayscale_224 = self.image_resize(grayscale, width=224, height=224, inter=cv2.INTER_AREA)
+        depth_224 = self.image_resize(depth, width=224, height=224, inter=cv2.INTER_AREA)
+
+        # imsave('grayscale_224.png', grayscale_224)
+        # imsave('depth_224.png', depth_224)
         # print("depth pixel mean: {}, type: {}".format(np.nanmean(depth), type(depth[200][200])))
         # print("grayscale pixel mean: {}, type: {}".format(np.mean(grayscale), type(grayscale[200][200])))
 
@@ -659,13 +696,13 @@ class PickbotReachCamEnv(gym.Env):
         # print("depth size: {}, type: {}".format(depth.shape, type(depth)))
 
         # 3) Image Normalization
-        grayscale = grayscale.astype(np.float32)
-        grayscale = grayscale / 255.0
+        grayscale_224 = grayscale_224.astype(np.float32)
+        grayscale_224 = grayscale_224 / 255.0
 
         # 4) Concatenate rgb and depth image and get a 4-channel observation
-        grayscale = grayscale.reshape(grayscale.shape[0], grayscale.shape[1], 1)
-        depth = depth.reshape((depth.shape[0], depth.shape[1], 1))
-        observation = np.append(grayscale, depth, axis=2)
+        grayscale_224 = grayscale_224.reshape(grayscale_224.shape[0], grayscale_224.shape[1], 1)
+        depth_224 = depth_224.reshape((depth_224.shape[0], depth_224.shape[1], 1))
+        observation = np.append(grayscale_224, depth_224, axis=2)
 
         return observation
 
