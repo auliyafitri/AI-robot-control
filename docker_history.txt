@@ -1,0 +1,10 @@
+source ../ros_entrypoint.sh 
+bash install.sh 
+
+cd src/AI-robot-control/
+pip install -e .
+
+. install.sh 
+
+cd home/mark/SimBot
+source devel/setup.bash 

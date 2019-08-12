@@ -16,14 +16,16 @@ from baselines.common.cmd_util import make_vec_env
 timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mmin')
 
 num_env = 1
-env_id = "PickbotReachOrientDoorHandle-v0"
+env_id = "PickbotReachOrientDoorHandle-v1"
 env_type = "classic_control"
 seed = None
 task_name = "reach_orient"
+last_timestamp = '2019-08-07_10h14min'
 
 # Create needed folders for log file and models
 logdir = os.path.dirname(evaluations.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + timestamp + '/'
 modelsdir = os.path.dirname(models.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + timestamp + '/'
+loaddir = os.path.dirname(models.__file__) + '/' + task_name + '/trpo/' + env_id + '/' + last_timestamp + '/'
 
 # Generate tensorboard file
 format_strs = ['stdout', 'log', 'csv', 'tensorboard']
@@ -52,7 +54,8 @@ def main():
         env=env,
         network='mlp',
         total_timesteps=2000000,
-        save_path=modelsdir
+        save_path=modelsdir,
+        load_path=loaddir+"policy_latest"
     )
 
     print("Saving model to " + modelsdir)

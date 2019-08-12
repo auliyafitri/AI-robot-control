@@ -959,8 +959,8 @@ class PickbotReachEnv(gym.Env):
         self.check_contact_1()
         self.check_contact_2()
         self.check_collision()
-        self.check_rgb_camera()
-        self.check_rgbd_camera()
+        # self.check_rgb_camera()
+        # self.check_rgbd_camera()
         self.check_gripper_state()
         rospy.logdebug("ALL SYSTEMS READY")
 
