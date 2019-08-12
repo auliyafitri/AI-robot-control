@@ -36,8 +36,9 @@ def main():
     # model = deepq.models.cnn_to_mlp(convs=[(32, 8, 4), (64, 4, 2), (64, 3, 1), (64, 3, 1), (128, 3, 1)],
     #                                 hiddens=[512, 256],
     #                                 dueling=False)
+    # VGG-16 architecture
     model = deepq.models.cnn_to_mlp(convs=[(64, 3, 1), (128, 3, 1), (256, 3, 1), (512, 3, 1), (512, 3, 1)],
-                                    hiddens=[4096, 1000],
+                                    hiddens=[1024, 500],
                                     dueling=False)
 
     act = deepq.learn(
@@ -45,6 +46,7 @@ def main():
         network=model,
         lr=1e-3,
         total_timesteps=1000000000,
+        batch_size=12,
         buffer_size=50000,
         exploration_fraction=0.1,
         exploration_final_eps=0.02,
