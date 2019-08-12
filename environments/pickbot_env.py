@@ -55,7 +55,7 @@ class PickbotReachEnv(gym.Env):
 
     def __init__(self, joint_increment=0.02, sim_time_factor=0.001, random_object=False, random_position=False,
                  use_object_type=False, populate_object=False, env_object_type='free_shapes', is_discrete=False,
-                 sparse=True, load_experience=False):
+                 sparse=False, load_experience=False):
         """
         initializing all the relevant variables and connections
         :param sim_time_factor: gazebo simulation time factor
