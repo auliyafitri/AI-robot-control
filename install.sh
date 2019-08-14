@@ -44,6 +44,7 @@ sudo python3 -m pip install -e .
 # Install ROS Required Plugins such as Vacuum Gripper from ARIAC 2017 project
 cd ~/catkin_ws/src
 git clone https://bitbucket.org/osrf/ariac -b ariac_2017
+git clone https://github.com/YangLiu14/gazebo_ros_pkgs.git
 cd ..
 catkin_make
 source devel/setup.bash
