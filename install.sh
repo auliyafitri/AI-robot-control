@@ -5,12 +5,17 @@ sudo sh -c '
     > /etc/apt/sources.list.d/gazebo-stable.list'
 wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
 
+apt-get update
+apt-get dist-upgrade
+
+apt-get install python-scipy
+
 # Installing Gazebo
 sudo apt-get update
 sudo apt-get install -y gazebo7 gazebo7-plugin-base gazebo7-common libgazebo7
 
 # Installing Gazebo-ROS Compatibility Packages
-sudo apt-get install -y --allow-unauthenticated ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control ros-kinetic-ros-controllers ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control ros-kinetic-joint-state-controller ros-kinetic-joint-state-publisher ros-kinetic-effort-controllers
+sudo apt-get install -y --allow-unauthenticated ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control ros-kinetic-ros-controllers ros-kinetic-gazebo-ros-pkgs ros-kinetic-gazebo-ros-control ros-kinetic-joint-state-controller ros-kinetic-joint-state-publisher ros-kinetic-effort-controllers ros-kinetic-moveit
 source /opt/ros/kinetic/setup.bash
 
 # Installing Python packages
