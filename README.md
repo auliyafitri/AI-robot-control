@@ -72,3 +72,16 @@ roslaunch robot_training start_training_Q_Learning.launch
 ```
 roslaunch robot_training start_training_Deep_Q_Learning.launch
 ```
+
+## MoveIt: run simulation using MoveIt as controller
+1. Start Simulation:
+```
+roslaunch ur_gazebo pickbot.launch
+```
+
+2. Start moveit controller:
+```
+$ cd ~/catkin_ws/src/AI-robot-control/simulation/motion_control
+$ python pickbot_motion_control.py
+```
+3. Run trainning script (choose the training script you want)
