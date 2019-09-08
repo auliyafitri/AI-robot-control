@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/mark/SimBot/src/AI-robot-control/models/reach_orient/ppo2/PickbotReachOrientDoorHandle-v5/2019-09-05_22h42min/policy_best"
+all_model_checkpoint_paths: "/home/mark/SimBot/src/AI-robot-control/models/reach_orient/ppo2/PickbotReachOrientDoorHandle-v5/2019-09-05_22h42min/policy_best"
