@@ -1,0 +1,549 @@
+Logging to /home/mark/SimBot/src/AI-robot-control/evaluations/reach_orient/ppo2/PickbotReachOrientDoorHandle-v5/2019-09-05_22h42min
+load_state method is deprecated, please use load_variables instead
+---------------------------------------
+| approxkl           | 6.619778e-06   |
+| clipfrac           | 0.0            |
+| eplenmean          | 22.8           |
+| eprewmean          | 0.205          |
+| explained_variance | 0.97           |
+| fps                | 3              |
+| nupdates           | 1              |
+| policy_entropy     | 0.03338663     |
+| policy_loss        | -2.9166637e-05 |
+| serial_timesteps   | 1024           |
+| time_elapsed       | 323            |
+| total_timesteps    | 1024           |
+| value_loss         | 0.00022877567  |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 7.185218e-05   |
+| clipfrac           | 0.0009765625   |
+| eplenmean          | 21.6           |
+| eprewmean          | 0.23           |
+| explained_variance | 0.697          |
+| fps                | 3              |
+| nupdates           | 10             |
+| policy_entropy     | 0.0340825      |
+| policy_loss        | -0.00020506518 |
+| serial_timesteps   | 10240          |
+| time_elapsed       | 3.22e+03       |
+| total_timesteps    | 10240          |
+| value_loss         | 0.0055431896   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 2.9726158e-05  |
+| clipfrac           | 0.00048828125  |
+| eplenmean          | 21.6           |
+| eprewmean          | 0.18           |
+| explained_variance | 0.718          |
+| fps                | 3              |
+| nupdates           | 20             |
+| policy_entropy     | 0.0147184655   |
+| policy_loss        | -0.00022190064 |
+| serial_timesteps   | 20480          |
+| time_elapsed       | 6.44e+03       |
+| total_timesteps    | 20480          |
+| value_loss         | 0.0037031712   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 1.1263027e-05  |
+| clipfrac           | 0.0            |
+| eplenmean          | 28.1           |
+| eprewmean          | 0.14           |
+| explained_variance | 0.7            |
+| fps                | 2              |
+| nupdates           | 30             |
+| policy_entropy     | 0.022172276    |
+| policy_loss        | -1.9133615e-05 |
+| serial_timesteps   | 30720          |
+| time_elapsed       | 9.91e+03       |
+| total_timesteps    | 30720          |
+| value_loss         | 0.0015772672   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 9.690716e-11   |
+| clipfrac           | 0.0            |
+| eplenmean          | 28             |
+| eprewmean          | 0.18           |
+| explained_variance | 0.839          |
+| fps                | 3              |
+| nupdates           | 40             |
+| policy_entropy     | 0.013330869    |
+| policy_loss        | -1.6149716e-07 |
+| serial_timesteps   | 40960          |
+| time_elapsed       | 1.34e+04       |
+| total_timesteps    | 40960          |
+| value_loss         | 0.0009269043   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 8.8538596e-05 |
+| clipfrac           | 0.0007324219  |
+| eplenmean          | 22.8          |
+| eprewmean          | 0.12          |
+| explained_variance | 0.66          |
+| fps                | 3             |
+| nupdates           | 50            |
+| policy_entropy     | 0.008642215   |
+| policy_loss        | -0.000830085  |
+| serial_timesteps   | 51200         |
+| time_elapsed       | 1.67e+04      |
+| total_timesteps    | 51200         |
+| value_loss         | 0.0038271004  |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 6.5253116e-06  |
+| clipfrac           | 0.00024414062  |
+| eplenmean          | 22.3           |
+| eprewmean          | 0.17           |
+| explained_variance | 0.875          |
+| fps                | 3              |
+| nupdates           | 60             |
+| policy_entropy     | 0.0060766316   |
+| policy_loss        | -3.6883866e-05 |
+| serial_timesteps   | 61440          |
+| time_elapsed       | 2e+04          |
+| total_timesteps    | 61440          |
+| value_loss         | 0.0010877597   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+-------------------------------------
+| approxkl           | 8.104261e-12 |
+| clipfrac           | 0.0          |
+| eplenmean          | 21.2         |
+| eprewmean          | 0.18         |
+| explained_variance | 0.536        |
+| fps                | 3            |
+| nupdates           | 70           |
+| policy_entropy     | 0.006941692  |
+| policy_loss        | 3.867899e-07 |
+| serial_timesteps   | 71680        |
+| time_elapsed       | 2.32e+04     |
+| total_timesteps    | 71680        |
+| value_loss         | 0.0037450914 |
+-------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 2.6036948e-10 |
+| clipfrac           | 0.0           |
+| eplenmean          | 27            |
+| eprewmean          | 0.27          |
+| explained_variance | 0.973         |
+| fps                | 3             |
+| nupdates           | 80            |
+| policy_entropy     | 0.0036022821  |
+| policy_loss        | -2.188608e-08 |
+| serial_timesteps   | 81920         |
+| time_elapsed       | 2.65e+04      |
+| total_timesteps    | 81920         |
+| value_loss         | 0.00014457767 |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 7.7647775e-12 |
+| clipfrac           | 0.0           |
+| eplenmean          | 22.6          |
+| eprewmean          | 0.13          |
+| explained_variance | 0.7           |
+| fps                | 3             |
+| nupdates           | 90            |
+| policy_entropy     | 0.0033882617  |
+| policy_loss        | 1.1969532e-06 |
+| serial_timesteps   | 92160         |
+| time_elapsed       | 2.97e+04      |
+| total_timesteps    | 92160         |
+| value_loss         | 0.002723948   |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 3.0213262e-12 |
+| clipfrac           | 0.0           |
+| eplenmean          | 23.3          |
+| eprewmean          | 0.13          |
+| explained_variance | 0.628         |
+| fps                | 3             |
+| nupdates           | 100           |
+| policy_entropy     | 0.0031508082  |
+| policy_loss        | 6.7506335e-07 |
+| serial_timesteps   | 102400        |
+| time_elapsed       | 3.3e+04       |
+| total_timesteps    | 102400        |
+| value_loss         | 0.0027215485  |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 1.5046008e-06  |
+| clipfrac           | 0.0            |
+| eplenmean          | 26.9           |
+| eprewmean          | 0.19           |
+| explained_variance | 0.697          |
+| fps                | 2              |
+| nupdates           | 110            |
+| policy_entropy     | 0.0031523188   |
+| policy_loss        | -3.7717982e-06 |
+| serial_timesteps   | 112640         |
+| time_elapsed       | 3.65e+04       |
+| total_timesteps    | 112640         |
+| value_loss         | 0.0019074014   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 1.234717e-06  |
+| clipfrac           | 0.0           |
+| eplenmean          | 21.8          |
+| eprewmean          | 0.2           |
+| explained_variance | 0.54          |
+| fps                | 3             |
+| nupdates           | 120           |
+| policy_entropy     | 0.0038070818  |
+| policy_loss        | -9.661657e-06 |
+| serial_timesteps   | 122880        |
+| time_elapsed       | 3.99e+04      |
+| total_timesteps    | 122880        |
+| value_loss         | 0.009742187   |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 5.2706645e-11 |
+| clipfrac           | 0.0           |
+| eplenmean          | 21.9          |
+| eprewmean          | 0.18          |
+| explained_variance | 0.564         |
+| fps                | 3             |
+| nupdates           | 130           |
+| policy_entropy     | 0.0032700934  |
+| policy_loss        | 1.8044375e-06 |
+| serial_timesteps   | 133120        |
+| time_elapsed       | 4.32e+04      |
+| total_timesteps    | 133120        |
+| value_loss         | 0.0055900607  |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 4.6691946e-14 |
+| clipfrac           | 0.0           |
+| eplenmean          | 26.4          |
+| eprewmean          | 0.18          |
+| explained_variance | 0.949         |
+| fps                | 2             |
+| nupdates           | 140           |
+| policy_entropy     | 0.0023175504  |
+| policy_loss        | 1.9324943e-08 |
+| serial_timesteps   | 143360        |
+| time_elapsed       | 4.68e+04      |
+| total_timesteps    | 143360        |
+| value_loss         | 0.00028403307 |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 5.9100565e-13 |
+| clipfrac           | 0.0           |
+| eplenmean          | 20.4          |
+| eprewmean          | 0.25          |
+| explained_variance | 0.719         |
+| fps                | 3             |
+| nupdates           | 150           |
+| policy_entropy     | 0.002494709   |
+| policy_loss        | 1.8591527e-07 |
+| serial_timesteps   | 153600        |
+| time_elapsed       | 5e+04         |
+| total_timesteps    | 153600        |
+| value_loss         | 0.0055148443  |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 5.44368e-12    |
+| clipfrac           | 0.0            |
+| eplenmean          | 20.5           |
+| eprewmean          | 0.24           |
+| explained_variance | 0.713          |
+| fps                | 2              |
+| nupdates           | 160            |
+| policy_entropy     | 0.0025796187   |
+| policy_loss        | -2.6312773e-07 |
+| serial_timesteps   | 163840         |
+| time_elapsed       | 5.32e+04       |
+| total_timesteps    | 163840         |
+| value_loss         | 0.0046868995   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 6.840379e-07   |
+| clipfrac           | 0.0            |
+| eplenmean          | 21.6           |
+| eprewmean          | 0.25           |
+| explained_variance | 0.717          |
+| fps                | 3              |
+| nupdates           | 170            |
+| policy_entropy     | 0.003048631    |
+| policy_loss        | -3.2407697e-06 |
+| serial_timesteps   | 174080         |
+| time_elapsed       | 5.65e+04       |
+| total_timesteps    | 174080         |
+| value_loss         | 0.002619017    |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 5.616683e-06   |
+| clipfrac           | 0.0            |
+| eplenmean          | 18.4           |
+| eprewmean          | 0.23           |
+| explained_variance | 0.8            |
+| fps                | 3              |
+| nupdates           | 180            |
+| policy_entropy     | 0.0023486037   |
+| policy_loss        | -3.8442027e-05 |
+| serial_timesteps   | 184320         |
+| time_elapsed       | 5.98e+04       |
+| total_timesteps    | 184320         |
+| value_loss         | 0.0019426853   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 1.4110091e-08 |
+| clipfrac           | 0.0           |
+| eplenmean          | 20.3          |
+| eprewmean          | 0.22          |
+| explained_variance | 0.68          |
+| fps                | 2             |
+| nupdates           | 190           |
+| policy_entropy     | 0.0028229072  |
+| policy_loss        | 1.9850268e-06 |
+| serial_timesteps   | 194560        |
+| time_elapsed       | 6.32e+04      |
+| total_timesteps    | 194560        |
+| value_loss         | 0.0064122872  |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 3.4892364e-13 |
+| clipfrac           | 0.0           |
+| eplenmean          | 18.9          |
+| eprewmean          | 0.25          |
+| explained_variance | 0.639         |
+| fps                | 2             |
+| nupdates           | 200           |
+| policy_entropy     | 0.0025195319  |
+| policy_loss        | 2.7182978e-08 |
+| serial_timesteps   | 204800        |
+| time_elapsed       | 6.65e+04      |
+| total_timesteps    | 204800        |
+| value_loss         | 0.006028168   |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 2.9004188e-06  |
+| clipfrac           | 0.0            |
+| eplenmean          | 21.1           |
+| eprewmean          | 0.17           |
+| explained_variance | 0.749          |
+| fps                | 3              |
+| nupdates           | 210            |
+| policy_entropy     | 0.0025488306   |
+| policy_loss        | -1.1283555e-05 |
+| serial_timesteps   | 215040         |
+| time_elapsed       | 6.99e+04       |
+| total_timesteps    | 215040         |
+| value_loss         | 0.002839885    |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 3.3028686e-12 |
+| clipfrac           | 0.0           |
+| eplenmean          | 20.3          |
+| eprewmean          | 0.27          |
+| explained_variance | 0.714         |
+| fps                | 2             |
+| nupdates           | 220           |
+| policy_entropy     | 0.0023847786  |
+| policy_loss        | 3.647001e-07  |
+| serial_timesteps   | 225280        |
+| time_elapsed       | 7.34e+04      |
+| total_timesteps    | 225280        |
+| value_loss         | 0.004991452   |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 6.3474535e-14 |
+| clipfrac           | 0.0           |
+| eplenmean          | 22.3          |
+| eprewmean          | 0.14          |
+| explained_variance | 0.843         |
+| fps                | 3             |
+| nupdates           | 230           |
+| policy_entropy     | 0.0013341368  |
+| policy_loss        | -9.522773e-08 |
+| serial_timesteps   | 235520        |
+| time_elapsed       | 7.67e+04      |
+| total_timesteps    | 235520        |
+| value_loss         | 0.00074825337 |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 1.5585233e-13 |
+| clipfrac           | 0.0           |
+| eplenmean          | 20.8          |
+| eprewmean          | 0.16          |
+| explained_variance | 0.561         |
+| fps                | 3             |
+| nupdates           | 240           |
+| policy_entropy     | 0.0013128389  |
+| policy_loss        | 1.4214311e-07 |
+| serial_timesteps   | 245760        |
+| time_elapsed       | 8e+04         |
+| total_timesteps    | 245760        |
+| value_loss         | 0.0018178961  |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 3.993272e-13   |
+| clipfrac           | 0.0            |
+| eplenmean          | 20.5           |
+| eprewmean          | 0.17           |
+| explained_variance | 0.768          |
+| fps                | 3              |
+| nupdates           | 250            |
+| policy_entropy     | 0.0019100324   |
+| policy_loss        | -1.0681106e-07 |
+| serial_timesteps   | 256000         |
+| time_elapsed       | 8.32e+04       |
+| total_timesteps    | 256000         |
+| value_loss         | 0.0016497608   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 1.7760592e-12 |
+| clipfrac           | 0.0           |
+| eplenmean          | 29.9          |
+| eprewmean          | 0.11          |
+| explained_variance | 0.703         |
+| fps                | 3             |
+| nupdates           | 260           |
+| policy_entropy     | 0.0014507796  |
+| policy_loss        | 1.1059456e-09 |
+| serial_timesteps   | 266240        |
+| time_elapsed       | 8.66e+04      |
+| total_timesteps    | 266240        |
+| value_loss         | 0.0034707615  |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 1.7968415e-11  |
+| clipfrac           | 0.0            |
+| eplenmean          | 20.4           |
+| eprewmean          | 0.17           |
+| explained_variance | 0.742          |
+| fps                | 2              |
+| nupdates           | 270            |
+| policy_entropy     | 0.0014751693   |
+| policy_loss        | -1.5768455e-06 |
+| serial_timesteps   | 276480         |
+| time_elapsed       | 9.01e+04       |
+| total_timesteps    | 276480         |
+| value_loss         | 0.0014056969   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 9.492762e-13  |
+| clipfrac           | 0.0           |
+| eplenmean          | 23            |
+| eprewmean          | 0.14          |
+| explained_variance | 0.87          |
+| fps                | 3             |
+| nupdates           | 280           |
+| policy_entropy     | 0.0012637672  |
+| policy_loss        | 3.1290983e-07 |
+| serial_timesteps   | 286720        |
+| time_elapsed       | 9.33e+04      |
+| total_timesteps    | 286720        |
+| value_loss         | 0.00064782606 |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 5.023114e-13  |
+| clipfrac           | 0.0           |
+| eplenmean          | 22.9          |
+| eprewmean          | 0.15          |
+| explained_variance | 0.943         |
+| fps                | 3             |
+| nupdates           | 290           |
+| policy_entropy     | 0.0013974822  |
+| policy_loss        | 3.5703124e-07 |
+| serial_timesteps   | 296960        |
+| time_elapsed       | 9.69e+04      |
+| total_timesteps    | 296960        |
+| value_loss         | 0.0002478043  |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+---------------------------------------
+| approxkl           | 1.1010034e-06  |
+| clipfrac           | 0.0            |
+| eplenmean          | 22.6           |
+| eprewmean          | 0.17           |
+| explained_variance | 0.874          |
+| fps                | 3              |
+| nupdates           | 300            |
+| policy_entropy     | 0.0015592527   |
+| policy_loss        | -1.3234967e-07 |
+| serial_timesteps   | 307200         |
+| time_elapsed       | 1e+05          |
+| total_timesteps    | 307200         |
+| value_loss         | 0.0004924316   |
+---------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 1.5616699e-13 |
+| clipfrac           | 0.0           |
+| eplenmean          | 24.4          |
+| eprewmean          | 0.16          |
+| explained_variance | 0.932         |
+| fps                | 2             |
+| nupdates           | 310           |
+| policy_entropy     | 0.0014457211  |
+| policy_loss        | 8.154893e-08  |
+| serial_timesteps   | 317440        |
+| time_elapsed       | 1.03e+05      |
+| total_timesteps    | 317440        |
+| value_loss         | 0.00037608817 |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
+-------------------------------------
+| approxkl           | 6.019514e-13 |
+| clipfrac           | 0.0          |
+| eplenmean          | 21.4         |
+| eprewmean          | 0.15         |
+| explained_variance | 0.475        |
+| fps                | 3            |
+| nupdates           | 320          |
+| policy_entropy     | 0.0016901294 |
+| policy_loss        | 1.321896e-07 |
+| serial_timesteps   | 327680       |
+| time_elapsed       | 1.07e+05     |
+| total_timesteps    | 327680       |
+| value_loss         | 0.0049432176 |
+-------------------------------------
+save_state method is deprecated, please use save_variables instead
+--------------------------------------
+| approxkl           | 2.8729647e-13 |
+| clipfrac           | 0.0           |
+| eplenmean          | 23            |
+| eprewmean          | 0.18          |
+| explained_variance | 0.558         |
+| fps                | 3             |
+| nupdates           | 330           |
+| policy_entropy     | 0.0016995195  |
+| policy_loss        | -4.301546e-08 |
+| serial_timesteps   | 337920        |
+| time_elapsed       | 1.1e+05       |
+| total_timesteps    | 337920        |
+| value_loss         | 0.0043030106  |
+--------------------------------------
+save_state method is deprecated, please use save_variables instead
